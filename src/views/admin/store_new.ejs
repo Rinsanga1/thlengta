@@ -1,0 +1,138 @@
+<header class="nav">
+    <div class="container nav-inner">
+      <div class="brand">
+        <span>
+           <img src="/assets/img/thlengtalogo.png" alt="Thlengta logo" width="80px"/>
+        </span>
+        <span class="small">
+          <img src="/assets/img/thlengtalogotext.png" atl="Thlengta logo type" width="195px"/>
+        </span>
+        <span class="small">
+          <img src="/assets/img/com.png" atl="Thlengta logo type" width="75px" style="margin-left: -10px"/>
+        </span>
+      </div>
+      <nav class="nav-links">
+           <a class="btn" href="/admin/dashboard">Back</a>
+      </nav>
+    </div>
+  </header>
+<!---Below is the fucntional stuff -->
+<section class="section" style="padding-top:46px;">
+  <div class="card pad super" style="max-width:980px;margin:0 auto;">
+    <div class="topbar" style="margin-bottom:14px;">
+      <div>
+        <div class="h-eyebrow">
+          <span class="chip">Store</span>
+          <span class="chip">Setup</span>
+        </div>
+        <h2 style="margin:10px 0 0;">Create Store</h2>
+        <div class="small" style="margin-top:6px;">
+          Add store details, then set the GPS boundary employees must be inside to check in.
+        </div>
+      </div>
+    </div>
+
+    <% if (error) { %>
+      <div class="error"><%= error %></div>
+    <% } %>
+
+    <!-- IMPORTANT: multipart for logo upload -->
+    <form class="form" method="post" action="/admin/store/new" enctype="multipart/form-data">
+      <div class="grid-3" style="grid-template-columns: 1.2fr 0.8fr; gap:14px;">
+        <!-- Left column: store basics -->
+        <div class="card pad" style="background:#fff;">
+          <h3 style="margin:0 0 10px;">Store details</h3>
+
+          <div class="field">
+            <label>Store / Company Name</label>
+            <input type="text" name="name" required placeholder="Your store name" />
+          </div>
+
+          <div class="field">
+            <label>Store Logo (optional)</label>
+            <input type="file" name="logo" accept="image/png,image/jpeg,image/webp" />
+            <div class="small">PNG/JPG/WebP supported.</div>
+          </div>
+
+          <div class="field">
+            <label>Opening Time (optional)</label>
+            <input type="time" name="open_time" />
+            <div class="small">Used to calculate on-time vs late in logs.</div>
+          </div>
+
+          <div class="notice" style="background:#fff7df;">
+            <label style="display:flex; gap:10px; align-items:flex-start; margin:0;">
+              <input type="checkbox" name="grace_enabled" value="1" />
+              <span>
+                <b>Enable 10-minute grace period</b>
+                <div class="small" style="margin-top:4px;">
+                  Employees will not be marked late within 10 minutes after opening time.
+                </div>
+              </span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Right column: guidance -->
+        <div class="card pad" style="background:#f8faf9;">
+          <h3 style="margin:0 0 10px;">Quick tips</h3>
+
+          <div class="notice" style="margin-bottom:12px;">
+            <div style="font-weight:900;">Find latitude and longitude</div>
+            <div class="small" style="margin-top:6px;">
+              Open Google Maps → right click your store location → copy the two numbers.
+            </div>
+          </div>
+
+          <div class="notice" style="background:#eaf6f0;">
+            <div style="font-weight:900;">Recommended radius</div>
+            <div class="small" style="margin-top:6px;">
+              Start with <b>50 to 80 meters</b>. If check-in fails often, increase slightly.
+            </div>
+          </div>
+
+          <div class="small" style="margin-top:12px;">
+            GPS is not perfect indoors. A slightly bigger radius is normal.
+          </div>
+        </div>
+      </div>
+
+      <div style="height:14px;"></div>
+
+      <!-- Geofence inputs -->
+      <div class="card pad" style="background:#fff;">
+        <h3 style="margin:0 0 10px;">Geofence (required)</h3>
+        <div class="small" style="margin:0 0 12px;">
+          Employees must be inside this boundary to check in.
+        </div>
+
+        <div class="grid-3" style="grid-template-columns: 1fr 1fr 1fr; gap:14px;">
+          <div class="field">
+            <label>Geofence Latitude</label>
+            <input type="number" step="any" name="lat" placeholder="23.7271" required />
+          </div>
+
+          <div class="field">
+            <label>Geofence Longitude</label>
+            <input type="number" step="any" name="lng" placeholder="92.7176" required />
+          </div>
+
+          <div class="field">
+            <label>Geofence Radius (meters)</label>
+            <input type="number" name="radius_m" placeholder="60" min="10" required />
+            <div class="small">Example: 60</div>
+          </div>
+        </div>
+
+        <div class="actions" style="margin-top:14px;">
+          <button class="btn primary" type="submit" style="width:auto;">Create Store</button>
+          <a class="btn" href="/admin/dashboard">Cancel</a>
+        </div>
+
+        <div class="small" style="margin-top:10px;">
+          Tip: You can get lat/lng from Google Maps by right-clicking a location.
+        </div>
+      </div>
+    </form>
+  </div>
+</section>

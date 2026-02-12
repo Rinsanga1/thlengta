@@ -1,0 +1,145 @@
+<header class="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="dashboard">
+        <span>
+           <img src="/assets/img/thlengtalogo.png" alt="Thlengta logo" width="80px"/>
+        </span>
+        <span class="small">
+          <img src="/assets/img/thlengtalogotext.png" atl="Thlengta logo type" width="195px"/>
+        </span>
+        <span class="small">
+          <img src="/assets/img/com.png" atl="Thlengta logo type" width="75px" style="margin-left: -10px"/>
+        </span>
+      </a>
+
+      <nav class="nav-links">
+        <a class="btn" href="/superadmin/dashboard">Back</a>
+      </nav>
+    </div>
+  </header>
+<!---Below is the fucntional stuff -->
+<section class="section" style="padding-top:46px;">
+  <div class="card pad super" style="max-width:980px;margin:0 auto;">
+    <div class="topbar" style="margin-bottom:14px;">
+      <div>
+        <div class="h-eyebrow">
+          <span class="chip">Superadmin</span>
+          <span class="chip">Admin</span>
+          <span class="chip">Edit</span>
+        </div>
+        <h2 style="margin:10px 0 0;">Edit Admin</h2>
+        <div class="small" style="margin-top:6px;">
+          Update profile details, status, expiry, and password.
+        </div>
+      </div>
+    </div>
+
+    <% if (msg) { %>
+      <div class="notice" style="margin:12px 0; background:#eaf6f0;">
+        <div style="font-weight:900;">Saved</div>
+        <div class="small" style="margin-top:6px;"><%= msg %></div>
+      </div>
+    <% } %>
+
+    <div class="card pad" style="background:#f8faf9; margin-bottom:14px;">
+      <div class="small">
+        Admin ID: <b><%= admin.id %></b>
+        <span class="muted"> | </span>
+        Created: <b><%= admin.created_at %></b>
+      </div>
+    </div>
+
+    <form class="form" method="post" action="/superadmin/admins/<%= admin.id %>/edit">
+      <div class="grid-3" style="grid-template-columns: 1fr 1fr; gap:14px;">
+        <div class="card pad" style="background:#fff;">
+          <h3 style="margin:0 0 10px;">Profile</h3>
+
+          <div class="field">
+            <label>Name</label>
+            <input type="text" name="name" value="<%= admin.name || '' %>" placeholder="Full name" />
+          </div>
+
+          <div class="field">
+            <label>Phone</label>
+            <input type="text" name="phone" value="<%= admin.phone || '' %>" placeholder="Phone number" />
+          </div>
+
+          <div class="field">
+            <label>Address</label>
+            <input type="text" name="address" value="<%= admin.address || '' %>" placeholder="Address" />
+          </div>
+
+          <div class="field">
+            <label>Email</label>
+            <input type="email" name="email" value="<%= admin.email %>" required />
+          </div>
+        </div>
+
+        <div class="card pad" style="background:#fff;">
+          <h3 style="margin:0 0 10px;">Access control</h3>
+
+          <div class="field">
+            <label>Status</label>
+            <select name="status" required>
+              <option value="pending" <%= admin.status === 'pending' ? 'selected' : '' %>>pending</option>
+              <option value="active" <%= admin.status === 'active' ? 'selected' : '' %>>active</option>
+              <option value="rejected" <%= admin.status === 'rejected' ? 'selected' : '' %>>rejected</option>
+              <option value="disabled" <%= admin.status === 'disabled' ? 'selected' : '' %>>disabled</option>
+            </select>
+            <div class="small" style="margin-top:6px;">
+              Set to <b>active</b> to allow login.
+            </div>
+          </div>
+
+          <div class="field">
+         <label>Plan</label>
+        <select name="plan" required>
+        <option value="standard" <%= (String(admin.plan || 'standard') === 'standard') ? 'selected' : '' %>>
+         Standard (1 store)
+         </option>
+        <option value="pro" <%= (String(admin.plan || 'standard') === 'pro') ? 'selected' : '' %>>
+         Pro (up to 5 stores)
+         </option>
+       <option value="enterprise" <%= (String(admin.plan || 'standard') === 'enterprise') ? 'selected' : '' %>>
+      Enterprise (unlimited)
+    </option>
+  </select>
+  <div class="small" style="margin-top:6px;">
+    Controls how many stores this admin can create.
+  </div>
+</div>
+
+          <div class="field">
+            <label>Expiry (manual)</label>
+            <input type="datetime-local" name="expires_at" value="<%= expiresLocal %>" />
+            <div class="small" style="margin-top:6px;">
+              Leave empty to set no expiry date (not recommended if you plan to enforce expiry).
+            </div>
+          </div>
+
+          <div class="notice" style="background:#fff7df; margin-top:10px;">
+            <div style="font-weight:900;">Password</div>
+            <div class="small" style="margin-top:6px;">
+              Set a new password only if needed. Otherwise leave it blank.
+            </div>
+          </div>
+
+          <div class="field" style="margin-top:10px;">
+            <label>Set New Password (optional)</label>
+            <input
+              type="password"
+              name="new_password"
+              minlength="8"
+              placeholder="Leave blank to keep current password"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="actions" style="margin-top:14px;">
+        <button class="btn primary" type="submit" style="width:auto;">Save Changes</button>
+        <a class="btn" href="/superadmin/dashboard">Cancel</a>
+      </div>
+    </form>
+  </div>
+</section>

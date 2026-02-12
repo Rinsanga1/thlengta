@@ -1,0 +1,13 @@
+# Databases
+*.sqlite
+*.sqlite3
+*.sqlite.bak
+data/
+#end
+node_modules/
+.env
+.pm2/
+*.log
+.DS_Store
+public/uploads/
+

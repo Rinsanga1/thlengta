@@ -1,0 +1,191 @@
+<header class="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="dashboard">
+        <span>
+           <img src="/assets/img/thlengtalogo.png" alt="Thlengta logo" width="80px"/>
+        </span>
+        <span class="small">
+          <img src="/assets/img/thlengtalogotext.png" atl="Thlengta logo type" width="195px"/>
+        </span>
+        <span class="small">
+          <img src="/assets/img/com.png" atl="Thlengta logo type" width="75px" style="margin-left: -10px"/>
+        </span>
+      </a>
+
+      <nav class="nav-links">
+        <form method="post" action="/superadmin/logout" style="margin:0;">
+        <button class="btn" type="submit" style="width:auto;">Logout</button>
+      </form>
+      </nav>
+    </div>
+  </header>
+<!-- below is what was working lol-->
+<section class="section" style="padding-top:46px;">
+  <div class="card pad super" style="max-width:1200px;margin:0 auto;">
+    <div class="topbar" style="margin-bottom:14px;">
+      <div>
+        <div class="h-eyebrow">
+          <span class="chip">Superadmin</span>
+          <span class="chip">Dashboard</span>
+          <a class="btn primary" href="/superadmin/upgrade-requests">Upgrade Requests</a>
+        </div>
+        <h2 style="margin:10px 0 0;">Admin Dashboard</h2>
+        <div class="small" style="margin-top:6px;">
+          Approve, renew, disable, or manage admins.
+        </div>
+      </div>
+    </div>
+
+    <% if (msg) { %>
+      <div class="notice" style="margin:12px 0; background:#eaf6f0;">
+        <div style="font-weight:900;">Done</div>
+        <div class="small" style="margin-top:6px;"><%= msg %></div>
+      </div>
+    <% } %>
+
+    <% if (!admins.length) { %>
+      <div class="card pad" style="background:#f8faf9;">
+        <div style="font-weight:900;">No admins yet</div>
+        <div class="small" style="margin-top:6px;">
+          New registrations will appear here for approval.
+        </div>
+      </div>
+    <% } else { %>
+
+      <div class="notice" style="margin:12px 0; background:#f8faf9;">
+        <div style="font-weight:900;">Tip</div>
+        <div class="small" style="margin-top:6px;">
+          Scroll horizontally if your screen is small. The table includes store and employee counts.
+        </div>
+      </div>
+
+      <div style="overflow:auto; border-radius:14px; border:1px solid rgba(0,0,0,0.10); background:#fff;">
+        <table style="width:100%; border-collapse:collapse; min-width:1080px;">
+          <thead>
+            <tr>
+              <th style="text-align:left; padding:12px; border-bottom:2px solid rgba(0,0,0,0.12);">Admin</th>
+              <th style="text-align:left; padding:12px; border-bottom:2px solid rgba(0,0,0,0.12);">Status</th>
+              <th style="text-align:left; padding:12px; border-bottom:2px solid rgba(0,0,0,0.12);">Expiry</th>
+              <th style="text-align:left; padding:12px; border-bottom:2px solid rgba(0,0,0,0.12);">Requested Plan</th>
+              <th style="text-align:left; padding:12px; border-bottom:2px solid rgba(0,0,0,0.12);">Stores</th>
+              <th style="text-align:left; padding:12px; border-bottom:2px solid rgba(0,0,0,0.12);">Employees</th>
+              <th style="text-align:left; padding:12px; border-bottom:2px solid rgba(0,0,0,0.12);">Store Names</th>
+              <th style="text-align:left; padding:12px; border-bottom:2px solid rgba(0,0,0,0.12);">Actions</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <% admins.forEach(a => { %>
+              <tr>
+                <td style="padding:12px; border-bottom:1px solid rgba(0,0,0,0.08);">
+                  <div style="font-weight:900;"><%= a.name || "-" %></div>
+                  <div class="small"><%= a.email %></div>
+                  <div class="small"><%= a.phone %></div>
+                </td>
+
+                <td style="padding:12px; border-bottom:1px solid rgba(0,0,0,0.08);">
+                  <% if (a.status === 'active' && a.expired) { %>
+                    <span class="badge" style="background:#fff1f1;">
+                      <span class="dot" style="background:#d64545;"></span>
+                      expired
+                    </span>
+                  <% } else if (a.status === 'active') { %>
+                    <span class="badge" style="background:#eaf6f0;">
+                      <span class="dot"></span>
+                      active
+                    </span>
+                  <% } else if (a.status === 'pending') { %>
+                    <span class="badge" style="background:#fff7df;">
+                      <span class="dot" style="background:#c58b1b;"></span>
+                      pending
+                    </span>
+                  <% } else if (a.status === 'disabled') { %>
+                    <span class="badge" style="background:#f2f2f2;">
+                      <span class="dot" style="background:#7a7a7a;"></span>
+                      disabled
+                    </span>
+                  <% } else if (a.status === 'rejected') { %>
+                    <span class="badge" style="background:#fff1f1;">
+                      <span class="dot" style="background:#d64545;"></span>
+                      rejected
+                    </span>
+                  <% } else { %>
+                    <span class="badge"><span class="dot" style="background:var(--accent2);"></span><%= a.status %></span>
+                  <% } %>
+                </td>
+
+                <td style="padding:12px; border-bottom:1px solid rgba(0,0,0,0.08); white-space:nowrap;">
+                  <span class="small"><%= a.expires_at || "-" %></span>
+                </td>
+
+                <td style="padding:12px; border-bottom:1px solid rgba(0,0,0,0.08);">
+  <span class="badge" style="background:#f8faf9; text-transform:capitalize;">
+    <span class="dot" style="background:var(--accent2);"></span>
+    <%= (a.status === 'pending'
+      ? (a.requested_plan || 'standard')
+      : (a.plan || 'standard')) %>
+  </span>
+</td>
+
+                <td style="padding:12px; border-bottom:1px solid rgba(0,0,0,0.08);">
+                  <span class="badge" style="background:#f8faf9;">
+                    <span class="dot" style="background:var(--accent2);"></span>
+                    <%= a.store_count %>
+                  </span>
+                </td>
+
+                <td style="padding:12px; border-bottom:1px solid rgba(0,0,0,0.08);">
+                  <span class="badge" style="background:#f8faf9;">
+                    <span class="dot" style="background:var(--accent2);"></span>
+                    <%= a.employee_count %>
+                  </span>
+                </td>
+
+                <td style="padding:12px; border-bottom:1px solid rgba(0,0,0,0.08);">
+                  <span class="small"><%= a.store_names || "-" %></span>
+                </td>
+
+                <td style="padding:12px; border-bottom:1px solid rgba(0,0,0,0.08); white-space:nowrap;">
+                  <div class="actions" style="gap:8px; margin:0;">
+                    <a class="btn" href="/superadmin/admins/<%= a.id %>/edit">Edit</a>
+
+                    <% if (a.status === 'pending') { %>
+  <form method="post" action="/superadmin/admins/<%= a.id %>/approve" style="display:inline; margin:0;">
+    <button class="btn primary" type="submit" style="width:auto;">Approve</button>
+  </form>
+<% } %>
+
+                    <form method="post" action="/superadmin/admins/<%= a.id %>/renew" style="display:inline; margin:0;">
+                      <button class="btn" type="submit" style="width:auto;">Renew</button>
+                    </form>
+
+                    <form method="post" action="/superadmin/admins/<%= a.id %>/disable" style="display:inline; margin:0;">
+                      <button class="btn" type="submit" style="width:auto;">Disable</button>
+                    </form>
+
+                    <% if (a.status === 'pending') { %>
+  <form method="post" action="/superadmin/admins/<%= a.id %>/reject" style="display:inline; margin:0;">
+    <button class="btn" type="submit" style="width:auto;">Reject</button>
+  </form>
+<% } %>
+
+                    <form
+                      method="post"
+                      action="/superadmin/admins/<%= a.id %>/delete"
+                      style="display:inline; margin:0;"
+                      onsubmit="return confirm('Delete this admin and ALL their stores, employees, logs, and uploaded logos? This cannot be undone.');"
+                    >
+                      <button class="btn" type="submit" style="width:auto; background:#fff1f1;">
+                        Delete
+                      </button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } %>
+  </div>
+</section>

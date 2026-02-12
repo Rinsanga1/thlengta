@@ -1,0 +1,135 @@
+<header class="nav">
+  <div class="container nav-inner">
+    <div class="brand">
+      <span>
+        <img src="/assets/img/thlengtalogo.png" alt="Thlengta logo" width="80px"/>
+      </span>
+      <span class="small">
+        <img src="/assets/img/thlengtalogotext.png" atl="Thlengta logo type" width="195px"/>
+      </span>
+      <span class="small">
+        <img src="/assets/img/com.png" atl="Thlengta logo type" width="75px" style="margin-left: -10px"/>
+      </span>
+    </div>
+
+    <nav class="nav-links">
+      <a class="btn" href="/manager/dashboard">Back</a>
+    </nav>
+  </div>
+</header>
+
+<section class="section" style="padding-top:46px;">
+  <div class="card pad super" style="margin:0 auto;">
+    <div class="topbar" style="margin-bottom:14px;">
+      <div>
+        <div class="h-eyebrow">
+          <span class="chip">Logs</span>
+          <span class="chip">Attendance</span>
+        </div>
+        <h2 style="margin:10px 0 0;">Attendance Logs</h2>
+        <div class="small" style="margin-top:6px;">
+          Store: <b><%= store.name %></b>
+        </div>
+      </div>
+    </div>
+
+    <div class="card pad" style="background:#f8faf9; margin-bottom:14px;">
+      <div class="actions" style="align-items:end;">
+        <form method="get" action="/manager/store/<%= store.id %>/logs" style="display:flex; gap:10px; flex-wrap:wrap; align-items:end;">
+          <div class="field" style="margin:0;">
+            <label>Date</label>
+            <input type="date" name="date" value="<%= selectedDate %>" />
+          </div>
+          <button class="btn primary" type="submit" style="width:auto; margin:0;">View</button>
+        </form>
+
+        <div style="flex:1;"></div>
+
+        <div class="actions" style="margin:0; gap:10px;">
+          <a class="btn" href="/manager/store/<%= store.id %>/logs.csv?date=<%= selectedDate %>" style="width:auto;">Export Day CSV</a>
+          <a
+            class="btn"
+            href="/manager/store/<%= store.id %>/logs_month.csv?month=<%= selectedDate.slice(0,7) %>"
+            style="width:auto;"
+          >
+            Export Month CSV
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <% if (!logs || !logs.length) { %>
+      <div class="muted">No logs for this date.</div>
+    <% } else { %>
+      <div style="overflow:auto;">
+        <table style="width:100%; border-collapse:collapse;">
+          <thead>
+            <tr>
+              <th style="text-align:left; padding:12px; border-bottom:2px solid rgba(0,0,0,0.12);">Time</th>
+              <th style="text-align:left; padding:12px; border-bottom:2px solid rgba(0,0,0,0.12);">Employee</th>
+              <th style="text-align:left; padding:12px; border-bottom:2px solid rgba(0,0,0,0.12);">Event</th>
+              <th style="text-align:left; padding:12px; border-bottom:2px solid rgba(0,0,0,0.12);">GPS</th>
+              <th style="text-align:left; padding:12px; border-bottom:2px solid rgba(0,0,0,0.12);">Device</th>
+              <th style="text-align:left; padding:12px; border-bottom:2px solid rgba(0,0,0,0.12);">Late</th>
+              <th style="text-align:left; padding:12px; border-bottom:2px solid rgba(0,0,0,0.12);">IP</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% logs.forEach(l => { %>
+              <tr>
+                <td style="padding:12px; border-bottom:1px solid rgba(0,0,0,0.08);">
+                  <div style="font-weight:800;"><%= l.time12 || "-" %></div>
+                  <div class="small" style="opacity:0.75;"><%= l.created_at_ist || "" %></div>
+                </td>
+
+                <td style="padding:12px; border-bottom:1px solid rgba(0,0,0,0.08);">
+                  <%= l.employee_email || "-" %>
+                </td>
+
+                <td style="padding:12px; border-bottom:1px solid rgba(0,0,0,0.08);">
+                  <span class="badge"><%= l.event_type %></span>
+                </td>
+
+                <td style="padding:12px; border-bottom:1px solid rgba(0,0,0,0.08);">
+                  <% if (l.gps_ok) { %>
+                    <span class="badge" style="background:#eaf6f0;"><span class="dot"></span> OK</span>
+                  <% } else { %>
+                    <span class="badge" style="background:#fff1f1;"><span class="dot" style="background:#d64545;"></span> FAIL</span>
+                  <% } %>
+                </td>
+
+                <td style="padding:12px; border-bottom:1px solid rgba(0,0,0,0.08);">
+                  <% if (l.device_ok) { %>
+                    <span class="badge" style="background:#eaf6f0;"><span class="dot"></span> OK</span>
+                  <% } else { %>
+                    <span class="badge" style="background:#fff1f1;"><span class="dot" style="background:#d64545;"></span> FAIL</span>
+                  <% } %>
+                </td>
+
+                <td style="padding:12px; border-bottom:1px solid rgba(0,0,0,0.08);">
+                  <% if (l.punctuality === "LATE") { %>
+                    <span class="badge" style="background:#fff1f1;"><span class="dot" style="background:#d64545;"></span> LATE (<%= l.late_by_min %>m)</span>
+                  <% } else if (l.punctuality === "ON_TIME") { %>
+                    <span class="badge" style="background:#eaf6f0;"><span class="dot"></span> ON TIME</span>
+                  <% } else { %>
+                    <span class="small">-</span>
+                  <% } %>
+                </td>
+
+                <td style="padding:12px; border-bottom:1px solid rgba(0,0,0,0.08);">
+                  <span class="small"><%= l.ip || "-" %></span>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } %>
+
+    <div class="actions" style="margin-top:14px;">
+      <a class="btn" href="/manager/store/<%= store.id %>/qr">QR</a>
+      <a class="btn" href="/manager/store/<%= store.id %>/employees">Employees</a>
+    </div>
+
+  </div>
+</section>
