@@ -14,16 +14,10 @@ const SQLiteStoreFactory = require("connect-sqlite3");
 const SQLiteStore = SQLiteStoreFactory(session);
 
 
-
 const app = express();
 
 
 compileCSS();
-
-
-// serve static assets - bun can serve typescript directly
-app.use('/assets', express.static(path.join(__dirname, 'app/assets')));
-app.use('/client', express.static(path.join(__dirname, 'app/client')));
 
 
 // If behind Nginx/Cloudflare, this helps with secure cookies + req.ip
@@ -33,14 +27,19 @@ app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "app/views"));
 
 
-app.use(securityMiddleware);
 
-
+// serve static assets - bun can serve typescript directly
+app.use('/assets', express.static(path.join(__dirname, 'app/assets')));
+app.use('/client', express.static(path.join(__dirname, 'app/client')));
 // Body parsers
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-
 app.use(cookieParser());
+app.use(securityMiddleware);
+// Render page helper
+app.use(renderPageMiddleware);
+// Router
+app.use("/", router);
 
 
 // ----------------------
@@ -89,15 +88,6 @@ app.use(
 );
 
 
-
-
-// Render page helper
-app.use(renderPageMiddleware);
-
-
-// Router
-app.use("/", router);
-
 app.get("/health", (req, res) => res.json({ ok: true, app: "thlengta" }));
 
 const PORT = Number(process.env.PORT || 3000);
@@ -111,4 +101,4 @@ initDb()
   .catch((err) => {
     console.error("DB init failed:", err);
     process.exit(1);
-});
+  });
