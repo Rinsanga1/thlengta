@@ -8,10 +8,7 @@ const { renderPageMiddleware } = require("./app/middleware/renderPage");
 const { initDb } = require("./app/db/database");
 const { compileCSS } = require("./scripts/compile-css");
 const router = require("./config/routes");
-
-// @refactor this later: SQLite session store
-const SQLiteStoreFactory = require("connect-sqlite3");
-const SQLiteStore = SQLiteStoreFactory(session);
+const { BunSqliteSessionStore } = require("./config/sessionStore");
 
 
 const app = express();
@@ -36,29 +33,17 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
 app.use(securityMiddleware);
-// Render page helper
-app.use(renderPageMiddleware);
-// Router
-app.use("/", router);
 
 
-// ----------------------
 // Sessions (SQLite store)
-// ----------------------
 const SESSION_SECRET = process.env.SESSION_SECRET || "dev_secret_change_me";
 if (SESSION_SECRET === "dev_secret_change_me") {
   console.warn("[WARN] SESSION_SECRET is using default. Set it in .env for production.");
 }
 
-
 // Store file will be created automatically if missing
-const sessionStore = new SQLiteStore({
-  db: "sessions.sqlite",
-  dir: process.cwd(),
-  table: "sessions",
-  // ttl is seconds. This is the server-side cleanup window.
-  // Even if cookie expires sooner, old rows may remain until cleanup (fine).
-  ttl: 60 * 60 * 24 * 30 // 30 days
+const sessionStore = new BunSqliteSessionStore({
+  db: path.join(process.cwd(), "sessions.sqlite")
 });
 
 
@@ -87,6 +72,11 @@ app.use(
   })
 );
 
+
+// Render page helper
+app.use(renderPageMiddleware);
+// Router
+app.use("/", router);
 
 app.get("/health", (req, res) => res.json({ ok: true, app: "thlengta" }));
 

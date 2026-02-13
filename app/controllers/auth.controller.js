@@ -12,7 +12,7 @@ exports.redirect = (req, res) => {
 
 // Renders the registration form
 exports.new = (req, res) => {
-  const plan = normalizePlan(req.query.plan);
+  const plan = normalizePlan(req.query.plan || req.params.plan);
 
   res.renderPage("marketing/new", { // Renamed view
     title: "Register",

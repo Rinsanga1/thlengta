@@ -11,7 +11,6 @@
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^2.4.3",
-    "connect-sqlite3": "^0.9.16",
     "cookie-parser": "^1.4.6",
     "dotenv": "^16.4.5",
     "ejs": "^3.1.9",
@@ -22,8 +21,7 @@
     "nanoid": "^5.0.7",
     "nodemailer": "^7.0.12",
     "qrcode": "^1.5.4",
-    "sharp": "^0.34.5",
-    "sqlite3": "^5.1.7"
+    "sharp": "^0.34.5"
   },
   "devDependencies": {
     "nodemon": "^3.1.11"

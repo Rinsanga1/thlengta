@@ -35,6 +35,14 @@ const router = express.Router();
 router.get("/", home.index);
 router.post("/contact", contact.create);
 router.get("/login", auth.redirect);
+
+// Plan-specific registration routes (must be before generic /register)
+router.get("/register/:plan", (req, res, next) => {
+  req.query.plan = req.params.plan;
+  auth.new(req, res, next);
+});
+
+// Generic registration route
 router.get("/register", auth.new); // New: Display registration form
 router.post("/register", auth.create); // New: Handle registration submission
 router.get("/register/submitted", auth.submitted); // Renamed: Registration submitted page

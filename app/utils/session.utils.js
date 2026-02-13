@@ -1,5 +1,5 @@
 const path = require("path");
-const sqlite3 = require("sqlite3").verbose();
+const { Database } = require("bun:sqlite");
 
 const REMEMBER_ME_MS = 14 * 24 * 60 * 60 * 1000; // 14 days
 
@@ -10,24 +10,14 @@ function setRememberMeCookie(req, remember) {
 }
 
 function deleteSessionsByNeedle(needle) {
-  return new Promise((resolve, reject) => {
-    try {
-      const sessionsDbPath = path.join(process.cwd(), "sessions.sqlite");
-      const db = new sqlite3.Database(sessionsDbPath, (err) => {
-        if (err) return reject(err);
-      });
-
-      const like = `%${needle}%`;
-
-      db.run("DELETE FROM sessions WHERE sess LIKE ?", [like], function (err) {
-        db.close(() => {});
-        if (err) return reject(err);
-        return resolve(this.changes || 0);
-      });
-    } catch (e) {
-      return reject(e);
-    }
-  });
+  const sessionsDbPath = path.join(process.cwd(), "sessions.sqlite");
+  const db = new Database(sessionsDbPath);
+  
+  const like = `%${needle}%`;
+  const stmt = db.prepare("DELETE FROM sessions WHERE sess LIKE ?");
+  const result = stmt.run(like);
+  
+  return result.changes || 0;
 }
 
 module.exports = {
