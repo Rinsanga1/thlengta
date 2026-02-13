@@ -12,7 +12,7 @@
       </span>
     </div>
     <nav class="nav-links">
-      <a class="btn" href="/admin/workplace/new/step-1">Back</a>
+      <a class="btn" href="/admin/stores/new/step-1">Back</a>
     </nav>
   </div>
 </header>
@@ -60,14 +60,14 @@
             </div>
           </div>
 
-          <form class="form" method="post" action="/admin/workplace/new/step-2" style="margin-top:12px;">
+          <form class="form" method="post" action="/admin/stores/new/step-2" style="margin-top:12px;">
             <input type="hidden" name="lat" id="lat" />
             <input type="hidden" name="lng" id="lng" />
             <input type="hidden" name="accuracy_m" id="acc" />
 
             <div class="actions" style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;">
               <button class="btn primary" type="submit" id="btnContinue" disabled style="width:auto;">Continue</button>
-              <a class="btn" href="/admin/workplace/new/step-1" style="width:auto;">Back</a>
+              <a class="btn" href="/admin/stores/new/step-1" style="width:auto;">Back</a>
             </div>
 
             <div class="small" style="margin-top:10px; color:var(--muted);">
@@ -127,7 +127,7 @@
         <button class="btn" type="button" id="btnManual" style="width:auto;">Manually add location</button>
       </div>
 
-      <form class="form" id="manualForm" method="post" action="/admin/workplace/new/step-2" style="display:none;margin-top:12px;">
+      <form class="form" id="manualForm" method="post" action="/admin/stores/new/step-2" style="display:none;margin-top:12px;">
         <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:14px;">
           <div class="field">
             <label>Latitude</label>
@@ -163,4 +163,4 @@
   </div>
 </section>
 
-<script src="/js/workplace_step2.js" defer></script>
+<script src="/client/utils/workplace_step2.js" defer></script>

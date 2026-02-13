@@ -13,7 +13,7 @@
       </div>
       
       <nav class="nav-links">
-          <a class="btn" href="/admin/store/<%= store.id %>/employees">Back</a>
+          <a class="btn" href="/admin/stores/<%= store.id %>/employees">Back</a>
       </nav>
     </div>
   </header>
@@ -37,7 +37,7 @@
       <div class="error"><%= error %></div>
     <% } %>
 
-    <form class="form" method="post" action="/admin/store/<%= store.id %>/employees/new" style="margin-top:12px;">
+    <form class="form" method="post" action="/admin/stores/<%= store.id %>/employees/new" style="margin-top:12px;">
       <div class="field">
         <label>Employee Email</label>
         <input type="email" name="email" required placeholder="staff@example.com" />

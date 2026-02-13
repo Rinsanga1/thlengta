@@ -33,13 +33,13 @@
     </div>
 
     <div class="actions" style="margin:10px 0 14px;">
-      <a class="btn" href="/admin/store/<%= store.id %>/qr">QR</a>
-      <a class="btn" href="/admin/store/<%= store.id %>/employees">Employees</a>
-      <a class="btn" href="/admin/store/<%= store.id %>/settings">Settings</a>
+      <a class="btn" href="/admin/stores/<%= store.id %>/qr">QR</a>
+      <a class="btn" href="/admin/stores/<%= store.id %>/employees">Employees</a>
+      <a class="btn" href="/admin/stores/<%= store.id %>/settings">Settings</a>
     </div>
 
     <div class="card pad" style="background:#f8faf9;">
-      <form method="get" action="/admin/store/<%= store.id %>/logs">
+      <form method="get" action="/admin/stores/<%= store.id %>/logs">
         <div class="field">
           <label>Date</label>
           <input type="date" name="date" value="<%= selectedDate %>" required />
@@ -48,11 +48,11 @@
         <div class="actions" style="margin-top:10px;">
           <button class="btn primary" type="submit">View</button>
 
-          <a class="btn" href="/admin/store/<%= store.id %>/logs.csv?date=<%= selectedDate %>">
+          <a class="btn" href="/admin/stores/<%= store.id %>/logs.csv?date=<%= selectedDate %>">
             Download Day CSV
           </a>
 
-          <a class="btn" href="/admin/store/<%= store.id %>/logs_month.csv?month=<%= selectedDate.slice(0,7) %>">
+          <a class="btn" href="/admin/stores/<%= store.id %>/logs_month.csv?month=<%= selectedDate.slice(0,7) %>">
             Download Month CSV
           </a>
         </div>

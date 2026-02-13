@@ -1,5 +1,6 @@
 const { dbGet, dbAll } = require("../../db/helpers");
 
+
 // Displays the admin dashboard (index)
 exports.index = async (req, res) => {
   const adminId = req.session.adminId;
@@ -24,6 +25,7 @@ exports.index = async (req, res) => {
     pendingUpgrade
   });
 };
+
 
 // Handles the root /admin path, redirecting based on session status
 exports.gateway = (req, res) => {

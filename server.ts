@@ -128,7 +128,7 @@ app.use(
 
       // Your site is https (and you set trust proxy), so keep secure true.
       // If you ever test on plain http locally, set this to false locally.
-      secure: true
+      secure: false
 
       // IMPORTANT:
       // We do NOT set maxAge here, so by default it becomes a session cookie

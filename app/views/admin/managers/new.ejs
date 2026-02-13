@@ -13,7 +13,7 @@
     </div>
 
     <nav class="nav-links">
-      <a class="btn" href="/admin/store/<%= store.id %>/managers">Back</a>
+      <a class="btn" href="/admin/stores/<%= store.id %>/managers">Back</a>
     </nav>
   </div>
 </header>
@@ -38,7 +38,7 @@
       <div class="error"><%= error %></div>
 
       <div class="actions" style="margin-top:12px;">
-        <a class="btn" href="/admin/store/<%= store.id %>/managers">Back</a>
+        <a class="btn" href="/admin/stores/<%= store.id %>/managers">Back</a>
       </div>
     <% } else { %>
 
@@ -46,7 +46,7 @@
         <div class="error"><%= error %></div>
       <% } %>
 
-      <form class="form" method="post" action="/admin/store/<%= store.id %>/managers/new" style="margin-top:12px;">
+      <form class="form" method="post" action="/admin/stores/<%= store.id %>/managers/new" style="margin-top:12px;">
         <div class="field">
           <label>Manager Email</label>
           <input type="email" name="email" required placeholder="manager@company.com" />
@@ -62,7 +62,7 @@
 
         <div class="actions" style="margin-top:12px;">
           <button class="btn primary" type="submit" style="width:auto;">Save</button>
-          <a class="btn" href="/admin/store/<%= store.id %>/managers">Cancel</a>
+          <a class="btn" href="/admin/stores/<%= store.id %>/managers">Cancel</a>
         </div>
       </form>
 

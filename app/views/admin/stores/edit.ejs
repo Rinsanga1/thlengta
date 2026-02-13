@@ -52,9 +52,9 @@
         <div class="small">Public ID: <b><%= store.public_id %></b></div>
 
         <div class="actions" style="margin-top:12px;">
-          <a class="btn" href="/admin/store/<%= store.id %>/qr">View QR</a>
-          <a class="btn" href="/admin/store/<%= store.id %>/employees">Employees</a>
-          <a class="btn" href="/admin/store/<%= store.id %>/logs">Logs</a>
+          <a class="btn" href="/admin/stores/<%= store.id %>/qr">View QR</a>
+          <a class="btn" href="/admin/stores/<%= store.id %>/employees">Employees</a>
+          <a class="btn" href="/admin/stores/<%= store.id %>/logs">Logs</a>
         </div>
 
         <div class="small" style="margin-top:10px;">
@@ -69,7 +69,7 @@
         </div>
 
         <div class="actions" style="margin-top:12px;">
-          <a class="btn primary" href="/admin/store/<%= store.id %>/logs">Open Logs</a>
+          <a class="btn primary" href="/admin/stores/<%= store.id %>/logs">Open Logs</a>
         </div>
 
         <div class="small" style="margin-top:10px;">
@@ -108,7 +108,7 @@
         </div>
 
         <div>
-          <form class="form" method="post" action="/admin/store/<%= store.id %>/logo" enctype="multipart/form-data">
+          <form class="form" method="post" action="/admin/stores/<%= store.id %>/logo" enctype="multipart/form-data">
             <div class="field">
               <label>Upload / replace logo</label>
               <input type="file" name="logo" accept="image/png,image/jpeg,image/webp" required />
@@ -131,7 +131,7 @@
     Opening time is used to mark attendance as <b>On Time</b> or <b>Late</b>.
   </div>
 
-  <form class="form" method="post" action="/admin/store/<%= store.id %>/settings">
+  <form class="form" method="post" action="/admin/stores/<%= store.id %>/settings">
 
     <!-- Opening time (card) -->
     <div class="card pad" style="background:#f8faf9;">
@@ -202,7 +202,7 @@
       <div class="export-grid">
         <div class="card pad" style="background:#fff;">
           <h3 style="margin:0 0 10px;">Export a day</h3>
-          <form class="form" method="get" action="/admin/store/<%= store.id %>/logs.csv">
+          <form class="form" method="get" action="/admin/stores/<%= store.id %>/logs.csv">
             <div class="field">
               <label>Date</label>
               <input type="date" name="date" value="<%= new Date().toISOString().slice(0,10) %>" required />
@@ -215,7 +215,7 @@
 
         <div class="card pad" style="background:#fff;">
           <h3 style="margin:0 0 10px;">Export a month</h3>
-          <form class="form" method="get" action="/admin/store/<%= store.id %>/logs_month.csv">
+          <form class="form" method="get" action="/admin/stores/<%= store.id %>/logs_month.csv">
             <div class="field">
               <label>Month</label>
               <input type="month" name="month" value="<%= new Date().toISOString().slice(0,7) %>" required />
@@ -239,7 +239,7 @@
 
       <form
         method="post"
-        action="/admin/store/<%= store.id %>/qr/rotate"
+        action="/admin/stores/<%= store.id %>/qr/rotate"
         onsubmit="return confirm('Rotate QR? Old QR will stop working immediately.');"
       >
         <button class="btn" type="submit" style="width:auto;">Rotate QR</button>
@@ -257,7 +257,7 @@
 
       <form
         method="post"
-        action="/admin/store/<%= store.id %>/delete"
+        action="/admin/stores/<%= store.id %>/delete"
         onsubmit="return confirm('DELETE STORE? This cannot be undone.');"
       >
         <button class="btn" type="submit" style="width:auto; background:#fff;">

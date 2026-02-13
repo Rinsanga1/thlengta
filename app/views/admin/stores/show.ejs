@@ -41,7 +41,7 @@
           <div style="background:#fff; padding:14px; border-radius:16px; border:2px solid rgba(0,0,0,0.1); box-shadow: 4px 4px 0 rgba(0,0,0,0.12);">
             <img
               id="rawPreview"
-              src="/admin/store/<%= store.id %>/qr.png"
+              src="/admin/stores/<%= store.id %>/qr.png"
               alt="QR"
               width="260"
               height="260"
@@ -61,11 +61,11 @@
           </button>
 
           <!-- Optional: keep raw download as secondary -->
-          <a class="btn" id="rawBtn" href="/admin/store/<%= store.id %>/qr.png" download="store-<%= store.id %>-qr.png" style="width:auto;">
+          <a class="btn" id="rawBtn" href="/admin/stores/<%= store.id %>/qr.png" download="store-<%= store.id %>-qr.png" style="width:auto;">
             Download RAW
           </a>
 
-          <a class="btn" href="/admin/store/<%= store.id %>/employees">Employees</a>
+          <a class="btn" href="/admin/stores/<%= store.id %>/employees">Employees</a>
         </div>
 
         <!-- Hidden canvas used for generating the framed PNG -->
@@ -75,7 +75,7 @@
         <div
           id="qrPosterMount"
           data-frame-url="/assets/img/qr-frame.png"
-          data-raw-template="/admin/store/{ID}/qr.png"
+          data-raw-template="/admin/stores/{ID}/qr.png"
           data-store-id="<%= store.id %>"
           data-qr-scale="0.60"
           data-offset-x="0"
@@ -83,7 +83,7 @@
         ></div>
 
         <!-- External JS only (CSP-safe) -->
-        <script src="/js/qrPoster.js" defer></script>
+        <script src="/client/utils/qrPoster.js" defer></script>
       </div>
     <!-- </div> -->
     
@@ -120,8 +120,8 @@
         </div>
 
         <div class="actions" style="margin-top:12px;">
-          <a class="btn" href="/admin/store/<%= store.id %>/settings">Settings</a>
-          <a class="btn" href="/admin/store/<%= store.id %>/logs">View Logs</a>
+          <a class="btn" href="/admin/stores/<%= store.id %>/settings">Settings</a>
+          <a class="btn" href="/admin/stores/<%= store.id %>/logs">View Logs</a>
         </div>
       </div>
     </div>

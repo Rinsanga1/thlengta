@@ -282,6 +282,7 @@ exports.edit = async (req, res) => {
   });
 };
 
+
 // Updates store settings (update action)
 exports.update = async (req, res) => {
   try {
@@ -303,6 +304,7 @@ exports.update = async (req, res) => {
     return res.status(500).send("Server error");
   }
 };
+
 
 // Updates store logo (part of update action, handled separately by multer)
 exports.updateLogo = async (req, res) => {

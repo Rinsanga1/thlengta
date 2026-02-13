@@ -27,8 +27,7 @@ exports.create = async (req, res) => {
     const invalid = () =>
       res.renderPage("admin/sessions/new", { title: "Login", error: "Invalid credentials." });
 
-    favicon: "/assets/img/favicon.ico",
-    blocked = (msg) => res.renderPage("admin/sessions/new", { title: "Login", error: msg });
+    const blocked = (msg) => res.renderPage("admin/sessions/new", { title: "Login", error: msg });
 
     // 1) Try ADMIN login
     const admin = await dbGet(

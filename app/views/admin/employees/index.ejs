@@ -40,8 +40,8 @@
     <% } %>
 
     <div class="actions" style="margin:12px 0 8px;">
-      <a class="btn" href="/admin/store/<%= store.id %>/qr">View QR</a>
-      <a class="btn primary" href="/admin/store/<%= store.id %>/employees/new">Add Employee</a>
+      <a class="btn" href="/admin/stores/<%= store.id %>/qr">View QR</a>
+      <a class="btn primary" href="/admin/stores/<%= store.id %>/employees/new">Add Employee</a>
     </div>
 
     <div class="notice" style="margin:10px 0 16px;">
@@ -56,7 +56,7 @@
         <div style="font-weight:900;">No employees yet</div>
         <div class="small" style="margin-top:6px;">Add your first employee to enable check-in.</div>
         <div class="actions" style="margin-top:12px;">
-          <a class="btn primary" href="/admin/store/<%= store.id %>/employees/new">Add Employee</a>
+          <a class="btn primary" href="/admin/stores/<%= store.id %>/employees/new">Add Employee</a>
         </div>
       </div>
     <% } else { %>
@@ -96,7 +96,7 @@
 
                 <td style="padding:12px; border-bottom:1px solid rgba(0,0,0,0.08); white-space:nowrap;">
                   <div class="actions" style="gap:8px; margin:0;">
-                    <form method="post" action="/admin/store/<%= store.id %>/employees/<%= e.id %>/toggle" style="display:inline;">
+                    <form method="post" action="/admin/stores/<%= store.id %>/employees/<%= e.id %>/toggle" style="display:inline;">
                       <button type="submit" style="width:auto; margin:0;">
                         <%= e.is_active ? "Disable" : "Enable" %>
                       </button>
@@ -105,7 +105,7 @@
                     <% if (e.is_active && e.device_registered) { %>
                       <form
                         method="post"
-                        action="/admin/store/<%= store.id %>/employees/<%= e.id %>/device/reset"
+                        action="/admin/stores/<%= store.id %>/employees/<%= e.id %>/device/reset"
                         style="display:inline; margin:0;"
                         onsubmit="return confirm('Reset device for this employee? They will need email + PIN again on a new phone.');"
                       >
@@ -117,7 +117,7 @@
 
                     <form
                       method="post"
-                      action="/admin/store/<%= store.id %>/employees/<%= e.id %>/delete"
+                      action="/admin/stores/<%= store.id %>/employees/<%= e.id %>/delete"
                       style="display:inline; margin:0;"
                       onsubmit="return confirm('Delete this employee? This cannot be undone.');"
                     >
