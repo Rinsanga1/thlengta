@@ -27,11 +27,13 @@ const superadminAdmins = require("../app/controllers/superadmin/admins.controlle
 const superadminUpgradeRequests = require("../app/controllers/superadmin/upgradeRequests.controller"); // Import superadminUpgradeRequests
 const upload = require("../app/middleware/upload"); // Import upload middleware
 const home = require("../app/controllers/home.controller");
+const contact = require("../app/controllers/contact.controller");
 
 const router = express.Router();
 
 // Home
 router.get("/", home.index);
+router.post("/contact", contact.create);
 router.get("/login", auth.redirect);
 router.get("/register", auth.new); // New: Display registration form
 router.post("/register", auth.create); // New: Handle registration submission

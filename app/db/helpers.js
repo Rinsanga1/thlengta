@@ -1,5 +1,6 @@
 const { openDb } = require("./database");
 
+
 // Promise wrappers for sqlite3
 function dbGet(sql, params = []) {
   const db = openDb();
@@ -10,7 +11,7 @@ function dbGet(sql, params = []) {
       resolve(row);
     });
   });
-}
+};
 
 function dbAll(sql, params = []) {
   const db = openDb();
