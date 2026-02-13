@@ -1,0 +1,61 @@
+<header class="nav">
+  <div class="container nav-inner">
+    <a class="brand" href="/index.html">
+      <span>
+        <img src="/assets/img/thlengtalogo.png" alt="Thlengta logo" width="80px"/>
+      </span>
+      <span class="small">
+        <img src="/assets/img/thlengtalogotext.png" atl="Thlengta logo type" width="195px"/>
+      </span>
+      <span class="small">
+        <img src="/assets/img/com.png" atl="Thlengta logo type" width="75px" style="margin-left: -10px"/>
+      </span>
+    </a>
+
+    <nav class="nav-links">
+      <a class="btn" href="/index.html">Back</a>
+    </nav>
+  </div>
+</header>
+
+<section class="section" style="padding-top:56px;">
+  <div class="card pad super" style="max-width:920px;margin:0 auto;">
+    <div class="topbar" style="margin-bottom:14px;">
+      <div>
+        <div class="h-eyebrow">
+          <span class="chip">Thlengta</span>
+          <span class="chip">Signup</span>
+        </div>
+        <h2 style="margin:10px 0 0;">Registration Submitted</h2>
+        <div class="small" style="margin-top:6px;">
+          Your request has been sent for approval.
+        </div>
+
+        <div class="small" style="margin-top:10px;">
+          Selected plan: <b><%= (plan || "standard").toUpperCase() %></b>
+        </div>
+      </div>
+    </div>
+
+    <div class="notice" style="margin:12px 0; background:#eaf6f0;">
+      <div style="font-weight:900;">Submitted for Approval</div>
+      <div class="small" style="margin-top:6px;">
+        We will review and approve your account soon. Once approved, you can login and start creating stores and employees.
+      </div>
+    </div>
+
+    <div class="card pad" style="background:#fff;">
+      <h3 style="margin:0 0 10px;">What happens next?</h3>
+      <div class="small">
+        1) Our team reviews your request<br/>
+        2) After payment/approval, you can log in normally<br/>
+        3) If we need verification, we may contact you
+      </div>
+
+      <div style="margin-top:16px; display:flex; gap:10px; flex-wrap:wrap;">
+        <a class="btn primary" href="/admin/login">Go to Login</a>
+        <a class="btn" href="/index.html">Back to Home</a>
+      </div>
+    </div>
+  </div>
+</section>

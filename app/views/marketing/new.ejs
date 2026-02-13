@@ -1,0 +1,83 @@
+<div class="auth-container">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <img src="/assets/img/thlengtalogo.png" alt="Thlengta" width="48" height="48" style="background: white; border-radius: 8px; padding: 8px;">
+    </div>
+    
+    <h1 class="auth-title">Create Your Account</h1>
+    <p class="auth-subtitle">Simplify your attendance tracking with Thlengta</p>
+
+    <% if (error) { %>
+      <div class="auth-alert error">
+        <span>⚠</span>
+        <span><%= error %></span>
+      </div>
+    <% } %>
+
+    <div class="alert info" style="margin-bottom: 1.5rem;">
+      <span>ℹ</span>
+      <div class="alert-content">
+        <div class="alert-title">Approval Flow</div>
+        <div class="alert-message">After registration, your account will be pending approval. Once approved, you can login and start creating stores and employees.</div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 0.5rem;">
+        <span>Selected plan:</span>
+        <span class="status-badge approved"><%= (plan || "standard").toUpperCase() %></span>
+      </div>
+    </div>
+
+    <form class="auth-form" method="post" action="/register">
+      <input type="hidden" name="plan" value="<%= plan || 'standard' %>">
+
+      <div class="form-grid">
+        <div class="form-group">
+          <h3 class="form-section-title">Personal Information</h3>
+          
+          <div class="form-group">
+            <label class="form-label required">Full Name</label>
+            <input type="text" class="form-input" name="name" required placeholder="Your full name" autocomplete="name">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label required">Phone Number</label>
+            <input type="tel" class="form-input" name="phone" required placeholder="Phone number" autocomplete="tel">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label required">Business Address</label>
+            <input type="text" class="form-input" name="address" required placeholder="Business / store address" autocomplete="street-address">
+            <p class="form-help">Use your main business contact details. This helps faster approval.</p>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <h3 class="form-section-title">Account Information</h3>
+
+          <div class="form-group">
+            <label class="form-label required">Email Address</label>
+            <input type="email" class="form-input" name="email" required placeholder="you@example.com" autocomplete="email">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label required">Password</label>
+            <div class="password-input-group">
+              <input type="password" class="form-input" name="password" minlength="8" required placeholder="Minimum 8 characters" autocomplete="new-password">
+              <button type="button" class="password-toggle">👁</button>
+            </div>
+            <p class="form-help">Use a strong, unique password (minimum 8 characters).</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="auth-button">
+          <span>Submit for Approval</span>
+        </button>
+      </div>
+
+      <p class="form-help text-center">
+        By submitting, you agree to be contacted for verification if needed.
+      </p>
+    </form>
+  </div>
+</div>

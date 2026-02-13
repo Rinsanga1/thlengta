@@ -1,0 +1,73 @@
+<section class="section" style="padding-top:56px;">
+  <div class="card pad" style="max-width:620px;margin:0 auto;">
+    <div class="topbar" style="margin-bottom:14px;">
+      <div>
+        <div class="h-eyebrow">
+          <span class="chip">Employee</span>
+          <span class="chip">Action required</span>
+        </div>
+
+        <h2 style="margin:10px 0 0;">
+          <% if (mode === "on_break") { %>
+            You are on break
+          <% } else { %>
+            You are already checked in
+          <% } %>
+        </h2>
+
+        <div class="small" style="margin-top:6px;">
+          Store: <b><%= store && store.name ? store.name : "-" %></b>
+        </div>
+      </div>
+    </div>
+
+    <div class="notice" style="margin-top:12px; background:#f8faf9;">
+      <div style="font-weight:900;">Choose what to do</div>
+      <div class="small" style="margin-top:6px;">
+        <% if (mode === "on_break") { %>
+          Tap Resume Work to end your break, or Checkout to finish your day.
+        <% } else { %>
+          Tap Break if you are stepping out, or Checkout if you are going home.
+        <% } %>
+      </div>
+    </div>
+
+    <form method="post" action="/e/scan/<%= storePublicId %>/choice">
+      <input type="hidden" name="lat" value="<%= typeof lat !== 'undefined' ? lat : '' %>">
+      <input type="hidden" name="lng" value="<%= typeof lng !== 'undefined' ? lng : '' %>">
+
+      <% if (error) { %>
+        <div class="error" style="margin-top:12px;"><%= error %></div>
+      <% } %>
+
+      <!-- employee action buttons -->
+      <div class="actions employee-actions" style="margin-top:14px; display:flex; gap:10px; flex-wrap:wrap;">
+        <button
+          class="btn employee-btn employee-btn--primary"
+          type="submit"
+          name="choice"
+          value="<%= mode === 'on_break' ? 'resume' : 'break' %>"
+          style="white-space:nowrap;"
+        >
+          <span style="display:inline-block;">
+            <%= mode === "on_break" ? "Resume Work" : "Break" %>
+          </span>
+        </button>
+
+        <button
+          class="btn employee-btn employee-btn--secondary"
+          type="submit"
+          name="choice"
+          value="checkout"
+          style="white-space:nowrap;"
+        >
+          <span style="display:inline-block;">Checkout</span>
+        </button>
+      </div>
+    </form>
+
+    <div class="small" style="margin-top:12px;">
+      If you did not mean to do this, close this page and scan again.
+    </div>
+  </div>
+</section>

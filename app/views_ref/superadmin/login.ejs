@@ -1,0 +1,76 @@
+<header class="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="login">
+        <span>
+           <img src="/assets/img/thlengtalogo.png" alt="Thlengta logo" width="80px"/>
+        </span>
+        <span class="small">
+          <img src="/assets/img/thlengtalogotext.png" atl="Thlengta logo type" width="195px"/>
+        </span>
+        <span class="small">
+          <img src="/assets/img/com.png" atl="Thlengta logo type" width="75px" style="margin-left: -10px"/>
+        </span>
+      </a>
+
+      <nav class="nav-links">
+        <h3>Backend Office</h3>
+      </nav>
+    </div>
+  </header>
+<!--Functional stuff below-->
+<section class="section" style="padding-top:56px;">
+  <div class="card pad" style="max-width:520px;margin:0 auto;">
+    <div class="topbar" style="margin-bottom:14px;">
+      <div>
+        <div class="h-eyebrow">
+          <span class="chip">Superadmin</span>
+          <span class="chip">Back Office</span>
+        </div>
+        <h2 style="margin:10px 0 0;">THLENG TA Control Panel</h2>
+        <div class="small" style="margin-top:6px;">
+          Restricted access. Superadmin only.
+        </div>
+      </div>
+    </div>
+
+    <% if (error) { %>
+      <div class="error"><%= error %></div>
+    <% } %>
+
+    <form method="post" action="/superadmin/login" class="form" style="margin-top:12px;">
+      <div class="field">
+        <label>Email</label>
+        <input
+          type="email"
+          name="email"
+          required
+          placeholder="superadmin@thlengta.com"
+        />
+      </div>
+
+      <div class="field">
+        <label>Password</label>
+        <input
+          type="password"
+          name="password"
+          required
+          placeholder="••••••••"
+        />
+      </div>
+
+      <button class="btn primary full" type="submit">
+        Login to Back Office
+      </button>
+    </form>
+
+    <div class="notice" style="margin-top:14px;">
+      <div style="font-weight:900;">Not a superadmin?</div>
+      <div class="small" style="margin-top:6px;">
+        Use the regular admin login instead.
+      </div>
+      <div style="margin-top:8px;">
+        <a class="btn" href="/admin/login">Go to Admin Login</a>
+      </div>
+    </div>
+  </div>
+</section>

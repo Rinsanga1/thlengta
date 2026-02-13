@@ -1,0 +1,134 @@
+<div class="scan-container">
+  <div class="scan-card">
+    <div class="scan-header">
+      <h2 class="scan-store-name"><%= store.name %></h2>
+      <p class="scan-store-subtitle">Employee Check-in</p>
+    </div>
+
+    <% if (error) { %>
+      <div class="scan-error">
+        <span>⚠</span>
+        <span><%= error %></span>
+      </div>
+    <% } %>
+
+    <div class="location-status checking">
+      <span class="location-icon">📍</span>
+      <span>Enable Location Services to continue</span>
+    </div>
+          <h2 style="margin:10px 0 0;">Thlengta Scan</h2>
+          <div class="small" style="margin-top:6px;">
+            Store: <b><%= store.name %></b>
+          </div>
+        </div>
+      </div>
+
+      <% if (error) { %>
+        <div class="error"><%= error %></div>
+      <% } %>
+
+      <div class="notice" style="margin:12px 0; background:#f8faf9;">
+        <div style="font-weight:900;">Before you continue</div>
+        <div class="small" style="margin-top:6px;">
+          Turn on Location (GPS). We’ll verify you are inside the store boundary.
+        </div>
+      </div>
+
+      <form class="scan-form" id="scanForm" method="post" action="/e/scan/<%= store.public_id %>">
+        <input type="hidden" name="lat" id="lat" value="" />
+        <input type="hidden" name="lng" id="lng" value="" />
+
+        <!-- Device token for anti-buddy-punching -->
+        <input type="hidden" name="device_token" id="device_token" value="" />
+        <!-- Fingerprinting fields -->
+        <input type="hidden" name="fp_tz" id="fp_tz" value="" />
+        <input type="hidden" name="fp_sw" id="fp_sw" value="" />
+        <input type="hidden" name="fp_sh" id="fp_sh" value="" />
+        <input type="hidden" name="fp_dpr" id="fp_dpr" value="" />
+        <input type="hidden" name="fp_lang" id="fp_lang" value="" />
+        <input type="hidden" name="fp_platform" id="fp_platform" value="" />
+
+        <% if (mode === "first") { %>
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-input" name="email" required placeholder="your@email.com" autocomplete="username" />
+            <p class="form-help">First time on this phone only.</p>
+          </div>
+        <% } %>
+
+        <div class="form-group">
+          <label class="form-label">PIN</label>
+          <input
+            id="pinInput"
+            class="pin-input"
+            type="password"
+            name="pin"
+            inputmode="numeric"
+            autocomplete="one-time-code"
+            required
+            placeholder="Enter your PIN"
+          />
+          <p class="form-help">Ask your manager if you forgot your PIN.</p>
+        </div>
+
+        <div class="form-help" style="margin-top:1rem; text-align:center;">
+          By continuing, you agree that Thlengta may collect your location at scan time and basic device information
+          (cookies / device verification) for attendance verification and fraud prevention.
+        </div>
+
+        <button class="scan-button" id="submitBtn" type="button">
+          <%= mode === "first" ? "Verify and Check In" : "Check In" %>
+                <span>🔐 Scan to Check In</span>
+      </button>
+
+      <div class="location-status" id="gpsStatus">
+        <span class="location-icon">📍</span>
+        <span>Checking location...</span>
+      </div>
+
+      <div class="form-help" id="gpsDebug"></div>
+
+      <div class="form-help">
+        💡 Tip: If location permission is blocked, open browser settings and allow location for this site.
+      </div>
+    </form>
+  </div>
+</div>
+
+  <!-- iOS QR / in-app browser Gate UI -->
+  <div data-ios-qr-gate style="display:none;">
+    <div class="card pad" style="max-width:640px;margin:0 auto; text-align:center;">
+      <div class="topbar" style="margin-bottom:14px;">
+        <div>
+          <div class="h-eyebrow" style="justify-content:center;">
+            <span class="chip">iPhone</span>
+            <span class="chip">QR Scanner</span>
+          </div>
+          <h2 style="margin:10px 0 0;">Open in Safari</h2>
+          <div class="small" style="margin-top:6px;">
+            Store: <b><%= store.name %></b>
+          </div>
+        </div>
+      </div>
+
+      <div class="notice" style="margin:12px 0; background:#f8faf9; text-align:left;">
+        <div style="font-weight:900;">Why you’re seeing this</div>
+        <div class="small" style="margin-top:6px;">
+          iPhone QR scanner opens a temporary browser that cannot stay logged in. Attendance works only in Safari.
+        </div>
+      </div>
+
+      <button type="button" class="btn primary full" data-open-safari>
+        Open on Phone Browser
+      </button>
+
+      <div class="small" data-ios-hint style="margin-top:12px; text-align:left;">
+        Tap the button. If Safari does not open, use Share → <b>Open in Safari</b>.
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<script src="/js/scan.js" defer></script>
+<script src="/js/ios-qr-detect.js" defer></script>

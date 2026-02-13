@@ -1,0 +1,85 @@
+
+
+<div class="card" style="margin:0 auto;">
+
+    <!-- TOP BAR -->
+    <div class="topbar" style="margin-bottom:14px;">
+      <div>
+        <div class="h-eyebrow">
+          <span class="chip">Admin</span>
+          <span class="chip">Dashboard</span>
+        </div>
+
+        <h2 style="margin:10px 0 6px;">Admin Dashboard</h2>
+
+        <!-- Admin identity -->
+        <div class="small" style="margin-bottom:8px;">
+          <b><%= admin?.email %></b>
+          &nbsp;|&nbsp;
+          Plan:
+          <b><%= (admin?.plan || "standard").toUpperCase() %></b>
+        </div>
+
+        <!-- Upgrade button (only if not enterprise) -->
+        <% if ((admin?.plan || "standard").toLowerCase() !== "enterprise") { %>
+          <a class="btn" href="/admin/upgrade">Upgrade Plan</a>
+        <% } %>
+
+        <!-- Pending upgrade notice -->
+        <% if (pendingUpgrade) { %>
+          <div class="notice" style="background:#fff7df; margin-top:10px;">
+            Upgrade request pending:
+            <b>
+              <%= pendingUpgrade.from_plan.toUpperCase() %>
+              →
+              <%= pendingUpgrade.to_plan.toUpperCase() %>
+            </b>
+          </div>
+        <% } %>
+
+        <div class="small" style="margin-top:10px;">
+          Manage stores, employees, and attendance.
+        </div>
+      </div>
+    </div>
+
+    <!-- HOW IT WORKS -->
+    <div class="notice" style="margin-bottom:18px;">
+      <div style="font-weight:900;">How it works</div>
+      <div class="small">
+        Create a store → print QR → add employees → staff check in using GPS and PIN.
+      </div>
+    </div>
+
+    <!-- ACTIONS -->
+    <div class="actions" style="margin-bottom:18px;">
+      <a class="btn primary" href="/admin/store/new">Create New Store</a>
+    </div>
+
+    <!-- STORES -->
+    <h3 style="margin:10px 0 12px;">Your Stores</h3>
+
+    <% if (!stores || !stores.length) { %>
+      <div class="muted">No stores yet.</div>
+    <% } else { %>
+      <div class="list">
+        <% stores.forEach(s => { %>
+          <div class="item">
+            <div class="icon">ST</div>
+            <div style="flex:1;">
+              <div style="font-weight:900;"><%= s.name %></div>
+              <div class="small" style="margin-top:6px; display:flex; gap:12px; flex-wrap:wrap;">
+                <a href="/admin/store/<%= s.id %>/qr">QR</a>
+                <a href="/admin/store/<%= s.id %>/settings">Settings</a>
+                <a href="/admin/store/<%= s.id %>/employees">Employees</a>
+                <a href="/admin/store/<%= s.id %>/logs">Logs</a>
+                <a href="/admin/store/<%= s.id %>/managers">Managers</a>
+              </div>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+    <% } %>
+
+  </div>
+</section>

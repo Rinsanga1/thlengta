@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Thlengta - Pricing Plans</title>
+  
+  <script type="module" src="/node_modules/@hotwired/turbo/dist/turbo.es2017-esm.min.js"></script>
+  <script type="module" src="/js/application.js"></script>
+  
+  <!-- Compiled CSS -->
+  <link rel="stylesheet" href="/assets/stylesheet/dist/application.css">
+</head>
+
+<body>
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-content">
+      <div class="hero-logo">
+        <img src="/assets/img/thlengtalogo.png" alt="Thlengta" width="80" height="80">
+      </div>
+      <h1 class="hero-title">Simple, Transparent Pricing</h1>
+      <p class="hero-subtitle">Choose the perfect plan for your team size</p>
+      
+      <div class="hero-actions">
+        <a href="/" class="btn btn-outline btn-large">
+          <span>←</span>
+          <span>Back to Home</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing Section -->
+  <section class="pricing-section">
+    <div class="container">
+      <h2 class="section-title">Choose Your Plan</h2>
+      
+      <div class="pricing-grid">
+        <!-- Standard Plan -->
+        <div class="pricing-card">
+          <div class="pricing-header">
+            <h3 class="pricing-title">Standard</h3>
+            <div class="pricing-price">
+              <span class="price-amount">Free</span>
+              <span class="price-period">forever</span>
+            </div>
+          </div>
+          
+          <div class="pricing-features">
+            <div class="feature-item">
+              <span class="feature-icon">✓</span>
+              <span>Up to 5 stores</span>
+            </div>
+            <div class="feature-item">
+              <span class="feature-icon">✓</span>
+              <span>Up to 50 employees</span>
+            </div>
+            <div class="feature-item">
+              <span class="feature-icon">✓</span>
+              <span>Basic attendance reports</span>
+            </div>
+            <div class="feature-item">
+              <span class="feature-icon">✓</span>
+              <span>Email support</span>
+            </div>
+          </div>
+          
+          <div class="pricing-cta">
+            <a href="/register" class="btn btn-secondary btn-large">
+              <span>Get Started</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Pro Plan -->
+        <div class="pricing-card featured">
+          <div class="pricing-badge">Most Popular</div>
+          
+          <div class="pricing-header">
+            <h3 class="pricing-title">Professional</h3>
+            <div class="pricing-price">
+              <span class="price-amount">₹299</span>
+              <span class="price-period">/month</span>
+            </div>
+          </div>
+          
+          <div class="pricing-features">
+            <div class="feature-item">
+              <span class="feature-icon">✓</span>
+              <span>Up to 20 stores</span>
+            </div>
+            <div class="feature-item">
+              <span class="feature-icon">✓</span>
+              <span>Up to 200 employees</span>
+            </div>
+            <div class="feature-item">
+              <span class="feature-icon">✓</span>
+              <span>Advanced reports & analytics</span>
+            </div>
+            <div class="feature-item">
+              <span class="feature-icon">✓</span>
+              <span>Priority email support</span>
+            </div>
+            <div class="feature-item">
+              <span class="feature-icon">✓</span>
+              <span>Data export & API access</span>
+            </div>
+          </div>
+          
+          <div class="pricing-cta">
+            <a href="/register?plan=pro" class="btn btn-primary btn-large">
+              <span>Get Pro</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Enterprise Plan -->
+        <div class="pricing-card">
+          <div class="pricing-header">
+            <h3 class="pricing-title">Enterprise</h3>
+            <div class="pricing-price">
+              <span class="price-amount">₹666</span>
+              <span class="price-period">/month</span>
+              <span class="price-billed">Billed yearly</span>
+            </div>
+          </div>
+          
+          <div class="pricing-features">
+            <div class="feature-item">
+              <span class="feature-icon">✓</span>
+              <span>Unlimited stores</span>
+            </div>
+            <div class="feature-item">
+              <span class="feature-icon">✓</span>
+              <span>Unlimited employees</span>
+            </div>
+            <div class="feature-item">
+              <span class="feature-icon">✓</span>
+              <span>Custom reporting & dashboards</span>
+            </div>
+            <div class="feature-item">
+              <span class="feature-icon">✓</span>
+              <span>Dedicated support manager</span>
+            </div>
+            <div class="feature-item">
+              <span class="feature-icon">✓</span>
+              <span>SLA guarantee</span>
+            </div>
+          </div>
+          
+          <div class="pricing-cta">
+            <a href="/register?plan=enterprise" class="btn btn-outline btn-large">
+              <span>Contact Sales</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- FAQ Section -->
+      <div class="faq-section">
+        <h3 class="section-title">Frequently Asked Questions</h3>
+        
+        <div class="faq-list">
+          <div class="faq-item">
+            <h4 class="faq-question">How does QR code attendance work?</h4>
+            <p class="faq-answer">Employees simply scan a QR code at your workplace using their phone's camera. No app installation required - just a basic QR scanner.</p>
+          </div>
+          
+          <div class="faq-item">
+            <h4 class="faq-question">Is my data secure?</h4>
+            <p class="faq-answer">Yes. We use enterprise-grade encryption and never share your data with third parties. All data is stored on secure servers.</p>
+          </div>
+          
+          <div class="faq-item">
+            <h4 class="faq-question">Can I change plans anytime?</h4>
+            <p class="faq-answer">Absolutely. You can upgrade or downgrade your plan at any time. Changes are prorated fairly.</p>
+          </div>
+          
+          <div class="faq-item">
+            <h4 class="faq-question">What if I need help?</h4>
+            <p class="faq-answer">Our support team is here to help. Pro and Enterprise plans get priority support with guaranteed response times.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="cta-section">
+    <div class="container">
+      <div class="cta-content">
+        <h2 class="cta-title">Ready to Get Started?</h2>
+        <p class="cta-subtitle">Join thousands of businesses that trust Thlengta for reliable attendance tracking.</p>
+        
+        <div class="cta-actions">
+          <a href="/register" class="btn btn-primary btn-large">
+            <span>Start Free Trial</span>
+          </a>
+          <a href="/contact" class="btn btn-outline btn-large">
+            <span>💬</span>
+            <span>Contact Sales</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+</body>
+
+</html>

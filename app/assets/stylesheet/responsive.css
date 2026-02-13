@@ -1,0 +1,492 @@
+/* Thlengta - Responsive Design */
+
+/* Breakpoint Variables */
+:root {
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1536px;
+}
+
+/* Mobile First Approach */
+
+/* Small Devices (up to 640px) */
+@media (max-width: 640px) {
+  /* Layout Adjustments */
+  .container {
+    padding: 0 0.75rem;
+  }
+  
+  /* Typography */
+  h1 { font-size: 1.75rem; }
+  h2 { font-size: 1.5rem; }
+  h3 { font-size: 1.25rem; }
+  
+  /* Navigation */
+  .nav-container {
+    padding: 0 0.75rem;
+  }
+  
+  .nav-brand {
+    font-size: 1.125rem;
+  }
+  
+  .nav-menu {
+    display: none;
+  }
+  
+  .nav-mobile-toggle {
+    display: block;
+  }
+  
+  /* Cards */
+  .card {
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  /* Forms */
+  .form-container {
+    padding: 1rem;
+  }
+  
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+  
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+  
+  .form-actions {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .form-actions .btn {
+    width: 100%;
+  }
+  
+  /* Dashboard */
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .stats-card {
+    padding: 1rem;
+  }
+  
+  .stats-value {
+    font-size: 1.5rem;
+  }
+  
+  /* Tables */
+  .data-table {
+    font-size: 0.75rem;
+  }
+  
+  .data-table th,
+  .data-table td {
+    padding: 0.5rem 0.75rem;
+  }
+  
+  .table-actions {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  
+  .table-action-button {
+    width: 100%;
+    text-align: center;
+  }
+  
+  /* Quick Actions */
+  .quick-actions-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .quick-action-button {
+    padding: 1rem 0.75rem;
+  }
+  
+  /* Activity List */
+  .activity-item {
+    padding: 0.75rem;
+  }
+  
+  .activity-avatar {
+    width: 2rem;
+    height: 2rem;
+    font-size: 0.75rem;
+  }
+  
+  /* QR Code */
+  .qr-container {
+    padding: 1rem;
+  }
+  
+  .qr-code img {
+    width: 150px;
+    height: 150px;
+  }
+  
+  .qr-actions {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .qr-download-options {
+    grid-template-columns: 1fr;
+  }
+  
+  /* Scan Interface */
+  .scan-container {
+    padding: 0.5rem;
+  }
+  
+  .scan-card {
+    padding: 1rem;
+  }
+  
+  .choice-actions {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+  
+  /* Device Approval */
+  .approval-actions {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  /* Modal */
+  .modal {
+    margin: 0.5rem;
+    max-width: none;
+    max-height: calc(100vh - 1rem);
+  }
+  
+  .modal-header,
+  .modal-body,
+  .modal-footer {
+    padding: 1rem;
+  }
+  
+  /* Toast */
+  .toast-container {
+    left: 0.75rem;
+    right: 0.75rem;
+    max-width: none;
+  }
+  
+  .toast {
+    padding: 0.75rem;
+  }
+  
+  /* Auth */
+  .auth-card {
+    padding: 1.5rem;
+    margin: 0.5rem;
+  }
+  
+  .auth-title {
+    font-size: 1.25rem;
+  }
+  
+  /* Charts */
+  .chart-container {
+    height: 250px;
+  }
+  
+  /* Filters */
+  .filters-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  /* File Upload */
+  .file-upload-area {
+    padding: 1.5rem;
+  }
+  
+  .file-preview-image {
+    width: 60px;
+    height: 60px;
+  }
+}
+
+/* Medium Devices (641px to 768px) */
+@media (min-width: 641px) and (max-width: 768px) {
+  /* Navigation */
+  .nav-container {
+    padding: 0 1rem;
+  }
+  
+  /* Dashboard */
+  .dashboard-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+  
+  /* Quick Actions */
+  .quick-actions-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  /* QR Code */
+  .qr-code img {
+    width: 200px;
+    height: 200px;
+  }
+  
+  /* Tables */
+  .table-actions {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  
+  /* Forms */
+  .form-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  /* Filters */
+  .filters-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Large Devices (769px to 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+  /* Dashboard */
+  .dashboard-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  /* Quick Actions */
+  .quick-actions-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  /* QR Code */
+  .qr-preview-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Extra Large Devices (1025px to 1280px) */
+@media (min-width: 1025px) and (max-width: 1280px) {
+  /* Dashboard */
+  .dashboard-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  /* Quick Actions */
+  .quick-actions-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* 2XL Devices (1281px and above) */
+@media (min-width: 1281px) {
+  /* Dashboard */
+  .dashboard-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  
+  /* Container */
+  .container {
+    max-width: 1400px;
+  }
+}
+
+/* High DPI Displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  /* Improve rendering on high DPI displays */
+  .qr-code img {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+  
+  .file-preview-image {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0f172a;
+    --surface: #1e293b;
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --border-color: #334155;
+    --primary-color: #3b82f6;
+    --primary-hover: #2563eb;
+    --success-color: #10b981;
+    --warning-color: #f59e0b;
+    --error-color: #ef4444;
+  }
+  
+  /* Adjust shadows for dark mode */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.3);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.3);
+  
+  /* Adjust overlays */
+  .modal-overlay {
+    background-color: rgba(0, 0, 0, 0.7);
+  }
+  
+  .loading-overlay {
+    background-color: rgba(15, 23, 42, 0.8);
+  }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  
+  .spinner {
+    animation: none;
+    border: 2px solid var(--primary-color);
+    border-right-color: transparent;
+  }
+}
+
+/* Print Styles */
+@media print {
+  /* Hide non-printable elements */
+  .nav-header,
+  .nav-sidebar,
+  .nav-mobile-toggle,
+  .nav-mobile-menu,
+  .nav-mobile-overlay,
+  .btn,
+  .form-actions,
+  .modal-overlay,
+  .toast-container,
+  .loading-overlay,
+  .table-actions,
+  .qr-actions,
+  .scan-button,
+  .auth-links,
+  .footer {
+    display: none !important;
+  }
+  
+  /* Ensure readable text */
+  body {
+    font-size: 12pt;
+    line-height: 1.4;
+    color: #000;
+    background: #fff;
+  }
+  
+  /* Remove backgrounds and shadows */
+  .card,
+  .form-container,
+  .stats-card,
+  .activity-card,
+  .data-table-card,
+  .qr-container {
+    box-shadow: none;
+    border: 1px solid #ccc;
+    background: #fff;
+  }
+  
+  /* Ensure tables don't break */
+  .data-table {
+    page-break-inside: avoid;
+  }
+  
+  .data-table tr {
+    page-break-inside: avoid;
+  }
+  
+  /* Optimize QR codes for printing */
+  .qr-code {
+    border: 2px solid #000;
+    background: #fff;
+  }
+  
+  .qr-code img {
+    max-width: 300px !important;
+    height: auto !important;
+  }
+}
+
+/* Landscape Orientation */
+@media (orientation: landscape) and (max-height: 500px) {
+  /* Adjust for small landscape screens */
+  .scan-container {
+    padding: 0.5rem;
+  }
+  
+  .scan-card {
+    padding: 1rem;
+    margin: 0.5rem;
+  }
+  
+  .auth-card {
+    padding: 1rem;
+    margin: 0.5rem;
+  }
+  
+  .modal {
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  
+  .nav-mobile-menu {
+    height: 100vh;
+  }
+}
+
+/* Touch Devices */
+@media (hover: none) and (pointer: coarse) {
+  /* Increase touch targets */
+  .btn,
+  .nav-link,
+  .table-action-button,
+  .qr-button {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  .checkbox-input,
+  .radio-input {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  
+  /* Remove hover effects */
+  .btn:hover,
+  .nav-link:hover,
+  .table-action-button:hover,
+  .qr-button:hover {
+    text-decoration: none;
+    background-color: var(--surface);
+    color: inherit;
+  }
+  
+  /* Add active states */
+  .btn:active,
+  .nav-link:active,
+  .table-action-button:active,
+  .qr-button:active {
+    background-color: var(--background);
+    transform: scale(0.98);
+  }
+}

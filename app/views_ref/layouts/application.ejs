@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title><%= title || "Thlengta" %></title>
+  <!-- Unified CSS - all styles compiled together -->
+  <link rel="stylesheet" href="/assets/stylesheet/dist/application.css">
+
+  <% if (favicon) { %>
+    <link rel="icon" type="image/x-icon" href="<%= favicon %>">
+  <% } %>
+</head>
+
+<body class="bg-grid">
+  <% if (typeof useWrap !== 'undefined' && useWrap) { %>
+    <div class="wrap">
+      <%- body %>
+    </div>
+  <% } else { %>
+    <%- body %>
+  <% } %>
+</body>
+</html>

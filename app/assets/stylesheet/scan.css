@@ -1,0 +1,452 @@
+/* Thlengta - Employee Scan Interface */
+
+/* Scan Container */
+.scan-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, var(--primary-color) 0%, #7c3aed 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+/* Scan Card */
+.scan-card {
+  background-color: var(--surface);
+  border-radius: 1rem;
+  box-shadow: var(--shadow-lg);
+  padding: 2rem;
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+
+.scan-header {
+  margin-bottom: 2rem;
+}
+
+.scan-store-name {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.scan-store-subtitle {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+}
+
+/* Scan Form */
+.scan-form {
+  text-align: left;
+}
+
+.scan-mode-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  padding: 0.75rem;
+  background-color: rgb(37 99 235 / 0.1);
+  border-radius: var(--border-radius);
+  font-size: 0.875rem;
+  color: var(--primary-color);
+}
+
+.scan-mode-indicator .scan-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+/* Location Status */
+.location-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border-radius: var(--border-radius);
+  margin-bottom: 1.5rem;
+  font-size: 0.875rem;
+}
+
+.location-status.checking {
+  background-color: rgb(245 158 11 / 0.1);
+  color: var(--warning-color);
+}
+
+.location-status.success {
+  background-color: rgb(34 197 94 / 0.1);
+  color: var(--success-color);
+}
+
+.location-status.error {
+  background-color: rgb(239 68 68 / 0.1);
+  color: var(--error-color);
+}
+
+.location-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+/* Employee Recognition */
+.employee-recognition {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background-color: var(--background);
+  border-radius: var(--border-radius);
+  border: 2px dashed var(--border-color);
+}
+
+.recognition-title {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.recognition-email {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--primary-color);
+  text-align: center;
+  margin-bottom: 0.5rem;
+}
+
+.recognition-message {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+/* PIN Input */
+.pin-input-group {
+  margin-bottom: 1.5rem;
+}
+
+.pin-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  color: var(--text-primary);
+}
+
+.pin-input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid var(--border-color);
+  border-radius: var(--border-radius);
+  font-size: 1.125rem;
+  text-align: center;
+  letter-spacing: 0.25rem;
+  font-weight: 600;
+  transition: var(--transition);
+  background-color: var(--surface);
+}
+
+.pin-input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgb(37 99 235 / 0.1);
+}
+
+.pin-input.error {
+  border-color: var(--error-color);
+}
+
+/* Email Input */
+.email-input-group {
+  margin-bottom: 1.5rem;
+}
+
+.email-input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  font-size: 0.875rem;
+  transition: var(--transition);
+  background-color: var(--surface);
+}
+
+.email-input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgb(37 99 235 / 0.1);
+}
+
+/* Scan Buttons */
+.scan-button {
+  width: 100%;
+  padding: 1rem;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.scan-button:hover {
+  background-color: var(--primary-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.scan-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.scan-button.loading {
+  background-color: var(--secondary-color);
+}
+
+/* Check Results */
+.check-result {
+  text-align: center;
+  padding: 2rem;
+}
+
+.result-icon {
+  width: 4rem;
+  height: 4rem;
+  margin: 0 auto 1.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+}
+
+.result-icon.success {
+  background-color: rgb(34 197 94 / 0.1);
+  color: var(--success-color);
+}
+
+.result-icon.error {
+  background-color: rgb(239 68 68 / 0.1);
+  color: var(--error-color);
+}
+
+.result-icon.warning {
+  background-color: rgb(245 158 11 / 0.1);
+  color: var(--warning-color);
+}
+
+.result-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.result-message {
+  color: var(--text-secondary);
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+}
+
+.result-details {
+  background-color: var(--background);
+  padding: 1rem;
+  border-radius: var(--border-radius);
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-bottom: 1.5rem;
+}
+
+.result-timestamp {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+/* Choice Actions */
+.choice-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.choice-button {
+  padding: 1rem;
+  border: 2px solid var(--border-color);
+  border-radius: var(--border-radius);
+  background-color: var(--surface);
+  cursor: pointer;
+  transition: var(--transition);
+  text-align: center;
+}
+
+.choice-button:hover {
+  border-color: var(--primary-color);
+  background-color: rgb(37 99 235 / 0.1);
+}
+
+.choice-button.primary {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+  color: white;
+}
+
+.choice-button.primary:hover {
+  background-color: var(--primary-hover);
+  border-color: var(--primary-hover);
+}
+
+.choice-icon {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.choice-label {
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+.choice-description {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-top: 0.25rem;
+}
+
+/* Device Approval */
+.device-approval-card {
+  background-color: rgb(245 158 11 / 0.1);
+  border: 2px solid rgb(245 158 11 / 0.2);
+  border-radius: var(--border-radius);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.approval-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--warning-color);
+  margin-bottom: 1rem;
+}
+
+.approval-message {
+  color: var(--text-secondary);
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+}
+
+.device-info {
+  background-color: var(--surface);
+  padding: 1rem;
+  border-radius: var(--border-radius);
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+  text-align: left;
+}
+
+.device-info-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.device-info-label {
+  font-weight: 500;
+}
+
+.approval-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.approval-button {
+  flex: 1;
+  padding: 0.75rem;
+  border: none;
+  border-radius: var(--border-radius);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.approval-button.primary {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.approval-button.primary:hover {
+  background-color: var(--primary-hover);
+}
+
+.approval-button.secondary {
+  background-color: transparent;
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}
+
+.approval-button.secondary:hover {
+  background-color: var(--background);
+}
+
+/* Error Messages */
+.scan-error {
+  background-color: rgb(239 68 68 / 0.1);
+  border: 1px solid rgb(239 68 68 / 0.2);
+  color: var(--error-color);
+  padding: 0.75rem;
+  border-radius: var(--border-radius);
+  margin-bottom: 1.5rem;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Loading States */
+.scan-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+}
+
+.scan-loading .spinner {
+  width: 1rem;
+  height: 1rem;
+}
+
+/* Mobile Responsive */
+@media (max-width: 480px) {
+  .scan-container {
+    padding: 0.5rem;
+  }
+  
+  .scan-card {
+    padding: 1.5rem;
+    margin: 0.5rem;
+  }
+  
+  .choice-actions {
+    grid-template-columns: 1fr;
+  }
+  
+  .approval-actions {
+    flex-direction: column;
+  }
+}

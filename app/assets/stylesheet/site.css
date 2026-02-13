@@ -1,0 +1,570 @@
+
+/* Thlengta marketing site - light, retro pixel vibe (not purple) */
+html{
+  scroll-padding-top: 90px; /* backup for hash jumps */
+}
+
+:root{
+  --bg: #fbfaf6;
+  --card: #ffffff;
+  --ink: #151515;
+  --muted: #4d4d4d;
+
+  --accent: #1f7a5b;    /* retro green */
+  --accent2: #ffb000;   /* amber */
+  --danger: #d64545;
+
+  --border: #1b1b1b;
+  --shadow: 6px 6px 0 #1b1b1b;
+
+  --max: 1080px;
+  --radius: 14px;
+}
+
+*{ box-sizing: border-box; }
+html,body{ height:100%; }
+body{
+  margin:0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji","Segoe UI Emoji";
+  line-height: 1.5;
+}
+
+/* =========================================
+   GLOBAL iPhone overflow leak protection
+   ========================================= */
+html, body{
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* Allow grid/flex children to actually shrink on iOS */
+.card, .pad, .super, .item, .notice, .actions{
+  min-width: 0;
+}
+
+/* Media and inputs should never force width overflow */
+img, video, canvas, svg{
+  max-width: 100%;
+  height: auto;
+}
+
+input, select, textarea{
+  max-width: 100%;
+}
+
+/* Make sure button text is always readable (some iOS browsers do weird inheritance) */
+.btn, button{
+  color: var(--ink);
+  -webkit-text-fill-color: var(--ink);
+}
+
+/* =========================================
+   STORE SETTINGS: Export Logs grid fix
+   ========================================= */
+.export-grid{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+/* On mobile, stack the export cards */
+@media (max-width: 720px){
+  .export-grid{
+    grid-template-columns: 1fr;
+  }
+
+  /* Make buttons full width on small screens so they don't overflow */
+  .export-grid .btn{
+    width: 100%;
+  }
+}
+
+/* If any button label is long, allow wrapping instead of overflow */
+.btn{
+  white-space: normal;
+  text-align: center;
+}
+/* ============== BUTTON READABILITY (iOS SAFE) ============== */
+
+/* Always ensure button text has strong contrast */
+.btn, button{
+  color: #151515;
+  -webkit-text-fill-color: #151515; /* iOS Safari text color fix */
+}
+
+/* Disabled buttons: keep readable but clearly disabled */
+.btn[disabled], button[disabled],
+.btn.is-disabled, button.is-disabled{
+  opacity: 0.65;              /* still looks disabled */
+  color: #151515;
+  -webkit-text-fill-color: #151515;
+  cursor: not-allowed;
+}
+
+/* If you previously made disabled buttons light-gray text, undo it */
+.btn[disabled] span, button[disabled] span{
+  color: #151515;
+  -webkit-text-fill-color: #151515;
+}
+/* ============== END BUTTON READABILITY ============== */
+
+/* subtle pixel-ish grid */
+.bg-grid{
+  background-image:
+    linear-gradient(to right, rgba(0,0,0,0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0,0,0,0.05) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+a{ color: inherit; text-decoration: none; }
+a:hover{ text-decoration: underline; }
+
+.container{
+  width: min(var(--max), calc(100% - 32px));
+  margin: 0 auto;
+}
+
+.skip{
+  position:absolute; left:-999px; top:auto; width:1px; height:1px; overflow:hidden;
+}
+.skip:focus{
+  left: 16px; top: 16px; width:auto; height:auto;
+  background: var(--card);
+  border: 2px solid var(--border);
+  padding: 10px 12px;
+  z-index: 9999;
+  box-shadow: var(--shadow);
+}
+
+.nav{
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: rgba(251,250,246,0.85);
+  backdrop-filter: blur(10px);
+  border-bottom: 2px solid rgba(0,0,0,0.08);
+}
+
+.nav-inner{
+  display:flex;
+  align-items:center;
+  justify-content: space-between;
+  padding: 14px 0;
+  gap: 12px;
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+}
+
+/* IMPORTANT: make sure brand images don't steal clicks on mobile */
+.brand img{
+  display:block;
+}
+
+.badge{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding: 6px 10px;
+  border: 2px solid var(--border);
+  border-radius: 999px;
+  background: var(--card);
+  box-shadow: 4px 4px 0 #1b1b1b;
+  font-size: 12px;
+}
+.dot{
+  width:10px;height:10px;border-radius:2px;
+  background: var(--accent);
+  border: 2px solid var(--border);
+}
+
+.nav-links{
+  display:flex;
+  align-items:center;
+  gap: 14px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.nav-links a{
+  padding: 8px 10px;
+  border-radius: 10px;
+}
+
+.nav-links a.active{
+  background: #eaf6f0;
+  border: 2px solid rgba(0,0,0,0.1);
+}
+
+.hero{
+  padding: 56px 0 28px;
+}
+
+.hero-grid{
+  display:grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 18px;
+  align-items: stretch;
+}
+
+@media (max-width: 900px){
+  .hero-grid{ grid-template-columns: 1fr; }
+}
+
+.card{
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+.card.pad{ padding: 22px; }
+
+.h-eyebrow{
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 12px;
+}
+.h-eyebrow .chip{
+  padding: 4px 8px;
+  border: 2px solid var(--border);
+  border-radius: 999px;
+  background: #fff7df;
+}
+
+h1{
+  margin: 10px 0 10px;
+  font-size: clamp(28px, 3.4vw, 44px);
+  line-height: 1.1;
+}
+
+.lede{
+  margin: 0 0 16px;
+  color: var(--muted);
+  font-size: 16px;
+  max-width: 60ch;
+}
+
+.about-lede{
+  margin: 0 0 16px;
+  color: var(--muted);
+  font-size: 16px;
+}
+
+.actions{
+  display:flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+
+.btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  padding: 12px 14px;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 4px 4px 0 #1b1b1b;
+  font-weight: 700;
+  cursor: pointer;
+}
+.btn:hover{ transform: translate(-1px,-1px); box-shadow: 5px 5px 0 #1b1b1b; }
+.btn:active{ transform: translate(0,0); box-shadow: 3px 3px 0 #1b1b1b; }
+.btn.primary{ background: #eaf6f0; }
+.btn.accent{ background: #fff7df; }
+.btn.full{ width: 100%; }
+
+.kbd{
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 12px;
+  padding: 2px 7px;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  background: #f3f3f3;
+}
+
+.grid-3{
+  display:grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+@media (max-width: 900px){
+  .grid-3{ grid-template-columns: 1fr; }
+}
+
+.section{
+  padding: 22px 0 46px;
+}
+.section h2{
+  margin: 0 0 10px;
+  font-size: 22px;
+}
+.section p{ color: var(--muted); margin: 0 0 12px; }
+
+.list{
+  display:flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.item{
+  display:flex;
+  gap: 12px;
+  align-items:flex-start;
+  padding: 14px;
+  border-top: 2px dashed rgba(0,0,0,0.15);
+}
+.item:first-child{ border-top: none; }
+
+.icon{
+  width: 42px; height: 42px;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  background: #f2fbf6;
+  box-shadow: 3px 3px 0 #1b1b1b;
+  display:flex; align-items:center; justify-content:center;
+  flex: 0 0 auto;
+  font-weight: 900;
+}
+
+.footer{
+  padding: 24px 0 40px;
+  color: var(--muted);
+  border-top: 2px solid rgba(0,0,0,0.08);
+}
+.footer a{ color: var(--ink); }
+
+.form{
+  display:grid;
+  gap: 10px;
+}
+.field{
+  display:grid;
+  gap: 6px;
+}
+label{ font-weight: 700; }
+
+input, textarea{
+  width: 100%;
+  padding: 12px 12px;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  background: #fff;
+  font-size: 14px;
+}
+textarea{ min-height: 120px; resize: vertical; }
+
+.notice{
+  padding: 12px 14px;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  background: #f2fbf6;
+}
+.notice.warn{ background: #fff1f1; }
+
+.small{ font-size: 13px; color: var(--muted); }
+
+/* ---------- Marketing scroll reveal (safe) ---------- */
+.reveal {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 550ms ease, transform 650ms ease;
+  will-change: opacity, transform;
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* highlight active nav link (used by site.js on links with data-nav) */
+.nav-links a.active {
+  font-weight: 900;
+  text-decoration: underline;
+  text-underline-offset: 6px;
+}
+
+/* =========================================================
+   MOBILE NAV FIX (NO scroll containers, NO overflow hacks)
+   - Hide About/Pricing/Contact
+   - Keep only Login visible
+   - Prevent logo from covering right side
+   ========================================================= */
+@media (max-width: 520px){
+  .nav-inner{
+    align-items: center;
+    gap: 10px;
+  }
+
+  /* Let brand shrink so it doesn’t push nav off-screen */
+  .brand{
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+
+  /* Shrink the two text images safely */
+  .brand .small img{
+    max-width: 140px;
+    height: auto;
+  }
+
+  /* Hide all nav links except the Login button */
+  .nav-links a:not(.btn){
+    display: none;
+  }
+
+  /* Keep login button always visible and not squeezed */
+  .nav-links{
+    flex: 0 0 auto;
+  }
+  .nav-links .btn{
+    white-space: nowrap;
+    width: auto;
+    padding: 10px 12px;
+  }
+}
+
+/* ---------- iPhone-safe nav fix ---------- */
+@media (max-width: 520px){
+
+  /* Brand should not push into nav space */
+  .brand{
+    flex: 0 1 auto;
+    min-width: 0;
+  }
+
+  /* Hide the .com image on small screens */
+  .brand img[src*="com"]{
+    display: none;
+  }
+
+  /* Ensure login button always sits cleanly */
+  .nav-links{
+    flex: 0 0 auto;
+    margin-left: auto;
+  }
+
+  .nav-links .btn{
+    white-space: nowrap;
+    padding: 10px 12px;
+  }
+}
+/* ---------- END MOBILE NAV FIX ---------- */
+
+/* Employee action buttons (Break, Resume, Checkout) */
+/* Scoped so it will not change other buttons across the site */
+.employee-actions .employee-btn{
+  /* Force readable text on iPhone */
+  color: var(--ink);
+  -webkit-text-fill-color: var(--ink);
+
+  /* Keep the same retro button feel */
+  font-weight: 800;
+  border-radius: 12px;
+
+  /* Keep sizing consistent */
+  padding: 12px 14px;
+  min-height: 44px;
+}
+
+/* Primary action (Break or Resume) */
+.employee-actions .employee-btn--primary{
+  background: #eaf6f0;
+}
+
+/* Secondary action (Checkout) */
+.employee-actions .employee-btn--secondary{
+  background: #fff;
+}
+
+/* Optional: make both buttons equal width on mobile */
+@media (max-width: 520px){
+  .employee-actions .employee-btn{
+    flex: 1 1 calc(50% - 10px);
+  }
+}
+/* ---------- END EMPLOYEE ACTION BUTTONS ---------- */
+
+/* =========================================
+   STORE SETTINGS: iOS fixes for opening time + export CSV
+   ========================================= */
+
+
+/* Let grid children shrink properly on iOS Safari */
+.store-grid-2 > * , .export-grid > * {
+  min-width: 0;
+}
+
+/* Stack 2-col grids on mobile (must use !important because inline grid-template-columns exists) */
+@media (max-width: 720px){
+  .store-grid-2{
+    grid-template-columns: 1fr !important;
+  }
+  .export-grid{
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* iOS date/month inputs love to overflow unless forced */
+.export-grid input[type="date"],
+.export-grid input[type="month"]{
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* Buttons in export cards should never push outside */
+.export-grid .actions{
+  width: 100%;
+}
+.export-grid button,
+.export-grid .btn{
+  width: 100%;
+  max-width: 100%;
+  white-space: normal;
+}
+
+/* Opening time: stop the checkbox label block from causing weird side overflow */
+.store-grid-2 .field label{
+  min-width: 0;
+}
+.store-grid-2 .field label span{
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+/* FORCE opening time grid to stack on mobile (inline style was overriding) */
+@media (max-width: 720px){
+  .opening-grid{
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Grace label: allow the text block to shrink + wrap normally */
+.grace-label{
+  min-width: 0;
+}
+.grace-label span{
+  min-width: 0;
+  max-width: 100%;
+  white-space: normal;
+  word-break: normal;
+  overflow-wrap: break-word; /* normal wrap, not per-letter */
+}
+
+
+
