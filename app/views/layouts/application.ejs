@@ -33,8 +33,12 @@
       <a data-nav href="/#about">About</a>
       <a data-nav href="/#pricing">Pricing</a>
       <a data-nav href="/#contact">Contact</a>
-      <a class="btn primary" href="/owner/login">Sign Up</a>
-      <a class="btn primary" href="/owner/login">Sign In</a>
+      <% if (isLoggedIn) { %>
+        <a class="btn" href="/users/signout">Sign Out</a>
+      <% } else { %>
+        <a class="btn" href="/register">Sign Up</a>
+        <a class="btn primary" href="/users/signin">Sign In</a>
+      <% } %>
     </nav>
   </div>
 </header>

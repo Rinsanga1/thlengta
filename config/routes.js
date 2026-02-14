@@ -3,6 +3,7 @@ const express = require("express");
 
 // require Controllers
 const auth = require("../app/controllers/auth.controller");
+const users = require("../app/controllers/users.controller");
 const ownerSessions = require("../app/controllers/owner/sessions.controller");
 const ownerDashboard = require("../app/controllers/owner/dashboard.controller");
 const { requireOwner } = require("../app/middleware/auth"); // Import requireOwner
@@ -42,9 +43,15 @@ router.get("/register/:plan", (req, res, next) => {
 });
 
 // Generic registration route
-router.get("/register", auth.new); // New: Display registration form
-router.post("/register", auth.create); // New: Handle registration submission
-router.get("/register/submitted", auth.submitted); // Renamed: Registration submitted page
+router.get("/register", auth.new);
+router.post("/register", auth.create);
+router.get("/register/submitted", auth.submitted);
+
+// User Sessions (Sign In)
+router.get("/users/signin", users.new);
+router.post("/users/signin", users.create);
+router.get("/users/signout", users.confirm);
+router.post("/users/signout", users.destroy);
 
 // Sessions
 router.get("/owner/login", ownerSessions.new);

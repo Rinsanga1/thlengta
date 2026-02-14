@@ -213,3 +213,40 @@ CREATE TABLE IF NOT EXISTS device_approval_requests (
 CREATE INDEX IF NOT EXISTS idx_device_approval_status ON device_approval_requests(status);
 CREATE INDEX IF NOT EXISTS idx_device_approval_store ON device_approval_requests(store_id);
 CREATE INDEX IF NOT EXISTS idx_device_approval_employee ON device_approval_requests(employee_id);
+
+-- =========================
+-- USERS + ROLES (Discord-like)
+-- =========================
+CREATE TABLE IF NOT EXISTS roles (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL UNIQUE,
+  description TEXT DEFAULT '',
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS users (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  email TEXT NOT NULL UNIQUE,
+  password_hash TEXT NOT NULL,
+  name TEXT DEFAULT '',
+  phone TEXT DEFAULT '',
+  status TEXT NOT NULL DEFAULT 'active',
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS user_roles (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER NOT NULL,
+  role_id INTEGER NOT NULL,
+  store_id INTEGER,
+  plan TEXT DEFAULT 'free',
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE(user_id, role_id, store_id),
+  FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY(role_id) REFERENCES roles(id) ON DELETE CASCADE,
+  FOREIGN KEY(store_id) REFERENCES stores(id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_user_roles_user_id ON user_roles(user_id);
+CREATE INDEX IF NOT EXISTS idx_user_roles_role_id ON user_roles(role_id);
+CREATE INDEX IF NOT EXISTS idx_user_roles_store_id ON user_roles(store_id);
