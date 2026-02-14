@@ -31,7 +31,7 @@
 
     <div class="card pad" style="background:#fff;">
       <div class="small" style="margin-bottom:10px;">
-        Logged in as <b><%= admin?.email %></b> | Current plan: <b><%= (admin?.plan || "standard").toUpperCase() %></b>
+        Logged in as <b><%= admin?.email %></b> | Current plan: <b><%= (admin?.plan || "free").toUpperCase() %></b>
       </div>
 
       <% if (pendingUpgrade) { %>

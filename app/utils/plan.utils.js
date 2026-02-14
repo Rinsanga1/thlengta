@@ -4,7 +4,8 @@ function normalizePlan(p) {
 
 function getUpgradeOptions(currentPlan) {
   const plan = normalizePlan(currentPlan);
-  if (plan === "standard") return ["pro", "enterprise"];
+  if (plan === "free") return ["plus", "pro", "enterprise"];
+  if (plan === "plus") return ["pro", "enterprise"];
   if (plan === "pro") return ["enterprise"];
   return [];
 }

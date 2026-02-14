@@ -1,7 +1,7 @@
 exports.normalizePlan = (input) => {
-  const plan = String(input || "standard").trim().toLowerCase();
-  const allowed = ["standard", "pro", "enterprise"];
-  return allowed.includes(plan) ? plan : "standard";
+  const plan = String(input || "free").trim().toLowerCase();
+  const allowed = ["free", "plus", "pro", "enterprise"];
+  return allowed.includes(plan) ? plan : "free";
 };
 
 
@@ -28,4 +28,3 @@ exports.emailAlreadyUsed = async (email) => {
 
   return false;
 }
-

@@ -17,11 +17,11 @@
           <b><%= admin?.email %></b>
           &nbsp;|&nbsp;
           Plan:
-          <b><%= (admin?.plan || "standard").toUpperCase() %></b>
+          <b><%= (admin?.plan || "free").toUpperCase() %></b>
         </div>
 
         <!-- Upgrade button (only if not enterprise) -->
-        <% if ((admin?.plan || "standard").toLowerCase() !== "enterprise") { %>
+        <% if ((admin?.plan || "free").toLowerCase() !== "enterprise") { %>
           <a class="btn" href="/owner/upgrade">Upgrade Plan</a>
         <% } %>
 

@@ -92,22 +92,25 @@
           </div>
 
           <div class="field">
-         <label>Plan</label>
+          <label>Plan</label>
         <select name="plan" required>
-        <option value="standard" <%= (String(admin.plan || 'standard') === 'standard') ? 'selected' : '' %>>
-         Standard (1 store)
-         </option>
-        <option value="pro" <%= (String(admin.plan || 'standard') === 'pro') ? 'selected' : '' %>>
-         Pro (up to 5 stores)
-         </option>
-       <option value="enterprise" <%= (String(admin.plan || 'standard') === 'enterprise') ? 'selected' : '' %>>
-      Enterprise (unlimited)
-    </option>
-  </select>
-  <div class="small" style="margin-top:6px;">
-    Controls how many stores this admin can create.
+          <option value="free" <%= (String(admin.plan || 'free') === 'free') ? 'selected' : '' %>>
+          Free (1 store, 2 employees)
+          </option>
+          <option value="plus" <%= (String(admin.plan || 'free') === 'plus') ? 'selected' : '' %>>
+          Plus (1 store, 10 employees)
+          </option>
+          <option value="pro" <%= (String(admin.plan || 'free') === 'pro') ? 'selected' : '' %>>
+          Pro (20 stores, 200 employees)
+          </option>
+        <option value="enterprise" <%= (String(admin.plan || 'free') === 'enterprise') ? 'selected' : '' %>>
+          Enterprise (unlimited)
+      </option>
+    </select>
+    <div class="small" style="margin-top:6px;">
+      Controls plan tier for this user.
+    </div>
   </div>
-</div>
 
           <div class="field">
             <label>Expiry (manual)</label>
