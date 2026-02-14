@@ -9,11 +9,13 @@ exports.new = (req, res) => {
   }
   
   const registered = req.query.registered === "true";
+  const redirect = req.query.redirect || "/";
   
   res.renderPage("users/signin", {
     title: "Sign In",
     error: null,
-    registered: registered || false
+    registered: registered || false,
+    redirect
   });
 };
 
@@ -23,18 +25,21 @@ exports.create = async (req, res) => {
     const email = String(req.body.email || "").trim().toLowerCase();
     const password = String(req.body.password || "");
     const rememberMe = String(req.body.remember_me || "") === "on";
+    const redirect = req.body.redirect || "/";
 
     if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
       return res.renderPage("users/signin", {
         title: "Sign In",
-        error: "Please enter a valid email."
+        error: "Please enter a valid email.",
+        redirect
       });
     }
 
     if (!password) {
       return res.renderPage("users/signin", {
         title: "Sign In",
-        error: "Please enter your password."
+        error: "Please enter your password.",
+        redirect
       });
     }
 
@@ -44,7 +49,8 @@ exports.create = async (req, res) => {
       return res.renderPage("users/signin", {
         title: "Sign In",
         error: "User not found. Would you like to sign up instead?",
-        registered: false
+        registered: false,
+        redirect
       });
     }
 
@@ -52,7 +58,8 @@ exports.create = async (req, res) => {
       return res.renderPage("users/signin", {
         title: "Sign In",
         error: "Your account is disabled. Please contact support.",
-        registered: false
+        registered: false,
+        redirect
       });
     }
 
@@ -61,20 +68,22 @@ exports.create = async (req, res) => {
       return res.renderPage("users/signin", {
         title: "Sign In",
         error: "Incorrect password.",
-        registered: false
+        registered: false,
+        redirect
       });
     }
 
     req.session.userId = user.id;
     setRememberMeCookie(req, rememberMe);
 
-    return res.redirect("/");
+    return res.redirect(redirect);
   } catch (err) {
     console.error(err);
     return res.renderPage("users/signin", {
       title: "Sign In",
       error: "Something went wrong. Please try again.",
-      registered: false
+      registered: false,
+      redirect
     });
   }
 };

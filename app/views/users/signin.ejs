@@ -21,6 +21,10 @@
     <% } %>
 
     <form class="form" method="post" action="/users/signin" style="margin-top:12px;">
+      <% if (redirect) { %>
+        <input type="hidden" name="redirect" value="<%= redirect %>">
+      <% } %>
+      
       <div class="field">
         <label>Email</label>
         <input type="email" name="email" required placeholder="you@example.com" autocomplete="email">

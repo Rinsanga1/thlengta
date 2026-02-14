@@ -37,6 +37,9 @@ router.get("/", home.index);
 router.post("/contact", contact.create);
 
 // Plan-specific registration routes (must be before generic /register)
+router.get("/register/free", auth.registerFree);
+router.post("/register/free", auth.registerFreeSubmit);
+
 router.get("/register/:plan", (req, res, next) => {
   req.query.plan = req.params.plan;
   auth.new(req, res, next);
@@ -46,6 +49,10 @@ router.get("/register/:plan", (req, res, next) => {
 router.get("/register", auth.new);
 router.post("/register", auth.create);
 router.get("/register/submitted", auth.submitted);
+
+// Checkout route - for Plus, Pro, Enterprise plans
+router.get("/checkout/:plan", auth.checkout);
+router.post("/checkout/:plan", auth.checkoutSubmit);
 
 // User Sessions (Sign In)
 router.get("/users/signin", users.new);

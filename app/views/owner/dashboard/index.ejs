@@ -73,7 +73,9 @@
                 <a href="/owner/stores/<%= s.id %>/edit">Settings</a>
                 <a href="/owner/stores/<%= s.id %>/employees">Employees</a>
                 <a href="/owner/stores/<%= s.id %>/logs">Logs</a>
-                <a href="/owner/stores/<%= s.id %>/managers">Managers</a>
+                <% if ((admin?.plan || "free") !== "free") { %>
+                  <a href="/owner/stores/<%= s.id %>/managers">Managers</a>
+                <% } %>
               </div>
             </div>
           </div>

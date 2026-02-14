@@ -5,6 +5,7 @@ const session = require("express-session");
 const cookieParser = require("cookie-parser");
 const { securityMiddleware } = require("./config/security");
 const { renderPageMiddleware } = require("./app/middleware/renderPage");
+const { routeLogger } = require("./app/middleware/route_logger");
 const { initDb } = require("./app/db/database");
 const { compileCSS } = require("./scripts/compile-css");
 const router = require("./config/routes");
@@ -75,6 +76,8 @@ app.use(
 
 // Render page helper
 app.use(renderPageMiddleware);
+// Route logger
+app.use(routeLogger);
 // Router
 app.use("/", router);
 

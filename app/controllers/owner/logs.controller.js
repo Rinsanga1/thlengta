@@ -1,6 +1,7 @@
 const { dbGet, dbAll, dbRun } = require("../../db/helpers");
 const { todayIST_yyyy_mm_dd, parseSqliteTimeToMinutes, to12Hour } = require("../../utils/time.utils");
 const { sqlInListPlaceholders } = require("../../utils/db.utils");
+const { getOwnerId } = require("../../middleware/auth");
 
 const ADMIN_VISIBLE_EVENTS = [
   "checkin",
@@ -25,7 +26,7 @@ async function cleanupOldLogs(storeId) {
 
 // Lists attendance logs for a given store and date (index action)
 exports.index = async (req, res) => {
-  const adminId = req.session.adminId;
+  const adminId = getOwnerId(req);
   const storeId = Number(req.params.storeId);
 
   const store = await dbGet(
@@ -95,7 +96,7 @@ exports.index = async (req, res) => {
 
 // Downloads daily attendance logs as CSV (custom action)
 exports.downloadDayCsv = async (req, res) => {
-  const adminId = req.session.adminId;
+  const adminId = getOwnerId(req);
   const storeId = Number(req.params.storeId);
 
   const store = await dbGet(
@@ -194,7 +195,7 @@ exports.downloadDayCsv = async (req, res) => {
 
 // Downloads monthly attendance logs as CSV (custom action)
 exports.downloadMonthCsv = async (req, res) => {
-  const adminId = req.session.adminId;
+  const adminId = getOwnerId(req);
   const storeId = Number(req.params.storeId);
 
   const store = await dbGet(

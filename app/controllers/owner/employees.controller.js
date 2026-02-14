@@ -1,9 +1,10 @@
 const bcrypt = require("bcryptjs");
 const { dbGet, dbRun, dbAll } = require("../../db/helpers");
+const { getOwnerId } = require("../../middleware/auth");
 
 // Lists all employees for a given store (index action)
 exports.index = async (req, res) => {
-  const adminId = req.session.adminId;
+  const adminId = getOwnerId(req);
   const storeId = Number(req.params.storeId);
 
   const store = await dbGet("SELECT id, name FROM stores WHERE id = ? AND admin_id = ?", [
@@ -40,7 +41,7 @@ exports.index = async (req, res) => {
 
 // Displays the form for adding a new employee (new action)
 exports.new = async (req, res) => {
-  const adminId = req.session.adminId;
+  const adminId = getOwnerId(req);
   const storeId = Number(req.params.storeId);
 
   const store = await dbGet("SELECT id, name FROM stores WHERE id = ? AND admin_id = ?", [
@@ -59,7 +60,7 @@ exports.new = async (req, res) => {
 // Handles the creation of a new employee (create action)
 exports.create = async (req, res) => {
   try {
-    const adminId = req.session.adminId;
+    const adminId = getOwnerId(req);
     const storeId = Number(req.params.storeId);
 
     const store = await dbGet("SELECT id, name FROM stores WHERE id = ? AND admin_id = ?", [
@@ -120,7 +121,7 @@ exports.create = async (req, res) => {
 // Toggles employee active status (custom update action)
 exports.updateStatus = async (req, res) => {
   try {
-    const adminId = req.session.adminId;
+    const adminId = getOwnerId(req);
     const storeId = Number(req.params.storeId);
     const employeeId = Number(req.params.employeeId);
 
@@ -153,7 +154,7 @@ exports.updateStatus = async (req, res) => {
 
 // Resets employee device (custom update action)
 exports.resetDevice = async (req, res) => {
-  const adminId = req.session.adminId;
+  const adminId = getOwnerId(req);
   const storeId = Number(req.params.storeId);
   const employeeId = Number(req.params.employeeId);
 
@@ -180,7 +181,7 @@ exports.resetDevice = async (req, res) => {
 // Deletes an employee (destroy action)
 exports.destroy = async (req, res) => {
   try {
-    const adminId = req.session.adminId;
+    const adminId = getOwnerId(req);
     const storeId = Number(req.params.storeId);
     const employeeId = Number(req.params.employeeId);
 

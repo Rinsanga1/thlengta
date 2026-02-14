@@ -1,10 +1,11 @@
 const bcrypt = require("bcryptjs");
 const { dbGet, dbRun, dbAll } = require("../../db/helpers");
-const { pickAlertTypeFromQuery } = require("../../utils/ui.utils"); // Our new ui utils
+const { pickAlertTypeFromQuery } = require("../../utils/ui.utils");
+const { getOwnerId } = require("../../middleware/auth");
 
 // Lists all managers for a given store (index action)
 exports.index = async (req, res) => {
-  const adminId = req.session.adminId;
+  const adminId = getOwnerId(req);
   const storeId = Number(req.params.storeId);
 
   const store = await dbGet("SELECT id, name FROM stores WHERE id = ? AND admin_id = ?", [
@@ -58,7 +59,7 @@ exports.index = async (req, res) => {
 
 // Displays the form for adding a new manager (new action)
 exports.new = async (req, res) => {
-  const adminId = req.session.adminId;
+  const adminId = getOwnerId(req);
   const storeId = Number(req.params.storeId);
 
   const store = await dbGet("SELECT id, name FROM stores WHERE id = ? AND admin_id = ?", [
@@ -89,7 +90,7 @@ exports.new = async (req, res) => {
 // Handles the creation of a new manager or assignment to a store (create action)
 exports.create = async (req, res) => {
   try {
-    const adminId = req.session.adminId;
+    const adminId = getOwnerId(req);
     const storeId = Number(req.params.storeId);
 
     const store = await dbGet("SELECT id, name FROM stores WHERE id = ? AND admin_id = ?", [
@@ -177,7 +178,7 @@ exports.create = async (req, res) => {
 // Toggles manager active status (custom update action)
 exports.updateStatus = async (req, res) => {
   try {
-    const adminId = req.session.adminId;
+    const adminId = getOwnerId(req);
     const storeId = Number(req.params.storeId);
     const managerId = Number(req.params.managerId);
 
@@ -213,7 +214,7 @@ exports.updateStatus = async (req, res) => {
 // Removes a manager from a store (destroy action, but not actual manager destruction)
 exports.destroy = async (req, res) => {
   try {
-    const adminId = req.session.adminId;
+    const adminId = getOwnerId(req);
     const storeId = Number(req.params.storeId);
     const managerId = Number(req.params.managerId);
 

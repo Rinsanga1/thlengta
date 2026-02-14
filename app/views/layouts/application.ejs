@@ -34,6 +34,7 @@
       <a data-nav href="/#pricing">Pricing</a>
       <a data-nav href="/#contact">Contact</a>
       <% if (isLoggedIn) { %>
+        <a data-nav href="/owner/dashboard">Stores</a>
         <a class="btn" href="/users/signout">Sign Out</a>
       <% } else { %>
         <a class="btn" href="/register">Sign Up</a>

@@ -1,0 +1,66 @@
+<section class="section" style="padding-top:46px;">
+  <div class="card pad" style="max-width:520px;margin:0 auto;">
+    <div class="topbar" style="margin-bottom:14px;">
+      <div>
+        <div class="h-eyebrow">
+          <span class="chip">Checkout</span>
+        </div>
+        <h2 style="margin:10px 0 0;"><%= plan.toUpperCase() %> Plan</h2>
+        <div class="small" style="margin-top:6px;">Complete your request</div>
+      </div>
+    </div>
+
+    <% if (success) { %>
+      <div class="notice" style="margin-bottom: 1rem; background:#eaf6f0;">
+        <%= success %>
+      </div>
+      <a class="btn primary full" href="/">Go to Home</a>
+    <% } else { %>
+      <% if (error) { %>
+        <div class="error"><%= error %></div>
+      <% } %>
+
+      <div class="card pad" style="background:#f8faf9; margin-bottom:1rem;">
+        <div class="small">
+          <strong>Plan Details:</strong>
+          <% if (plan === 'plus') { %>
+            <ul style="margin:8px 0 0 16px;padding:0;">
+              <li>₹599/month</li>
+              <li>1 store</li>
+              <li>10 employees</li>
+              <li>QR attendance</li>
+              <li>Download reports</li>
+            </ul>
+          <% } else if (plan === 'pro') { %>
+            <ul style="margin:8px 0 0 16px;padding:0;">
+              <li>₹999/month</li>
+              <li>20 stores</li>
+              <li>200 employees</li>
+              <li>QR attendance</li>
+              <li>Priority support</li>
+            </ul>
+          <% } else if (plan === 'enterprise') { %>
+            <ul style="margin:8px 0 0 16px;padding:0;">
+              <li>₹29,999/month</li>
+              <li>Unlimited stores</li>
+              <li>Unlimited employees</li>
+              <li>Dedicated support</li>
+              <li>Custom onboarding</li>
+            </ul>
+          <% } %>
+        </div>
+      </div>
+
+      <form method="post" action="/checkout/<%= plan %>" style="margin-top:1rem;">
+        <div class="notice" style="margin-bottom:1rem;">
+          Request plan approval and we will contact you for payment.
+        </div>
+        <button type="submit" class="btn primary full">Submit Request</button>
+      </form>
+
+      <div style="margin-top:1rem;">
+        <a class="btn full" href="/#pricing">Cancel</a>
+      </div>
+    <% } %>
+  </div>
+</section>

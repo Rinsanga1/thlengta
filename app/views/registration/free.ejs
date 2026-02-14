@@ -1,0 +1,37 @@
+<section class="section" style="padding-top:46px;">
+  <div class="card pad" style="max-width:520px;margin:0 auto;">
+    <div class="topbar" style="margin-bottom:14px;">
+      <div>
+        <div class="h-eyebrow">
+          <span class="chip">Free Plan</span>
+        </div>
+        <h2 style="margin:10px 0 0;">Create Your Free Account</h2>
+        <div class="small" style="margin-top:6px;">1 store · 2 employees · QR attendance · Basic reports</div>
+      </div>
+    </div>
+
+    <% if (error) { %>
+      <div class="error"><%= error %></div>
+    <% } %>
+
+    <form class="form" method="post" action="/register/free" style="margin-top:12px;">
+      <div class="field">
+        <label>Email</label>
+        <input type="email" name="email" required placeholder="you@example.com" autocomplete="email">
+      </div>
+
+      <div class="field">
+        <label>Password</label>
+        <input type="password" name="password" minlength="8" required placeholder="Minimum 8 characters" autocomplete="new-password">
+      </div>
+
+      <button class="btn primary full" type="submit" style="margin-top: 1rem;">Create Free Account</button>
+    </form>
+
+    <div class="notice" style="margin-top:16px;">
+      <div class="small">
+        Already have an account? <a href="/users/signin">Sign In</a>
+      </div>
+    </div>
+  </div>
+</section>

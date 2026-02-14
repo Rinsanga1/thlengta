@@ -10,6 +10,7 @@ const {
   parseTime12hToHHMM,
   isValidLatLng,
 } = require("../../utils/store.utils");
+const { getOwnerId, getOwnerType } = require("../../middleware/auth");
 
 // Helper function from original admin.routes.js, might be needed in controller or new utils
 function getBaseUrl(req) {
@@ -36,6 +37,15 @@ exports.new_step1_get = (req, res) => {
 
 // Wizard: Step 1 (Workplace info) - POST
 exports.new_step1_post = async (req, res) => {
+  // Force session to be created by accessing a property
+  req.session._createdAt = Date.now();
+  console.log("[DEBUG] Session touched, ID:", req.sessionID);
+  
+  // If session ID is still undefined, try to regenerate
+  if (!req.sessionID) {
+    console.log("[DEBUG] Session ID is undefined, attempting to regenerate");
+  }
+  
   const draft = ensureWorkplaceDraft(req);
 
   const name = (req.body.name || "").trim();
@@ -73,12 +83,28 @@ exports.new_step1_post = async (req, res) => {
     draft.logo_filename = req.file.filename;
   }
 
-  return res.redirect("/owner/stores/new/step-2");
+  console.log("[DEBUG] Draft after setting:", draft);
+  console.log("[DEBUG] SessionID:", req.sessionID);
+
+  // Ensure session is saved before redirect
+  req.session.save((err) => {
+    if (err) {
+      console.error("[DEBUG] Session save error:", err);
+      return res.renderPage("owner/stores/new_step1", {
+        title: "Create Workplace",
+        draft,
+        error: "Session error. Please try again."
+      });
+    }
+    console.log("[DEBUG] Session saved successfully");
+    return res.redirect("/owner/stores/new/step-2");
+  });
 };
 
 // Wizard: Step 2 (Location) - GET
 exports.new_step2_get = (req, res) => {
   const draft = ensureWorkplaceDraft(req);
+  console.log("[DEBUG Step2 GET] Draft:", draft);
   if (!draft.name) return res.redirect("/owner/stores/new/step-1");
 
   return res.renderPage("owner/stores/new_step2_location", {
@@ -157,18 +183,26 @@ exports.new_step4_get = (req, res) => {
 // Wizard: Finish (Create store/workplace + redirect to QR) - POST (This is the 'create' action for stores)
 exports.create = async (req, res) => {
   try {
-    const adminId = req.session.adminId;
+    const adminId = getOwnerId(req);
+    const ownerType = getOwnerType(req);
     const draft = ensureWorkplaceDraft(req);
 
     if (!draft || !draft.name || !draft.lat || !draft.lng || !draft.radius_m) {
       return res.redirect("/owner/stores/new/step-1");
     }
 
-    const adminRow = await dbGet("SELECT plan FROM admins WHERE id = ?", [adminId]);
-    const plan = String(adminRow?.plan || "standard").toLowerCase();
+    let plan = "free";
+    if (ownerType === "admin") {
+      const adminRow = await dbGet("SELECT plan FROM admins WHERE id = ?", [adminId]);
+      plan = String(adminRow?.plan || "free").toLowerCase();
+    } else {
+      const userRow = await dbGet("SELECT plan FROM users WHERE id = ?", [adminId]);
+      plan = String(userRow?.plan || "free").toLowerCase();
+    }
 
     let maxStores = 1;
-    if (plan === "pro") maxStores = 5;
+    if (plan === "plus") maxStores = 1;
+    if (plan === "pro") maxStores = 20;
     if (plan === "enterprise") maxStores = Number.POSITIVE_INFINITY;
 
     const countRow = await dbGet("SELECT COUNT(*) AS cnt FROM stores WHERE admin_id = ?", [adminId]);
@@ -231,7 +265,7 @@ exports.create = async (req, res) => {
 
 // Displays store details, including QR (show action)
 exports.show = async (req, res) => {
-  const adminId = req.session.adminId;
+  const adminId = getOwnerId(req);
   const storeId = Number(req.params.storeId);
 
   const store = await dbGet("SELECT id, name, public_id FROM stores WHERE id = ? AND admin_id = ?", [
@@ -246,7 +280,7 @@ exports.show = async (req, res) => {
 
 // Serves the store's QR code as a PNG
 exports.qrPng = async (req, res) => {
-  const adminId = req.session.adminId;
+  const adminId = getOwnerId(req);
   const storeId = Number(req.params.storeId);
 
   const store = await dbGet("SELECT id, public_id FROM stores WHERE id = ? AND admin_id = ?", [
@@ -265,7 +299,8 @@ exports.qrPng = async (req, res) => {
 
 // Displays the form for editing store settings (edit action)
 exports.edit = async (req, res) => {
-  const adminId = req.session.adminId;
+  const adminId = getOwnerId(req);
+  const ownerType = getOwnerType(req);
   const storeId = Number(req.params.storeId);
 
   const store = await dbGet(
@@ -274,9 +309,19 @@ exports.edit = async (req, res) => {
   );
   if (!store) return res.status(404).send("Store not found.");
 
-  res.renderPage("owner/stores/edit", { // Renamed view
+  let plan = "free";
+  if (ownerType === "admin") {
+    const adminRow = await dbGet("SELECT plan FROM admins WHERE id = ?", [adminId]);
+    plan = adminRow?.plan || "free";
+  } else {
+    const userRow = await dbGet("SELECT plan FROM users WHERE id = ?", [adminId]);
+    plan = userRow?.plan || "free";
+  }
+
+  res.renderPage("owner/stores/edit", {
     title: "Store Settings",
     store,
+    plan,
     message: req.query.msg || null,
     error: null
   });
@@ -286,7 +331,7 @@ exports.edit = async (req, res) => {
 // Updates store settings (update action)
 exports.update = async (req, res) => {
   try {
-    const adminId = req.session.adminId;
+    const adminId = getOwnerId(req);
     const storeId = Number(req.params.storeId);
 
     const open_time = String(req.body.open_time || "").trim();
@@ -309,7 +354,7 @@ exports.update = async (req, res) => {
 // Updates store logo (part of update action, handled separately by multer)
 exports.updateLogo = async (req, res) => {
   try {
-    const adminId = req.session.adminId;
+    const adminId = getOwnerId(req);
     const storeId = Number(req.params.storeId);
 
     if (!req.file || !req.file.filename) {
@@ -349,7 +394,7 @@ exports.updateLogo = async (req, res) => {
 // Deletes a store (destroy action)
 exports.destroy = async (req, res) => {
   try {
-    const adminId = req.session.adminId;
+    const adminId = getOwnerId(req);
     const storeId = Number(req.params.storeId);
 
     const store = await dbGet("SELECT id, logo_path FROM stores WHERE id = ? AND admin_id = ?", [
@@ -386,7 +431,7 @@ exports.destroy = async (req, res) => {
 
 // Rotates QR code public ID (custom action)
 exports.rotateQr = async (req, res) => {
-  const adminId = req.session.adminId;
+  const adminId = getOwnerId(req);
   const storeId = Number(req.params.storeId);
 
   const store = await dbGet("SELECT id FROM stores WHERE id = ? AND admin_id = ?", [
@@ -408,7 +453,7 @@ exports.rotateQr = async (req, res) => {
 
 // Admin Test QR Download (custom actions)
 exports.testQrDownload = async (req, res) => {
-  const adminId = req.session.adminId;
+  const adminId = getOwnerId(req);
   const stores = await dbAll(
     "SELECT id, name FROM stores WHERE admin_id = ? ORDER BY id DESC",
     [adminId]
@@ -420,7 +465,7 @@ exports.testQrDownload = async (req, res) => {
 };
 
 exports.testQrDownloadRawPng = async (req, res) => {
-  const adminId = req.session.adminId;
+  const adminId = getOwnerId(req);
   const storeId = Number(req.params.storeId);
 
   const store = await dbGet(
@@ -439,7 +484,7 @@ exports.testQrDownloadRawPng = async (req, res) => {
 };
 
 exports.testQrDownloadFramedPng = async (req, res) => {
-  const adminId = req.session.adminId;
+  const adminId = getOwnerId(req);
   const storeId = Number(req.params.storeId);
 
   const store = await dbGet(

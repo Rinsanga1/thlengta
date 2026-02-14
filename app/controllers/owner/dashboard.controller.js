@@ -1,13 +1,28 @@
 const { dbGet, dbAll } = require("../../db/helpers");
+const { getOwnerId, getOwnerType } = require("../../middleware/auth");
 
 
-// Displays the admin dashboard (index)
 exports.index = async (req, res) => {
-  const adminId = req.session.adminId;
+  const ownerId = getOwnerId(req);
+  const ownerType = getOwnerType(req);
 
-  const admin = await dbGet("SELECT id, email, plan FROM admins WHERE id = ?", [adminId]);
+  if (!ownerId) {
+    return res.redirect("/users/signin");
+  }
 
-  const stores = await dbAll("SELECT id, name, public_id FROM stores WHERE admin_id = ?", [adminId]);
+  let admin;
+  if (ownerType === "user") {
+    admin = await dbGet("SELECT id, email, plan FROM users WHERE id = ?", [ownerId]);
+  } else {
+    admin = await dbGet("SELECT id, email, plan FROM admins WHERE id = ?", [ownerId]);
+  }
+
+  if (!admin) {
+    req.session.destroy();
+    return res.redirect("/users/signin");
+  }
+
+  const stores = await dbAll("SELECT id, name, public_id FROM stores WHERE admin_id = ?", [ownerId]);
 
   const pendingUpgrade = await dbGet(
     `SELECT id, from_plan, to_plan, status, created_at
@@ -15,11 +30,11 @@ exports.index = async (req, res) => {
      WHERE admin_id = ? AND status = 'pending'
      ORDER BY id DESC
      LIMIT 1`,
-    [adminId]
+    [ownerId]
   );
 
-  res.renderPage("owner/dashboard/index", { // Renamed view
-    title: "Admin Dashboard",
+  return res.renderPage("owner/dashboard/index", {
+    title: ownerType === "user" ? "Dashboard" : "Admin Dashboard",
     admin,
     stores,
     pendingUpgrade
@@ -27,9 +42,10 @@ exports.index = async (req, res) => {
 };
 
 
-// Handles the root /admin path, redirecting based on session status
 exports.gateway = (req, res) => {
-  if (req.session?.adminId) {
+  const ownerId = getOwnerId(req);
+
+  if (ownerId) {
     return res.redirect("/owner/dashboard");
   }
 
@@ -37,5 +53,5 @@ exports.gateway = (req, res) => {
     return res.redirect("/manager/dashboard");
   }
 
-  return res.redirect("/owner/login");
+  return res.redirect("/users/signin");
 };

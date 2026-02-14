@@ -230,6 +230,7 @@ CREATE TABLE IF NOT EXISTS users (
   password_hash TEXT NOT NULL,
   name TEXT DEFAULT '',
   phone TEXT DEFAULT '',
+  plan TEXT DEFAULT 'free',
   status TEXT NOT NULL DEFAULT 'active',
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );

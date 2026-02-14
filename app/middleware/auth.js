@@ -1,5 +1,17 @@
 const { dbGet } = require("../db/helpers");
 
+// Helper: get owner ID from either user or admin session
+function getOwnerId(req) {
+  return req.session?.userId || req.session?.adminId || null;
+}
+
+// Helper: get owner type ('user' or 'admin')
+function getOwnerType(req) {
+  if (req.session?.userId) return 'user';
+  if (req.session?.adminId) return 'admin';
+  return null;
+}
+
 // Helper: hard logout for admin sessions
 function clearAdminSession(req) {
   if (!req.session) return;
@@ -18,44 +30,66 @@ function clearManagerSession(req) {
   delete req.session.sessionVersion;
 }
 
+// Helper: hard logout for user sessions
+function clearUserSession(req) {
+  if (!req.session) return;
+  delete req.session.userId;
+}
+
+// Middleware: require owner (either from admins table or users table)
 async function requireOwner(req, res, next) {
   try {
-    if (!req.session || !req.session.adminId) {
-      return res.redirect("/owner/login");
-    }
+    // Check for userId (new users table)
+    if (req.session?.userId) {
+      const userId = Number(req.session.userId);
+      const user = await dbGet("SELECT id, status FROM users WHERE id = ?", [userId]);
 
-    const adminId = Number(req.session.adminId);
+      if (!user || user.status !== "active") {
+        clearUserSession(req);
+        return res.redirect("/users/signin");
+      }
 
-    const row = await dbGet(
-      "SELECT id, session_version, status, expires_at FROM admins WHERE id = ?",
-      [adminId]
-    );
-
-    if (!row || row.status !== "active" || !row.expires_at) {
-      clearAdminSession(req);
-      return res.redirect("/owner/login");
-    }
-
-    const dbVer = Number(row.session_version || 0);
-
-    // Backward compatibility: if sessionVersion missing, attach it now
-    if (req.session.sessionVersion === undefined || req.session.sessionVersion === null) {
-      req.session.sessionVersion = dbVer;
       return next();
     }
 
-    const sessVer = Number(req.session.sessionVersion || 0);
+    // Check for adminId (legacy admins table)
+    if (req.session?.adminId) {
+      const adminId = Number(req.session.adminId);
 
-    if (dbVer !== sessVer) {
-      clearAdminSession(req);
-      return res.redirect("/owner/login");
+      const row = await dbGet(
+        "SELECT id, session_version, status, expires_at FROM admins WHERE id = ?",
+        [adminId]
+      );
+
+      if (!row || row.status !== "active" || !row.expires_at) {
+        clearAdminSession(req);
+        return res.redirect("/owner/login");
+      }
+
+      const dbVer = Number(row.session_version || 0);
+
+      // Backward compatibility: if sessionVersion missing, attach it now
+      if (req.session.sessionVersion === undefined || req.session.sessionVersion === null) {
+        req.session.sessionVersion = dbVer;
+        return next();
+      }
+
+      const sessVer = Number(req.session.sessionVersion || 0);
+
+      if (dbVer !== sessVer) {
+        clearAdminSession(req);
+        return res.redirect("/owner/login");
+      }
+
+      return next();
     }
 
-    return next();
+    // No session found - redirect to sign in
+    return res.redirect("/users/signin");
   } catch (e) {
     console.error("requireOwner error:", e);
-    clearAdminSession(req);
-    return res.redirect("/owner/login");
+    clearUserSession(req);
+    return res.redirect("/users/signin");
   }
 }
 
@@ -101,4 +135,4 @@ async function requireManager(req, res, next) {
   }
 }
 
-module.exports = { requireOwner, requireManager };
+module.exports = { requireOwner, requireManager, getOwnerId, getOwnerType };
