@@ -13,14 +13,14 @@ exports.destroy = async (req, res) => {
       ]);
     }
 
-    if (!req.session) return res.redirect("/admin/login");
-    req.session.destroy(() => res.redirect("/admin/login"));
+    if (!req.session) return res.redirect("/owner/login");
+    req.session.destroy(() => res.redirect("/owner/login"));
   } catch (e) {
     console.error("[MANAGER LOGOUT]", e);
     if (req.session) {
-      req.session.destroy(() => res.redirect("/admin/login"));
+      req.session.destroy(() => res.redirect("/owner/login"));
     } else {
-      res.redirect("/admin/login");
+      res.redirect("/owner/login");
     }
   }
 };

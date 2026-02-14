@@ -1,0 +1,65 @@
+<section class="section" style="padding-top:56px;">
+  <div class="card pad" style="max-width:560px;margin:0 auto;">
+    <div class="topbar" style="margin-bottom:18px;">
+      <div>
+        <div class="h-eyebrow">
+          <span class="chip">Admin</span>
+          <span class="chip">Setup</span>
+        </div>
+        <h2 style="margin:10px 0 0;">Create Admin Account</h2>
+        <div class="small" style="margin-top:6px;">
+          This is usually done once during initial setup.
+        </div>
+      </div>
+
+      <a class="btn" href="/owner/login" style="white-space:nowrap;">
+        Login
+      </a>
+    </div>
+
+    <% if (error) { %>
+      <div class="error"><%= error %></div>
+    <% } %>
+
+    <form
+      class="form"
+      method="post"
+      action="/owner/register"
+      style="margin-top:14px;"
+    >
+      <div class="field">
+        <label>Email</label>
+        <input
+          type="email"
+          name="email"
+          required
+          placeholder="admin@example.com"
+          autocomplete="username"
+        />
+      </div>
+
+      <div class="field">
+        <label>Password</label>
+        <input
+          type="password"
+          name="password"
+          minlength="8"
+          required
+          placeholder="Minimum 8 characters"
+          autocomplete="new-password"
+        />
+      </div>
+
+      <button class="btn primary full" type="submit">
+        Create Admin
+      </button>
+    </form>
+
+    <div class="notice" style="margin-top:16px;">
+      <div style="font-weight:900;">Password rules</div>
+      <div class="small">
+        Minimum 8 characters. Use a strong, unique password.
+      </div>
+    </div>
+  </div>
+</section>

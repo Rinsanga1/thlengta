@@ -1,0 +1,68 @@
+<header class="nav">
+    <div class="container nav-inner">
+      <div class="brand">
+        <span>
+           <img src="/assets/img/thlengtalogo.png" alt="Thlengta logo" width="80px"/>
+        </span>
+        <span class="small">
+          <img src="/assets/img/thlengtalogotext.png" atl="Thlengta logo type" width="195px"/>
+        </span>
+        <span class="small">
+          <img src="/assets/img/com.png" atl="Thlengta logo type" width="75px" style="margin-left: -10px"/>
+        </span>
+      </div>
+      
+      <nav class="nav-links">
+          <a class="btn" href="/owner/stores/<%= store.id %>/employees">Back</a>
+      </nav>
+    </div>
+  </header>
+<!---Below is the fucntional stuff -->
+<section class="section" style="padding-top:46px;">
+  <div class="card pad" style="max-width:720px;margin:0 auto;">
+    <div class="topbar" style="margin-bottom:14px;">
+      <div>
+        <div class="h-eyebrow">
+          <span class="chip">Employees</span>
+          <span class="chip">Add</span>
+        </div>
+        <h2 style="margin:10px 0 0;">Add Employee</h2>
+        <div class="small" style="margin-top:6px;">
+          Store: <b><%= store.name %></b>
+        </div>
+      </div>
+    </div>
+
+    <% if (error) { %>
+      <div class="error"><%= error %></div>
+    <% } %>
+
+    <form class="form" method="post" action="/owner/stores/<%= store.id %>/employees" style="margin-top:12px;">
+      <div class="field">
+        <label>Employee Email</label>
+        <input type="email" name="email" required placeholder="staff@example.com" />
+      </div>
+
+      <div class="field">
+        <label>Employee PIN</label>
+        <input
+          type="password"
+          name="pin"
+          inputmode="numeric"
+          minlength="4"
+          maxlength="8"
+          required
+          placeholder="4 to 8 digits"
+        />
+        <div class="small">PIN should be 4 to 8 digits.</div>
+      </div>
+
+      <button class="btn primary full" type="submit">Add Employee</button>
+    </form>
+
+    <div class="notice" style="margin-top:14px;">
+      <div style="font-weight:900;">Device rule</div>
+      <div class="small">Each employee can register on 1 device only. You can reset later if they change phones.</div>
+    </div>
+  </div>
+</section>

@@ -1,5 +1,5 @@
 exports.index = (_req, res) => {
-  res.renderPage("home", {
+  res.renderPage("home/index", {
     title: "Thleng Ta! | Simple staff attendance for your team!",
     metaDescription: "Thlengta is a lightweight attendance + staff tracking system built for small shops and teams. Retro-friendly UI, modern reliability.",
     themeColor: "#fbfaf6",

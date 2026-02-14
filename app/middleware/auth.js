@@ -18,10 +18,10 @@ function clearManagerSession(req) {
   delete req.session.sessionVersion;
 }
 
-async function requireAdmin(req, res, next) {
+async function requireOwner(req, res, next) {
   try {
     if (!req.session || !req.session.adminId) {
-      return res.redirect("/admin/login");
+      return res.redirect("/owner/login");
     }
 
     const adminId = Number(req.session.adminId);
@@ -33,7 +33,7 @@ async function requireAdmin(req, res, next) {
 
     if (!row || row.status !== "active" || !row.expires_at) {
       clearAdminSession(req);
-      return res.redirect("/admin/login");
+      return res.redirect("/owner/login");
     }
 
     const dbVer = Number(row.session_version || 0);
@@ -48,21 +48,21 @@ async function requireAdmin(req, res, next) {
 
     if (dbVer !== sessVer) {
       clearAdminSession(req);
-      return res.redirect("/admin/login");
+      return res.redirect("/owner/login");
     }
 
     return next();
   } catch (e) {
-    console.error("requireAdmin error:", e);
+    console.error("requireOwner error:", e);
     clearAdminSession(req);
-    return res.redirect("/admin/login");
+    return res.redirect("/owner/login");
   }
 }
 
 async function requireManager(req, res, next) {
   try {
     if (!req.session || !req.session.managerId || !req.session.managerAdminId) {
-      return res.redirect("/admin/login");
+      return res.redirect("/owner/login");
     }
 
     const managerId = Number(req.session.managerId);
@@ -75,7 +75,7 @@ async function requireManager(req, res, next) {
 
     if (!mgr || !mgr.is_active || Number(mgr.admin_id) !== adminId) {
       clearManagerSession(req);
-      return res.redirect("/admin/login");
+      return res.redirect("/owner/login");
     }
 
     const dbVer = Number(mgr.session_version || 0);
@@ -90,15 +90,15 @@ async function requireManager(req, res, next) {
 
     if (dbVer !== sessVer) {
       clearManagerSession(req);
-      return res.redirect("/admin/login");
+      return res.redirect("/owner/login");
     }
 
     return next();
   } catch (e) {
     console.error("requireManager error:", e);
     clearManagerSession(req);
-    return res.redirect("/admin/login");
+    return res.redirect("/owner/login");
   }
 }
 
-module.exports = { requireAdmin, requireManager };
+module.exports = { requireOwner, requireManager };

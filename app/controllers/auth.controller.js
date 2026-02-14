@@ -4,8 +4,9 @@ const { sendMail } = require("../utils/mailer");
 const { normalizePlan, emailAlreadyUsed } = require("../utils/auth.utils");
 
 
+// redirect function, and is exported
 exports.redirect = (req, res) => {
-  res.renderPage("home", { 
+  res.renderPage("home", {
     title: "Thlengta - Simple Staff Attendance"
   });
 };

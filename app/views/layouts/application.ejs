@@ -13,6 +13,33 @@
   <% } %>
 </head>
 
+<header class="nav">
+  <div class="container nav-inner">
+    <!-- rewrite to turbo -->
+    <a class="brand" href="/" data-nav>
+      <span>
+        <!-- rewrite to .svg files -->
+        <img src="/assets/img/thlengtalogo.png" alt="Thlengta logo" width="80px"/>
+      </span>
+      <span class="small">
+        <img src="/assets/img/thlengtalogotext.png" alt="Thlengta logo type" width="195px"/>
+      </span>
+      <span class="small">
+        <img src="/assets/img/com.png" alt="Thlengta logo type" width="75px" style="margin-left: -10px"/>
+      </span>
+    </a>
+
+    <nav class="nav-links">
+      <a data-nav href="/#about">About</a>
+      <a data-nav href="/#pricing">Pricing</a>
+      <a data-nav href="/#contact">Contact</a>
+      <a class="btn primary" href="/owner/login">Sign Up</a>
+      <a class="btn primary" href="/owner/login">Sign In</a>
+    </nav>
+  </div>
+</header>
+
+
 <body class="bg-grid">
   <% if (typeof useWrap !== 'undefined' && useWrap) { %>
     <div class="wrap">
@@ -22,4 +49,13 @@
     <%- body %>
   <% } %>
 </body>
+
+<footer class="footer">
+  <div class="container">
+    <div class="small">© <span id="year"></span> Thleng Ta!. Built in Mizoram.</div>
+    <div class="small" style="margin-top:8px">
+      <a href="#about">About</a> · <a href="#pricing">Pricing</a> · <a href="#contact">Contact</a>
+    </div>
+  </div>
+</footer>
 </html>

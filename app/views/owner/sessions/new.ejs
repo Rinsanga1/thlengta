@@ -1,0 +1,52 @@
+<header class="nav">
+  <div class="container nav-inner">
+    <a class="brand" href="/#home">
+      <span>
+        <img src="/assets/img/thlengtalogo.png" alt="Thlengta logo" width="80px"/>
+      </span>
+      <span class="small">
+        <img src="/assets/img/thlengtalogotext.png" atl="Thlengta logo type" width="195px"/>
+      </span>
+      <span class="small">
+        <img src="/assets/img/com.png" atl="Thlengta logo type" width="75px" style="margin-left: -10px"/>
+      </span>
+    </a>
+  </div>
+</header>
+
+<section class="section" style="padding-top:46px;">
+  <div class="card pad" style="max-width:520px;margin:0 auto;">
+    <div class="topbar" style="margin-bottom:14px;">
+      <div>
+        <div class="h-eyebrow">
+          <span class="chip">Thleng Ta! Dashboard</span>
+        </div>
+        <h2 style="margin:10px 0 0;">Login to your account</h2>
+        <div class="small" style="margin-top:6px;">Lets simplify attendance tracking!</div>
+      </div>
+    </div>
+
+    <% if (error) { %>
+      <div class="error"><%= error %></div>
+    <% } %>
+
+    <form class="form" method="post" action="/owner/login" style="margin-top:12px;">
+      <div class="field">
+        <label>Email</label>
+        <input type="email" name="email" required placeholder="admin@example.com" />
+      </div>
+
+      <div class="field">
+        <label>Password</label>
+        <input type="password" name="password" required placeholder="Your password" />
+      </div>
+
+      <div class="field" style="display:flex;align-items:center;gap:10px;margin-top:8px;">
+        <input id="remember_me" type="checkbox" name="remember_me" style="width:18px;height:18px;" />
+        <label for="remember_me" style="margin:0;">Remember me (2 weeks)</label>
+      </div>
+
+      <button class="btn primary full" type="submit">Login</button>
+    </form>
+  </div>
+</section>

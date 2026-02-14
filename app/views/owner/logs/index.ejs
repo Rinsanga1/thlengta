@@ -1,0 +1,162 @@
+<header class="nav">
+  <div class="container nav-inner">
+    <div class="brand">
+      <span>
+        <img src="/assets/img/thlengtalogo.png" alt="Thlengta logo" width="80px"/>
+      </span>
+      <span class="small">
+        <img src="/assets/img/thlengtalogotext.png" alt="Thlengta logo type" width="195px"/>
+      </span>
+      <span class="small">
+        <img src="/assets/img/com.png" alt="Thlengta logo type" width="75px" style="margin-left:-10px"/>
+      </span>
+    </div>
+    <nav class="nav-links">
+      <a class="btn" href="/owner/dashboard">Back</a>
+    </nav>
+  </div>
+</header>
+
+<section class="section" style="padding-top:46px;">
+  <div class="card pad super" style="margin:0 auto;">
+    <div class="topbar" style="margin-bottom:14px;">
+      <div>
+        <div class="h-eyebrow">
+          <span class="chip">Attendance</span>
+          <span class="chip">Logs</span>
+        </div>
+        <h2 style="margin:10px 0 0;">Attendance Logs</h2>
+        <div class="small" style="margin-top:6px;">
+          Store: <b><%= store.name %></b>
+        </div>
+      </div>
+    </div>
+
+    <div class="actions" style="margin:10px 0 14px;">
+      <a class="btn" href="/owner/stores/<%= store.id %>/">QR</a>
+      <a class="btn" href="/owner/stores/<%= store.id %>/employees">Employees</a>
+      <a class="btn" href="/owner/stores/<%= store.id %>/edit">Settings</a>
+    </div>
+
+    <div class="card pad" style="background:#f8faf9;">
+      <form method="get" action="/owner/stores/<%= store.id %>/logs">
+        <div class="field">
+          <label>Date</label>
+          <input type="date" name="date" value="<%= selectedDate %>" required />
+        </div>
+
+        <div class="actions" style="margin-top:10px;">
+          <button class="btn primary" type="submit">View</button>
+
+          <a class="btn" href="/owner/stores/<%= store.id %>/logs.csv?date=<%= selectedDate %>">
+            Download Day CSV
+          </a>
+
+          <a class="btn" href="/owner/stores/<%= store.id %>/logs_month.csv?month=<%= selectedDate.slice(0,7) %>">
+            Download Month CSV
+          </a>
+        </div>
+      </form>
+    </div>
+
+    <div style="height:14px;"></div>
+
+    <% if (!logs.length) { %>
+      <div class="card pad" style="background:#f8faf9;">
+        <b>No logs for this date</b>
+      </div>
+    <% } else { %>
+      <div style="overflow:auto;">
+        <table style="width:100%; border-collapse:collapse;">
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Employee</th>
+              <th>Event</th>
+              <th>Status</th>
+              <th>GPS</th>
+              <th>Device</th>
+              <th>IP</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% logs.forEach(r => { %>
+              <%
+                let label = r.event_type;
+                let bg = "#f1f3f5";
+                let dot = "#555";
+
+                if (r.event_type === "checkin") {
+                  label = "Check-in";
+                  bg = "#eaf6f0";
+                  dot = "var(--accent)";
+                } else if (r.event_type === "break") {
+                  label = "Break Started";
+                  bg = "#fff7e6";
+                  dot = "#ffb000";
+                } else if (r.event_type === "resume") {
+                  label = "Break Ended";
+                  bg = "#eaf6f0";
+                  dot = "#1f7a5b";
+                } else if (r.event_type === "checkout") {
+                  label = "Check-out";
+                } else if (r.event_type === "denied_gps") {
+                  label = "Denied (GPS)";
+                  bg = "#fff1f1";
+                  dot = "#d64545";
+                } else if (r.event_type === "denied_device") {
+                  label = "Denied (Device)";
+                  bg = "#fff1f1";
+                  dot = "#d64545";
+                }
+              %>
+
+              <tr>
+                <td><%= r.time12 || "" %></td>
+                <td><b><%= r.employee_email || "Unknown" %></b></td>
+
+                <td>
+                  <span class="badge" style="background:<%= bg %>;">
+                    <span class="dot" style="background:<%= dot %>;"></span>
+                    <%= label %>
+                  </span>
+                </td>
+
+                <td>
+                  <% if (r.event_type === "checkin" && r.punctuality === "LATE") { %>
+                    <span class="badge" style="background:#fff1f1;">
+                      <span class="dot" style="background:#d64545;"></span>
+                      Late (+<%= r.late_by_min %>m)
+                    </span>
+                  <% } else if (r.event_type === "checkin") { %>
+                    <span class="badge" style="background:#eaf6f0;">
+                      <span class="dot"></span> On Time
+                    </span>
+                  <% } else { %>
+                    <span class="small">N/A</span>
+                  <% } %>
+                </td>
+
+                <td>
+                  <span class="badge" style="background:<%= r.gps_ok ? '#eaf6f0' : '#fff1f1' %>;">
+                    <span class="dot" style="background:<%= r.gps_ok ? 'var(--accent)' : '#d64545' %>;"></span>
+                    <%= r.gps_ok ? "OK" : "FAIL" %>
+                  </span>
+                </td>
+
+                <td>
+                  <span class="badge" style="background:<%= r.device_ok ? '#eaf6f0' : '#fff1f1' %>;">
+                    <span class="dot" style="background:<%= r.device_ok ? 'var(--accent)' : '#d64545' %>;"></span>
+                    <%= r.device_ok ? "OK" : "FAIL" %>
+                  </span>
+                </td>
+
+                <td><span class="small"><%= r.ip || "" %></span></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } %>
+  </div>
+</section>

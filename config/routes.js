@@ -1,16 +1,16 @@
 const express = require("express");
 
-// require Controllers
 
+// require Controllers
 const auth = require("../app/controllers/auth.controller");
-const adminSessions = require("../app/controllers/admin/sessions.controller");
-const adminDashboard = require("../app/controllers/admin/dashboard.controller");
-const { requireAdmin } = require("../app/middleware/auth"); // Import requireAdmin
-const adminStores = require("../app/controllers/admin/stores.controller"); // Import adminStores
-const adminEmployees = require("../app/controllers/admin/employees.controller"); // Import adminEmployees
-const adminManagers = require("../app/controllers/admin/managers.controller"); // Import adminManagers
-const adminLogs = require("../app/controllers/admin/logs.controller"); // Import adminLogs
-const adminUpgrades = require("../app/controllers/admin/upgrades.controller"); // Import adminUpgrades
+const ownerSessions = require("../app/controllers/owner/sessions.controller");
+const ownerDashboard = require("../app/controllers/owner/dashboard.controller");
+const { requireOwner } = require("../app/middleware/auth"); // Import requireOwner
+const ownerStores = require("../app/controllers/owner/stores.controller"); // Import ownerStores
+const ownerEmployees = require("../app/controllers/owner/employees.controller"); // Import ownerEmployees
+const ownerManagers = require("../app/controllers/owner/managers.controller"); // Import ownerManagers
+const ownerLogs = require("../app/controllers/owner/logs.controller"); // Import ownerLogs
+const ownerUpgrades = require("../app/controllers/owner/upgrades.controller"); // Import ownerUpgrades
 const employeeScans = require("../app/controllers/employee/scans.controller"); // Import employeeScans
 const employeeDeviceApprovals = require("../app/controllers/employee/deviceApprovals.controller"); // Import employeeDeviceApprovals
 const employeeChoices = require("../app/controllers/employee/choices.controller"); // Import employeeChoices
@@ -21,8 +21,8 @@ const managerEmployees = require("../app/controllers/manager/employees.controlle
 const managerSessions = require("../app/controllers/manager/sessions.controller"); // Import managerSessions
 const { requireManager } = require("../app/middleware/auth"); // Import requireManager
 const { requireSuperAdmin } = require("../app/middleware/superadminAuth"); // Import requireSuperAdmin
-const superadminSessions = require("../app/controllers/superadmin/sessions.controller"); // Import superadminSessions
-const superadminDashboard = require("../app/controllers/superadmin/dashboard.controller"); // Import superadminDashboard
+const superownerSessions = require("../app/controllers/superadmin/sessions.controller"); // Import superownerSessions
+const superownerDashboard = require("../app/controllers/superadmin/dashboard.controller"); // Import superownerDashboard
 const superadminAdmins = require("../app/controllers/superadmin/admins.controller"); // Import superadminAdmins
 const superadminUpgradeRequests = require("../app/controllers/superadmin/upgradeRequests.controller"); // Import superadminUpgradeRequests
 const upload = require("../app/middleware/upload"); // Import upload middleware
@@ -34,7 +34,6 @@ const router = express.Router();
 // Home
 router.get("/", home.index);
 router.post("/contact", contact.create);
-router.get("/login", auth.redirect);
 
 // Plan-specific registration routes (must be before generic /register)
 router.get("/register/:plan", (req, res, next) => {
@@ -48,69 +47,63 @@ router.post("/register", auth.create); // New: Handle registration submission
 router.get("/register/submitted", auth.submitted); // Renamed: Registration submitted page
 
 // Sessions
-
-router.get("/admin/login", adminSessions.new);
-router.post("/admin/login", adminSessions.create);
-router.get("/admin/logout", adminSessions.destroy);
+router.get("/owner/login", ownerSessions.new);
+router.post("/owner/login", ownerSessions.create);
+router.get("/owner/logout", ownerSessions.destroy);
 
 // Dashboard
-
-router.get("/admin/dashboard", requireAdmin, adminDashboard.index);
-router.get("/admin", adminDashboard.gateway);
+router.get("/owner/dashboard", requireOwner, ownerDashboard.index);
+router.get("/owner", ownerDashboard.gateway);
 
 // Stores (Workplace)
-
-router.get("/admin/stores/new", requireAdmin, adminStores.new);
-router.get("/admin/stores/new/step-1", requireAdmin, adminStores.new_step1_get);
-router.post("/admin/stores/new/step-1", requireAdmin, upload.single("logo"), adminStores.new_step1_post);
-router.get("/admin/stores/new/step-2", requireAdmin, adminStores.new_step2_get);
-router.post("/admin/stores/new/step-2", requireAdmin, adminStores.new_step2_post);
-router.get("/admin/stores/new/step-3", requireAdmin, adminStores.new_step3_get);
-router.post("/admin/stores/new/step-3", requireAdmin, adminStores.new_step3_post);
-router.get("/admin/stores/new/step-4", requireAdmin, adminStores.new_step4_get);
-router.post("/admin/stores/new/finish", requireAdmin, adminStores.create);
-router.get("/admin/stores/:storeId", requireAdmin, adminStores.show); // Show QR
-router.get("/admin/stores/:storeId/qr.png", requireAdmin, adminStores.qrPng);
-router.get("/admin/stores/:storeId/edit", requireAdmin, adminStores.edit); // Settings
-router.post("/admin/stores/:storeId/settings", requireAdmin, adminStores.update);
-router.post("/admin/stores/:storeId/logo", requireAdmin, upload.single("logo"), adminStores.updateLogo);
-router.post("/admin/stores/:storeId/delete", requireAdmin, adminStores.destroy);
-router.post("/admin/stores/:storeId/qr/rotate", requireAdmin, adminStores.rotateQr);
+router.get("/owner/stores/new", requireOwner, ownerStores.new);
+router.get("/owner/stores/new/step-1", requireOwner, ownerStores.new_step1_get);
+router.post("/owner/stores/new/step-1", requireOwner, upload.single("logo"), ownerStores.new_step1_post);
+router.get("/owner/stores/new/step-2", requireOwner, ownerStores.new_step2_get);
+router.post("/owner/stores/new/step-2", requireOwner, ownerStores.new_step2_post);
+router.get("/owner/stores/new/step-3", requireOwner, ownerStores.new_step3_get);
+router.post("/owner/stores/new/step-3", requireOwner, ownerStores.new_step3_post);
+router.get("/owner/stores/new/step-4", requireOwner, ownerStores.new_step4_get);
+router.post("/owner/stores/new/finish", requireOwner, ownerStores.create);
+router.get("/owner/stores/:storeId", requireOwner, ownerStores.show); // Show QR
+router.get("/owner/stores/:storeId/qr.png", requireOwner, ownerStores.qrPng);
+router.get("/owner/stores/:storeId/edit", requireOwner, ownerStores.edit); // Settings
+router.post("/owner/stores/:storeId/settings", requireOwner, ownerStores.update);
+router.post("/owner/stores/:storeId/logo", requireOwner, upload.single("logo"), ownerStores.updateLogo);
+router.post("/owner/stores/:storeId/delete", requireOwner, ownerStores.destroy);
+router.post("/owner/stores/:storeId/qr/rotate", requireOwner, ownerStores.rotateQr);
 
 // Test QR Download routes
-
-router.get("/admin/test_qr_download", requireAdmin, adminStores.testQrDownload);
-router.get("/admin/test_qr_download/raw/:storeId.png", requireAdmin, adminStores.testQrDownloadRawPng);
-router.get("/admin/test_qr_download/framed/:storeId.png", requireAdmin, adminStores.testQrDownloadFramedPng);
-router.get("/admin/test_qr_download/debug_frame", requireAdmin, adminStores.debugFrame);
+router.get("/owner/test_qr_download", requireOwner, ownerStores.testQrDownload);
+router.get("/owner/test_qr_download/raw/:storeId.png", requireOwner, ownerStores.testQrDownloadRawPng);
+router.get("/owner/test_qr_download/framed/:storeId.png", requireOwner, ownerStores.testQrDownloadFramedPng);
+router.get("/owner/test_qr_download/debug_frame", requireOwner, ownerStores.debugFrame);
 
 // Admin Employees
-
-router.get("/admin/stores/:storeId/employees", requireAdmin, adminEmployees.index);
-router.get("/admin/stores/:storeId/employees/new", requireAdmin, adminEmployees.new);
-router.post("/admin/stores/:storeId/employees", requireAdmin, adminEmployees.create); // POST to root collection
-router.post("/admin/stores/:storeId/employees/:employeeId/toggle", requireAdmin, adminEmployees.updateStatus);
-router.post("/admin/stores/:storeId/employees/:employeeId/device/reset", requireAdmin, adminEmployees.resetDevice);
-router.post("/admin/stores/:storeId/employees/:employeeId/delete", requireAdmin, adminEmployees.destroy);
+router.get("/owner/stores/:storeId/employees", requireOwner, ownerEmployees.index);
+router.get("/owner/stores/:storeId/employees/new", requireOwner, ownerEmployees.new);
+router.post("/owner/stores/:storeId/employees", requireOwner, ownerEmployees.create); // POST to root collection
+router.post("/owner/stores/:storeId/employees/:employeeId/toggle", requireOwner, ownerEmployees.updateStatus);
+router.post("/owner/stores/:storeId/employees/:employeeId/device/reset", requireOwner, ownerEmployees.resetDevice);
+router.post("/owner/stores/:storeId/employees/:employeeId/delete", requireOwner, ownerEmployees.destroy);
 
 // Managers
-
-router.get("/admin/stores/:storeId/managers", requireAdmin, adminManagers.index);
-router.get("/admin/stores/:storeId/managers/new", requireAdmin, adminManagers.new);
-router.post("/admin/stores/:storeId/managers", requireAdmin, adminManagers.create); // POST to root collection
-router.post("/admin/stores/:storeId/managers/:managerId/toggle", requireAdmin, adminManagers.updateStatus);
-router.post("/admin/stores/:storeId/managers/:managerId/remove", requireAdmin, adminManagers.destroy);
+router.get("/owner/stores/:storeId/managers", requireOwner, ownerManagers.index);
+router.get("/owner/stores/:storeId/managers/new", requireOwner, ownerManagers.new);
+router.post("/owner/stores/:storeId/managers", requireOwner, ownerManagers.create); // POST to root collection
+router.post("/owner/stores/:storeId/managers/:managerId/toggle", requireOwner, ownerManagers.updateStatus);
+router.post("/owner/stores/:storeId/managers/:managerId/remove", requireOwner, ownerManagers.destroy);
 
 // Logs
 
-router.get("/admin/stores/:storeId/logs", requireAdmin, adminLogs.index);
-router.get("/admin/stores/:storeId/logs.csv", requireAdmin, adminLogs.downloadDayCsv);
-router.get("/admin/stores/:storeId/logs_month.csv", requireAdmin, adminLogs.downloadMonthCsv);
+router.get("/owner/stores/:storeId/logs", requireOwner, ownerLogs.index);
+router.get("/owner/stores/:storeId/logs.csv", requireOwner, ownerLogs.downloadDayCsv);
+router.get("/owner/stores/:storeId/logs_month.csv", requireOwner, ownerLogs.downloadMonthCsv);
 
 // Upgrades
 
-router.get("/admin/upgrade", requireAdmin, adminUpgrades.new);
-router.post("/admin/upgrade", requireAdmin, adminUpgrades.create);
+router.get("/owner/upgrade", requireOwner, ownerUpgrades.new);
+router.post("/owner/upgrade", requireOwner, ownerUpgrades.create);
 
 // Employee Scans
 
@@ -152,14 +145,14 @@ router.get("/manager/logout", managerSessions.destroy);
 
 // Superadmin Sessions
 
-router.get("/superadmin/login", superadminSessions.new);
-router.post("/superadmin/login", superadminSessions.create);
-router.post("/superadmin/logout", requireSuperAdmin, superadminSessions.destroy);
+router.get("/superadmin/login", superownerSessions.new);
+router.post("/superadmin/login", superownerSessions.create);
+router.post("/superadmin/logout", requireSuperAdmin, superownerSessions.destroy);
 
 // Superadmin Dashboard
 
-router.get("/superadmin", superadminDashboard.gateway);
-router.get("/superadmin/dashboard", requireSuperAdmin, superadminDashboard.index);
+router.get("/superadmin", superownerDashboard.gateway);
+router.get("/superadmin/dashboard", requireSuperAdmin, superownerDashboard.index);
 
 // Superadmin Admin Management
 

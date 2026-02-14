@@ -14,7 +14,7 @@ exports.index = async (req, res) => {
 
     if (!manager || !manager.is_active) {
       req.session.destroy(() => {});
-      return res.redirect("/admin/login");
+      return res.redirect("/owner/login");
     }
 
     const admin = await dbGet("SELECT id, email, plan FROM admins WHERE id = ?", [adminId]);

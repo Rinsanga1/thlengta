@@ -1,0 +1,69 @@
+<header class="nav">
+  <div class="container nav-inner">
+    <div class="brand">
+      <span><img src="/assets/img/thlengtalogo.png" alt="Thlengta logo" width="80px"/></span>
+      <span class="small"><img src="/assets/img/thlengtalogotext.png" width="195px"/></span>
+      <span class="small"><img src="/assets/img/com.png" width="75px" style="margin-left:-10px"/></span>
+    </div>
+    <nav class="nav-links">
+      <a class="btn" href="/owner/dashboard">Back</a>
+    </nav>
+  </div>
+</header>
+
+<section class="section" style="padding-top:46px;">
+  <div class="card pad super" style="max-width:980px;margin:0 auto;">
+    <div class="topbar" style="margin-bottom:14px;">
+      <div>
+        <div class="h-eyebrow">
+          <span class="chip">Plan</span>
+          <span class="chip">Upgrade</span>
+        </div>
+        <h2 style="margin:10px 0 0;">Upgrade Plan</h2>
+        <div class="small" style="margin-top:6px;">
+          Request an upgrade.
+        </div>
+      </div>
+    </div>
+
+    <% if (error) { %><div class="error"><%= error %></div><% } %>
+    <% if (message) { %><div class="notice" style="background:#eaf6f0;"><%= message %></div><% } %>
+
+    <div class="card pad" style="background:#fff;">
+      <div class="small" style="margin-bottom:10px;">
+        Logged in as <b><%= admin?.email %></b> | Current plan: <b><%= (admin?.plan || "standard").toUpperCase() %></b>
+      </div>
+
+      <% if (pendingUpgrade) { %>
+        <div class="notice" style="background:#fff7df;">
+          <b>Pending request:</b>
+          <div class="small" style="margin-top:6px;">
+            <%= String(pendingUpgrade.from_plan).toUpperCase() %> → <%= String(pendingUpgrade.to_plan).toUpperCase() %>
+          </div>
+        </div>
+      <% } %>
+
+      <% if (!options || options.length === 0) { %>
+        <div class="notice">
+          You are already on the highest plan. No upgrades available.
+        </div>
+      <% } else { %>
+        <form method="post" action="/owner/upgrade">
+          <div class="field">
+            <label>Select plan to upgrade to</label>
+            <select name="to_plan" required>
+              <% options.forEach(function(p){ %>
+                <option value="<%= p %>"><%= p.toUpperCase() %></option>
+              <% }); %>
+            </select>
+          </div>
+
+          <div class="actions" style="margin-top:14px;">
+            <button class="btn primary" type="submit">Request Upgrade</button>
+            <a class="btn" href="/owner/dashboard">Cancel</a>
+          </div>
+        </form>
+      <% } %>
+    </div>
+  </div>
+</section>

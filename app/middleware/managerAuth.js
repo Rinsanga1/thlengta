@@ -7,7 +7,7 @@ async function requireManager(req, res, next) {
     const managerAdminId = req.session.managerAdminId;
 
     if (!managerId || !managerAdminId) {
-      return res.redirect("/admin/login");
+      return res.redirect("/owner/login");
     }
 
     const row = await dbGet(
@@ -25,23 +25,23 @@ async function requireManager(req, res, next) {
       [managerId, managerAdminId]
     );
 
-    if (!row) return res.redirect("/admin/login");
-    if (!row.manager_active) return res.redirect("/admin/login");
-    if (row.admin_status !== "active") return res.redirect("/admin/login");
+    if (!row) return res.redirect("/owner/login");
+    if (!row.manager_active) return res.redirect("/owner/login");
+    if (row.admin_status !== "active") return res.redirect("/owner/login");
 
-    if (!row.admin_expires_at) return res.redirect("/admin/login");
+    if (!row.admin_expires_at) return res.redirect("/owner/login");
 
     // admin_expires_at stored in SQLite as "YYYY-MM-DD HH:MM:SS" UTC-ish
     const iso = String(row.admin_expires_at).replace(" ", "T") + "Z";
     const expMs = Date.parse(iso);
     if (!Number.isFinite(expMs) || expMs < Date.now()) {
-      return res.redirect("/admin/login");
+      return res.redirect("/owner/login");
     }
 
     return next();
   } catch (err) {
     console.error(err);
-    return res.redirect("/admin/login");
+    return res.redirect("/owner/login");
   }
 }
 
