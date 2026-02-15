@@ -1,4 +1,4 @@
-const { dbGet } = require("../../db/helpers");
+const { dbGet } = require("../../../db/helpers");
 const { getManagerStoreOrNull } = require("../../utils/manager.utils");
 const { toPngBuffer } = require("../../utils/qr"); // Assuming toPngBuffer is in qr.js
 

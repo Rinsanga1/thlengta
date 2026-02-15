@@ -1,5 +1,5 @@
 const bcrypt = require("bcryptjs");
-const { dbGet } = require("../../db/helpers");
+const { dbGet } = require("../../../db/helpers");
 const { setRememberMeCookie, deleteSessionsByNeedle } = require("../../utils/session.utils");
 
 exports.new = (req, res) => {

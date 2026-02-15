@@ -1,5 +1,5 @@
 const bcrypt = require("bcryptjs");
-const { dbGet, dbRun } = require("../db/helpers");
+const { dbGet, dbRun } = require("../../db/helpers");
 const { setRememberMeCookie, deleteSessionsByNeedle } = require("../utils/session.utils");
 const { normalizePlan } = require("../utils/auth.utils");
 

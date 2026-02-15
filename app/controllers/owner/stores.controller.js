@@ -1,4 +1,4 @@
-const { dbGet, dbRun, dbAll } = require("../../db/helpers");
+const { dbGet, dbRun, dbAll } = require("../../../db/helpers");
 const { nanoid } = require("nanoid");
 const path = require("path");
 const fs = require("fs");

@@ -1,4 +1,4 @@
-const { dbGet } = require("../db/helpers");
+const { dbGet } = require("../../db/helpers");
 
 // Manager must be logged in AND the parent admin must still be active + not expired
 async function requireManager(req, res, next) {

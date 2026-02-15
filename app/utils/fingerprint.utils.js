@@ -1,5 +1,5 @@
 const crypto = require("crypto");
-const { dbGet, dbRun } = require("../db/helpers"); // Assuming db/helpers is in parent directory
+const { dbGet, dbRun } = require("../../db/helpers");
 
 async function ensureFpTable() {
   await dbRun(`

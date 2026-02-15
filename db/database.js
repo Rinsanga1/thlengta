@@ -1,5 +1,6 @@
 const path = require("path");
 const fs = require("fs");
+
 const { Database } = require("bun:sqlite");
 
 const DB_PATH = process.env.DB_PATH || path.join(process.cwd(), "data.sqlite");

@@ -1,4 +1,4 @@
-const { dbGet, dbAll } = require("../../db/helpers");
+const { dbGet, dbAll } = require("../../../db/helpers");
 const { getOwnerId } = require("../../middleware/auth");
 
 

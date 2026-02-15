@@ -1,4 +1,4 @@
-const { dbGet } = require("../db/helpers");
+const { dbGet } = require("../../db/helpers");
 
 function getOwnerId(req) {
   return req.session?.userId || null;

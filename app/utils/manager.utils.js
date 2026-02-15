@@ -1,4 +1,4 @@
-const { dbGet } = require("../db/helpers");
+const { dbGet } = require("../../db/helpers");
 
 async function getManagerStoreOrNull(managerId, userId, storeId) {
   return dbGet(

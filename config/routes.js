@@ -70,7 +70,6 @@ router.get("/owner/dashboard", requireOwner, ownerDashboard.index);
 router.get("/owner", ownerDashboard.gateway);
 
 // Stores (Workplace)
-//router.get("/owner/stores/new", requireOwner, ownerStores.new);
 router.get("/owner/stores/new", requireOwner, ownerStores.new);
 router.get("/owner/stores/new/step-1", requireOwner, ownerStores.new_step1_get);
 router.post("/owner/stores/new/step-1", requireOwner, upload.single("logo"), ownerStores.new_step1_post);
@@ -110,67 +109,54 @@ router.post("/owner/stores/:storeId/managers/:managerId/toggle", requireOwner, o
 router.post("/owner/stores/:storeId/managers/:managerId/remove", requireOwner, ownerManagers.destroy);
 
 // Logs
-
 router.get("/owner/stores/:storeId/logs", requireOwner, ownerLogs.index);
 router.get("/owner/stores/:storeId/logs.csv", requireOwner, ownerLogs.downloadDayCsv);
 router.get("/owner/stores/:storeId/logs_month.csv", requireOwner, ownerLogs.downloadMonthCsv);
 
 // Upgrades
-
 router.get("/owner/upgrade", requireOwner, ownerUpgrades.new);
 router.post("/owner/upgrade", requireOwner, ownerUpgrades.create);
 
 // Employee Scans
-
 router.get("/e/scan/:storePublicId", employeeScans.index);
 
 // Employee Device Approvals
-
 router.post("/e/scan/:storePublicId/device/approve", employeeDeviceApprovals.create);
 
 // Employee Choices (Break / Resume / Checkout)
-
 router.post("/e/scan/:storePublicId/choice", employeeChoices.create);
 router.post("/e/scan/:storePublicId/action", employeeChoices.create);
 
 // Manager Dashboard
-
 router.get("/manager/dashboard", requireManager, managerDashboard.index);
 
 // Manager Store QR
-
 router.get("/manager/store/:storeId/qr", requireManager, managerQrs.show);
 router.get("/manager/store/:storeId/qr.png", requireManager, managerQrs.png);
 
 // Manager Logs
-
 router.get("/manager/store/:storeId/logs", requireManager, managerLogs.index);
 router.get("/manager/store/:storeId/logs.csv", requireManager, managerLogs.downloadDayCsv);
 
 // Manager Employees
-
 router.get("/manager/store/:storeId/employees", requireManager, managerEmployees.index);
 router.get("/manager/store/:storeId/employees/new", requireManager, managerEmployees.new);
 router.post("/manager/store/:storeId/employees", requireManager, managerEmployees.create);
 router.post("/manager/store/:storeId/employees/:employeeId/toggle", requireManager, managerEmployees.updateStatus);
 
 // Manager Logout
-
 router.get("/manager/logout", managerSessions.destroy);
 
 // Superadmin Sessions
-
 router.get("/superadmin/login", superownerSessions.new);
 router.post("/superadmin/login", superownerSessions.create);
 router.post("/superadmin/logout", requireSuperAdmin, superownerSessions.destroy);
 
 // Superadmin Dashboard
-
 router.get("/superadmin", superownerDashboard.gateway);
 router.get("/superadmin/dashboard", requireSuperAdmin, superownerDashboard.index);
 
 // Superadmin Admin Management
-
 router.get("/superadmin/admins/:adminId/edit", requireSuperAdmin, superadminAdmins.edit);
 router.post("/superadmin/admins/:adminId/edit", requireSuperAdmin, superadminAdmins.update);
 router.post("/superadmin/admins/:adminId/approve", requireSuperAdmin, superadminAdmins.approve);
@@ -180,7 +166,6 @@ router.post("/superadmin/admins/:adminId/renew", requireSuperAdmin, superadminAd
 router.post("/superadmin/admins/:adminId/delete", requireSuperAdmin, superadminAdmins.destroy);
 
 // Superadmin Upgrade Requests
-
 router.get("/superadmin/upgrade-requests", requireSuperAdmin, superadminUpgradeRequests.index);
 router.post("/superadmin/upgrade-requests/:id/approve", requireSuperAdmin, superadminUpgradeRequests.approve);
 router.post("/superadmin/upgrade-requests/:id/reject", requireSuperAdmin, superadminUpgradeRequests.reject);

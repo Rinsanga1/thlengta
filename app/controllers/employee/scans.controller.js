@@ -1,5 +1,5 @@
 const bcrypt = require("bcryptjs");
-const { dbGet, dbRun } = require("../../db/helpers");
+const { dbGet, dbRun } = require("../../../db/helpers");
 const { isInsideGeofence } = require("../../utils/geo"); // Need to confirm geo.js path
 const { ensureFpTable, fpHashFromBody, getStoredFpHash, upsertFpHash } = require("../../utils/fingerprint.utils");
 const { hashToken, newDeviceToken, getEmployeeByDeviceCookie, logDeniedDevice, setDeviceCookie } = require("../../utils/device.utils");

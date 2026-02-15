@@ -1,5 +1,5 @@
 const bcrypt = require("bcryptjs");
-const { dbGet, dbRun, dbAll } = require("../../db/helpers");
+const { dbGet, dbRun, dbAll } = require("../../../db/helpers");
 const { pickAlertTypeFromQuery } = require("../../utils/ui.utils");
 const { getOwnerId } = require("../../middleware/auth");
 

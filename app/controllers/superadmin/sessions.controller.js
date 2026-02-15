@@ -1,5 +1,5 @@
 const bcrypt = require("bcryptjs");
-const { dbGet, dbRun } = require("../../db/helpers"); // Assuming db/helpers is in parent directory
+const { dbGet, dbRun } = require("../../../db/helpers");
 
 // Renders the superadmin login form
 exports.new = (req, res) => {

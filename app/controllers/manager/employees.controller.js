@@ -1,5 +1,5 @@
 const bcrypt = require("bcryptjs");
-const { dbGet, dbAll, dbRun } = require("../../db/helpers");
+const { dbGet, dbAll, dbRun } = require("../../../db/helpers");
 const { getManagerStoreOrNull } = require("../../utils/manager.utils");
 
 // Lists employees for a store (manager view)

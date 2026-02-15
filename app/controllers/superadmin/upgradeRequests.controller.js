@@ -1,4 +1,4 @@
-const { dbGet, dbAll, dbRun } = require("../../db/helpers");
+const { dbGet, dbAll, dbRun } = require("../../../db/helpers");
 
 exports.index = async (req, res) => {
   const rows = await dbAll(

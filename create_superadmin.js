@@ -1,6 +1,6 @@
 require("dotenv").config();
 const bcrypt = require("bcryptjs");
-const { dbGet, dbRun } = require("./src/db/helpers");
+const { dbGet, dbRun } = require("./db/helpers");
 
 (async () => {
   const email = process.env.SUPERADMIN_EMAIL;

@@ -1,5 +1,5 @@
 const bcrypt = require("bcryptjs");
-const { dbGet, dbRun } = require("../../db/helpers");
+const { dbGet, dbRun } = require("../../../db/helpers");
 const { ensureFpTable, fpHashFromBody, upsertFpHash } = require("../../utils/fingerprint.utils");
 const { newDeviceToken, hashToken, setDeviceCookie } = require("../../utils/device.utils");
 const { computeCheckinTimeStatus } = require("../../utils/attendance.utils");

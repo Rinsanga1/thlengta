@@ -2,7 +2,7 @@ const bcrypt = require("bcryptjs");
 const path = require("path");
 const fs = require("fs");
 
-const { dbGet, dbAll, dbRun } = require("../../db/helpers");
+const { dbGet, dbAll, dbRun } = require("../../../db/helpers");
 const { addYears, toISODateTime, toSqliteDateTimeFromInput, toDateTimeLocalValue } = require("../../utils/time.utils");
 const { isValidEmail } = require("../../utils/validation.utils");
 const { normalizePlan } = require("../../utils/plan.utils"); // Reuse normalizePlan

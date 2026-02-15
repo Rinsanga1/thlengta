@@ -1,5 +1,5 @@
 const bcrypt = require("bcryptjs");
-const { dbGet, dbRun, dbAll } = require("../../db/helpers");
+const { dbGet, dbRun, dbAll } = require("../../../db/helpers");
 const { getOwnerId } = require("../../middleware/auth");
 
 // Lists all employees for a given store (index action)

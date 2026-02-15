@@ -1,4 +1,4 @@
-const { dbRun } = require("../../db/helpers");
+const { dbRun } = require("../../../db/helpers");
 
 exports.destroy = async (req, res) => {
   try {

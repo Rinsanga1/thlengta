@@ -1,4 +1,4 @@
-const { dbGet, dbRun } = require("../../db/helpers");
+const { dbGet, dbRun } = require("../../../db/helpers");
 const { sendMail } = require("../../utils/mailer");
 const { normalizePlan, getUpgradeOptions } = require("../../utils/plan.utils");
 const { getOwnerId } = require("../../middleware/auth");

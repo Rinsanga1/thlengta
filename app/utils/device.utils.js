@@ -1,5 +1,5 @@
 const crypto = require("crypto");
-const { dbGet, dbRun } = require("../db/helpers"); // Assuming db/helpers is in parent directory
+const { dbGet, dbRun } = require("../../db/helpers");
 
 function hashToken(t) {
   return crypto.createHash("sha256").update(String(t || "")).digest("hex");

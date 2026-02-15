@@ -1,4 +1,4 @@
-const { dbGet, dbRun } = require("../../db/helpers");
+const { dbGet, dbRun } = require("../../../db/helpers");
 const { isInsideGeofence } = require("../../utils/geo");
 const { ensureFpTable } = require("../../utils/fingerprint.utils");
 const { hashToken } = require("../../utils/device.utils"); // hashToken moved to device.utils

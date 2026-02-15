@@ -1,4 +1,4 @@
-const { dbGet } = require("../db/helpers");
+const { dbGet } = require("../../db/helpers");
 
 async function requireSuperAdmin(req, res, next) {
   try {

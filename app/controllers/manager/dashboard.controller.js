@@ -1,4 +1,4 @@
-const { dbGet, dbAll } = require("../../db/helpers");
+const { dbGet, dbAll } = require("../../../db/helpers");
 const { getManagerStoreOrNull } = require("../../utils/manager.utils");
 
 exports.index = async (req, res) => {
