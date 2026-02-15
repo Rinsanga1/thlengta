@@ -147,7 +147,7 @@ exports.renew = async (req, res) => {
 exports.destroy = async (req, res) => {
   const adminId = Number(req.params.adminId);
 
-  const stores = await dbAll("SELECT id, logo_path FROM stores WHERE admin_id = ?", [adminId]);
+  const stores = await dbAll("SELECT id, logo_path FROM stores WHERE user_id = ?", [adminId]);
 
   for (const s of stores) {
     if (s.logo_path && String(s.logo_path).startsWith("/uploads/")) {
@@ -169,8 +169,8 @@ exports.destroy = async (req, res) => {
     await dbRun("DELETE FROM employees WHERE store_id = ?", [s.id]);
   }
 
-  await dbRun("DELETE FROM stores WHERE admin_id = ?", [adminId]);
-  await dbRun("DELETE FROM admins WHERE id = ?", [adminId]);
+  await dbRun("DELETE FROM stores WHERE user_id = ?", [adminId]);
+  await dbRun("DELETE FROM users WHERE id = ?", [adminId]);
 
   return res.redirect("/superadmin/dashboard?msg=" + encodeURIComponent("Admin deleted fully."));
 };

@@ -134,8 +134,6 @@
     }
   }
 
-  console.log("[THLENGTA] scan.js loaded");
-
   // Fill device token + fingerprint immediately (so form has them even before click)
   attachDeviceToken();
   attachFingerprint();

@@ -5,7 +5,6 @@ const { newDeviceToken, hashToken, setDeviceCookie } = require("../../utils/devi
 const { computeCheckinTimeStatus } = require("../../utils/attendance.utils");
 
 
-// POST approval: manager/admin approves device change
 exports.create = async (req, res) => {
   await ensureFpTable();
 
@@ -13,7 +12,7 @@ exports.create = async (req, res) => {
     const storePublicId = String(req.params.storePublicId);
 
     const store = await dbGet(
-      "SELECT id, admin_id, name, public_id, lat, lng, radius_m, open_time, grace_enabled, grace_minutes FROM stores WHERE public_id = ?",
+      "SELECT id, user_id, name, public_id, lat, lng, radius_m, open_time, grace_enabled, grace_minutes FROM stores WHERE public_id = ?",
       [storePublicId]
     );
     if (!store) return res.status(404).send("Store not found.");
@@ -28,7 +27,7 @@ exports.create = async (req, res) => {
     const incomingFpHash = fpHashFromBody(req.body);
 
     if (!employeeEmail) {
-      return res.renderPage("employee/device_approvals/new", { // Renamed view
+      return res.renderPage("employee/device_approvals/new", {
         title: "Approval needed",
         store,
         employeeEmail: "",
@@ -48,14 +47,13 @@ exports.create = async (req, res) => {
       });
     }
 
-    // Find employee (must belong to this store)
     const employee = await dbGet(
       "SELECT id, email FROM employees WHERE store_id = ? AND email = ? AND is_active = 1",
       [store.id, employeeEmail]
     );
 
     if (!employee) {
-      return res.renderPage("employee/device_approvals/new", { // Renamed view
+      return res.renderPage("employee/device_approvals/new", {
         title: "Approval needed",
         store,
         employeeEmail,
@@ -75,27 +73,26 @@ exports.create = async (req, res) => {
       });
     }
 
-    // Auth approver:
-    // Option A: store owner admin (admins.id == store.admin_id)
-    // Option B: manager assigned to this store (manager_stores)
     let approved = false;
+    let approvedByType = null;
 
-    // Try Admin
-    const adminRow = await dbGet(
-      "SELECT id, password_hash FROM admins WHERE id = ? AND email = ?",
-      [store.admin_id, managerEmail]
+    const userRow = await dbGet(
+      "SELECT id, password_hash FROM users WHERE id = ? AND email = ?",
+      [store.user_id, managerEmail]
     );
 
-    if (adminRow) {
-      const okAdmin = await bcrypt.compare(managerPassword, adminRow.password_hash);
-      if (okAdmin) approved = true;
+    if (userRow) {
+      const okUser = await bcrypt.compare(managerPassword, userRow.password_hash);
+      if (okUser) {
+        approved = true;
+        approvedByType = "user";
+      }
     }
 
-    // Try Manager if not approved yet
     if (!approved) {
       const mgr = await dbGet(
-        "SELECT id, password_hash, is_active FROM managers WHERE email = ? AND admin_id = ?",
-        [managerEmail, store.admin_id]
+        "SELECT id, password_hash, is_active FROM managers WHERE email = ? AND user_id = ?",
+        [managerEmail, store.user_id]
       );
 
       if (mgr && Number(mgr.is_active) === 1) {
@@ -105,13 +102,16 @@ exports.create = async (req, res) => {
             "SELECT id FROM manager_stores WHERE manager_id = ? AND store_id = ?",
             [mgr.id, store.id]
           );
-          if (map) approved = true;
+          if (map) {
+            approved = true;
+            approvedByType = "manager";
+          }
         }
       }
     }
 
     if (!approved) {
-      return res.renderPage("employee/device_approvals/new", { // Renamed view
+      return res.renderPage("employee/device_approvals/new", {
         title: "Approval needed",
         store,
         employeeEmail: employee.email,
@@ -127,75 +127,66 @@ exports.create = async (req, res) => {
         },
         clientDeviceToken: String(req.body.client_device_token || ""),
         deniedLogId: String(req.body.deniedLogId || ""),
-        error: "Invalid approver credentials or not assigned to this store."
+        error: "Invalid owner/manager email or password."
       });
     }
 
-    // Approved: bind new device now
-    const newToken = newDeviceToken();
-    const newHash = hashToken(newToken);
-
-    // Update device hash for this employee (single device rule)
-    await dbRun(
-      "UPDATE employee_devices SET device_token_hash = ? WHERE employee_id = ?",
-      [newHash, employee.id]
-    );
-
-    // Update fingerprint too (so Layer 2 works in future)
-    await upsertFpHash(employee.id, incomingFpHash);
-
-    // Set cookie on this device
-    setDeviceCookie(res, newToken);
-
-    // CREDIT the denied attempt:
-    // If we can find the latest denied_device today, convert it to checkin with same timestamp.
-    // We do not create a new row; we flip denied_device into checkin so admin logs look clean.
-    const denied = await dbGet(
-      `
-      SELECT id, created_at
-      FROM attendance_logs
-      WHERE store_id = ?
-        AND employee_id = ?
-        AND event_type = 'denied_device'
-      ORDER BY id DESC
-      LIMIT 1
-      `,
-      [store.id, employee.id]
-    );
-
-    if (denied && denied.id) {
-      const ts = computeCheckinTimeStatus(store);
-
+    const clientDeviceToken = String(req.body.client_device_token || "");
+    if (clientDeviceToken) {
+      const dTokenHash = hashToken(clientDeviceToken);
       await dbRun(
-        `
-        UPDATE attendance_logs
-        SET event_type = 'checkin',
-            device_ok = 1,
-            gps_ok = 1,
-            lat = COALESCE(lat, ?),
-            lng = COALESCE(lng, ?),
-            time_status = ?,
-            minutes_late = ?
-        WHERE id = ?
-          AND event_type = 'denied_device'
-        `,
-        [
-          Number.isFinite(lat) ? lat : null,
-          Number.isFinite(lng) ? lng : null,
-          ts.time_status,
-          ts.minutes_late,
-          denied.id
-        ]
+        `INSERT OR REPLACE INTO employee_devices (employee_id, device_token_hash, fp_hash, fp_updated_at)
+         VALUES (?, ?, ?, datetime('now'))`,
+        [employee.id, dTokenHash, incomingFpHash || null]
       );
     }
 
-    return res.renderPage("employee/check_results/show", { // Renamed view
-      title: "Approved",
-      ok: true,
-      store,
-      employeeEmail: employee.email,
-      message: "Approved. This device is now linked. You are checked in."
-    });
+    const deniedLogId = String(req.body.deniedLogId || "");
+    if (deniedLogId && /^\d+$/.test(deniedLogId)) {
+      const nId = Number(deniedLogId);
+      const logRow = await dbGet("SELECT id, event_type FROM attendance_logs WHERE id = ?", [nId]);
+      if (logRow) {
+        await dbRun("UPDATE attendance_logs SET approved_at = datetime('now') WHERE id = ?", [nId]);
+        if (approvedByType === "user") {
+          await dbRun("UPDATE attendance_logs SET approved_by_user_id = ? WHERE id = ?", [store.user_id, nId]);
+        } else if (approvedByType === "manager") {
+          const mgr = await dbGet("SELECT id FROM managers WHERE email = ?", [managerEmail]);
+          if (mgr) {
+            await dbRun("UPDATE attendance_logs SET approved_by_manager_id = ? WHERE id = ?", [mgr.id, nId]);
+          }
+        }
+      }
+    }
+
+    await dbRun(
+      "UPDATE device_approval_requests SET status = 'approved', approved_at = datetime('now') WHERE employee_id = ? AND status = 'pending'",
+      [employee.id]
+    );
+
+    const event_type = String(req.body.attempted_event_type || "checkin").trim();
+    const timeStatus = computeCheckinTimeStatus(store, lat, lng);
+
+    await dbRun(
+      `INSERT INTO attendance_logs (
+        store_id, employee_id, event_type, device_ok, gps_ok,
+        lat, lng, user_agent, ip, time_status
+      )
+      VALUES (?, ?, ?, 1, 1, ?, ?, ?, ?, ?)`,
+      [
+        store.id,
+        employee.id,
+        event_type,
+        lat,
+        lng,
+        req.get("user-agent") || "",
+        req.ip,
+        timeStatus
+      ]
+    );
+
+    setDeviceCookie(res, clientDeviceToken);
+
+    return res.redirect(`/e/scan/${storePublicId}?approved=1`);
   } catch (err) {
     console.error(err);
     return res.status(500).send("Server error");

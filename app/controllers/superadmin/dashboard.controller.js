@@ -1,61 +1,52 @@
 const { dbGet, dbAll } = require("../../db/helpers");
 
-// Displays the superadmin dashboard (index action)
 exports.index = async (req, res) => {
-  const admins = await dbAll(
-    "SELECT id, email, name, phone, address, status, expires_at, created_at, plan, requested_plan FROM admins ORDER BY id DESC",
+  const users = await dbAll(
+    "SELECT id, email, name, phone, plan, status, created_at FROM users ORDER BY id DESC",
     []
   );
 
   const stats = await dbAll(
-    `
-    SELECT
-      s.admin_id AS admin_id,
+    `SELECT
+      s.user_id AS user_id,
       COUNT(DISTINCT s.id) AS store_count,
       COUNT(DISTINCT e.id) AS employee_count
     FROM stores s
     LEFT JOIN employees e ON e.store_id = s.id
-    GROUP BY s.admin_id
+    GROUP BY s.user_id
     `,
     []
   );
 
   const storeNames = await dbAll(
-    `
-    SELECT admin_id, GROUP_CONCAT(name, ', ') AS store_names
+    `SELECT user_id, GROUP_CONCAT(name, ', ') AS store_names
     FROM stores
-    GROUP BY admin_id
+    GROUP BY user_id
     `,
     []
   );
 
-  const statMap = new Map(stats.map((r) => [r.admin_id, r]));
-  const nameMap = new Map(storeNames.map((r) => [r.admin_id, r.store_names || ""]));
+  const statMap = new Map(stats.map((r) => [r.user_id, r]));
+  const nameMap = new Map(storeNames.map((r) => [r.user_id, r.store_names || ""]));
 
-  const now = new Date();
-
-  const rows = admins.map((a) => {
-    const st = statMap.get(a.id) || { store_count: 0, employee_count: 0 };
-    const stores = nameMap.get(a.id) || "";
-    let expired = false;
-    if (a.expires_at) expired = new Date(a.expires_at) < now;
+  const rows = users.map((u) => {
+    const st = statMap.get(u.id) || { store_count: 0, employee_count: 0 };
+    const stores = nameMap.get(u.id) || "";
     return {
-      ...a,
+      ...u,
       store_count: st.store_count,
       employee_count: st.employee_count,
-      store_names: stores,
-      expired
+      store_names: stores
     };
   });
 
-  res.renderPage("superadmin/dashboard/index", { // Renamed view
+  res.renderPage("superadmin/dashboard/index", {
     title: "Super Admin Dashboard",
-    admins: rows,
+    users: rows,
     msg: req.query.msg || null
   });
 };
 
-// Handles the root /superadmin path, redirecting to dashboard
 exports.gateway = (req, res) => {
   res.redirect("/superadmin/dashboard");
 };

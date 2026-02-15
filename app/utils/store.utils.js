@@ -1,8 +1,4 @@
 function ensureWorkplaceDraft(req) {
-  console.log("[DEBUG] req.session:", req.session ? "exists" : "undefined");
-  console.log("[DEBUG] req.sessionID:", req.sessionID);
-  console.log("[DEBUG] req.session cookie:", req.session.cookie);
-  console.log("[DEBUG] Existing draft:", req.session?.workplaceDraft);
   if (!req.session.workplaceDraft) req.session.workplaceDraft = {};
   return req.session.workplaceDraft;
 }

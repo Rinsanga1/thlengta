@@ -4,12 +4,12 @@ const { getOwnerId } = require("../../middleware/auth");
 
 // Lists all employees for a given store (index action)
 exports.index = async (req, res) => {
-  const adminId = getOwnerId(req);
+  const userId = getOwnerId(req);
   const storeId = Number(req.params.storeId);
 
-  const store = await dbGet("SELECT id, name FROM stores WHERE id = ? AND admin_id = ?", [
+  const store = await dbGet("SELECT id, name FROM stores WHERE id = ? AND user_id = ?", [
     storeId,
-    adminId
+    userId
   ]);
   if (!store) return res.status(404).send("Store not found.");
 
@@ -41,12 +41,12 @@ exports.index = async (req, res) => {
 
 // Displays the form for adding a new employee (new action)
 exports.new = async (req, res) => {
-  const adminId = getOwnerId(req);
+  const userId = getOwnerId(req);
   const storeId = Number(req.params.storeId);
 
-  const store = await dbGet("SELECT id, name FROM stores WHERE id = ? AND admin_id = ?", [
+  const store = await dbGet("SELECT id, name FROM stores WHERE id = ? AND user_id = ?", [
     storeId,
-    adminId
+    userId
   ]);
   if (!store) return res.status(404).send("Store not found.");
 
@@ -60,12 +60,12 @@ exports.new = async (req, res) => {
 // Handles the creation of a new employee (create action)
 exports.create = async (req, res) => {
   try {
-    const adminId = getOwnerId(req);
+    const userId = getOwnerId(req);
     const storeId = Number(req.params.storeId);
 
-    const store = await dbGet("SELECT id, name FROM stores WHERE id = ? AND admin_id = ?", [
+    const store = await dbGet("SELECT id, name FROM stores WHERE id = ? AND user_id = ?", [
       storeId,
-      adminId
+      userId
     ]);
     if (!store) return res.status(404).send("Store not found.");
 
@@ -121,13 +121,13 @@ exports.create = async (req, res) => {
 // Toggles employee active status (custom update action)
 exports.updateStatus = async (req, res) => {
   try {
-    const adminId = getOwnerId(req);
+    const userId = getOwnerId(req);
     const storeId = Number(req.params.storeId);
     const employeeId = Number(req.params.employeeId);
 
-    const store = await dbGet("SELECT id FROM stores WHERE id = ? AND admin_id = ?", [
+    const store = await dbGet("SELECT id FROM stores WHERE id = ? AND user_id = ?", [
       storeId,
-      adminId
+      userId
     ]);
     if (!store) return res.status(404).send("Store not found.");
 
@@ -154,13 +154,13 @@ exports.updateStatus = async (req, res) => {
 
 // Resets employee device (custom update action)
 exports.resetDevice = async (req, res) => {
-  const adminId = getOwnerId(req);
+  const userId = getOwnerId(req);
   const storeId = Number(req.params.storeId);
   const employeeId = Number(req.params.employeeId);
 
-  const store = await dbGet("SELECT id FROM stores WHERE id = ? AND admin_id = ?", [
+  const store = await dbGet("SELECT id FROM stores WHERE id = ? AND user_id = ?", [
     storeId,
-    adminId
+    userId
   ]);
   if (!store) return res.status(404).send("Store not found.");
 
@@ -181,13 +181,13 @@ exports.resetDevice = async (req, res) => {
 // Deletes an employee (destroy action)
 exports.destroy = async (req, res) => {
   try {
-    const adminId = getOwnerId(req);
+    const userId = getOwnerId(req);
     const storeId = Number(req.params.storeId);
     const employeeId = Number(req.params.employeeId);
 
-    const store = await dbGet("SELECT id FROM stores WHERE id = ? AND admin_id = ?", [
+    const store = await dbGet("SELECT id FROM stores WHERE id = ? AND user_id = ?", [
       storeId,
-      adminId
+      userId
     ]);
     if (!store) return res.status(404).send("Store not found.");
 

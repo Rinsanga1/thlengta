@@ -1,32 +1,24 @@
 const { dbGet, dbRun } = require("../../db/helpers");
 const { sendMail } = require("../../utils/mailer");
 const { normalizePlan, getUpgradeOptions } = require("../../utils/plan.utils");
-const { getOwnerId, getOwnerType } = require("../../middleware/auth");
+const { getOwnerId } = require("../../middleware/auth");
 
-// Displays the form for requesting an upgrade (new action)
 exports.new = async (req, res) => {
-  const ownerId = getOwnerId(req);
-  const ownerType = getOwnerType(req);
+  const userId = getOwnerId(req);
 
-  let admin, plan;
-  if (ownerType === "admin") {
-    admin = await dbGet("SELECT id, email, plan FROM admins WHERE id = ?", [ownerId]);
-    plan = admin?.plan || "free";
-  } else {
-    admin = await dbGet("SELECT id, email, plan FROM users WHERE id = ?", [ownerId]);
-    plan = admin?.plan || "free";
-  }
+  const user = await dbGet("SELECT id, email, plan FROM users WHERE id = ?", [userId]);
+  const plan = user?.plan || "free";
 
   const options = getUpgradeOptions(plan);
 
   const pendingUpgrade = await dbGet(
-    "SELECT id, from_plan, to_plan, status, created_at FROM upgrade_requests WHERE admin_id = ? AND status = 'pending' ORDER BY id DESC LIMIT 1",
-    [ownerId]
+    "SELECT id, from_plan, to_plan, status, created_at FROM upgrade_requests WHERE user_id = ? AND status = 'pending' ORDER BY id DESC LIMIT 1",
+    [userId]
   );
 
   return res.renderPage("owner/upgrades/new", {
     title: "Upgrade Plan",
-    admin,
+    admin: user,
     options,
     pendingUpgrade,
     error: null,
@@ -34,32 +26,24 @@ exports.new = async (req, res) => {
   });
 };
 
-// Handles the submission of an upgrade request (create action)
 exports.create = async (req, res) => {
-  const ownerId = getOwnerId(req);
-  const ownerType = getOwnerType(req);
+  const userId = getOwnerId(req);
 
-  let admin, plan;
-  if (ownerType === "admin") {
-    admin = await dbGet("SELECT id, email, plan FROM admins WHERE id = ?", [ownerId]);
-    plan = admin?.plan || "free";
-  } else {
-    admin = await dbGet("SELECT id, email, plan FROM users WHERE id = ?", [ownerId]);
-    plan = admin?.plan || "free";
-  }
+  const user = await dbGet("SELECT id, email, plan FROM users WHERE id = ?", [userId]);
+  const plan = user?.plan || "free";
 
   const options = getUpgradeOptions(plan);
   const toPlan = normalizePlan(req.body.to_plan);
 
   const pendingUpgrade = await dbGet(
-    "SELECT id FROM upgrade_requests WHERE admin_id = ? AND status = 'pending' LIMIT 1",
-    [ownerId]
+    "SELECT id FROM upgrade_requests WHERE user_id = ? AND status = 'pending' LIMIT 1",
+    [userId]
   );
 
   if (pendingUpgrade) {
     return res.renderPage("owner/upgrades/new", {
       title: "Upgrade Plan",
-      admin,
+      admin: user,
       options,
       pendingUpgrade,
       error: "You already have a pending upgrade request. Please wait for approval.",
@@ -70,7 +54,7 @@ exports.create = async (req, res) => {
   if (!options.includes(toPlan)) {
     return res.renderPage("owner/upgrades/new", {
       title: "Upgrade Plan",
-      admin,
+      admin: user,
       options,
       pendingUpgrade: null,
       error: "Invalid upgrade option.",
@@ -79,8 +63,8 @@ exports.create = async (req, res) => {
   }
 
   await dbRun(
-    "INSERT INTO upgrade_requests (admin_id, from_plan, to_plan, status) VALUES (?, ?, ?, 'pending')",
-    [ownerId, normalizePlan(plan), toPlan]
+    "INSERT INTO upgrade_requests (user_id, from_plan, to_plan, status) VALUES (?, ?, ?, 'pending')",
+    [userId, normalizePlan(plan), toPlan]
   );
 
   try {
@@ -90,12 +74,12 @@ exports.create = async (req, res) => {
       text:
         `User requested upgrade.
 
-Admin ID: ${ownerId}
-Admin Email: ${admin.email}
-From: ${normalizePlan(plan)}
-To: ${toPlan}
-Time: ${new Date().toISOString()}
-`
+ User ID: ${userId}
+ User Email: ${user.email}
+ From: ${normalizePlan(plan)}
+ To: ${toPlan}
+ Time: ${new Date().toISOString()}
+ `
     });
   } catch (e) {
     console.error("Failed to email superadmin about upgrade:", e.message);
@@ -103,7 +87,7 @@ Time: ${new Date().toISOString()}
 
   return res.renderPage("owner/upgrades/new", {
     title: "Upgrade Plan",
-    admin,
+    admin: user,
     options,
     pendingUpgrade: {
       from_plan: normalizePlan(plan),

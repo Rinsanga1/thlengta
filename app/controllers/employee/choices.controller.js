@@ -12,7 +12,7 @@ async function handleChoiceStateless(req, res) {
     const storePublicId = String(req.params.storePublicId);
 
     const store = await dbGet(
-      "SELECT id, admin_id, name, public_id, lat, lng, radius_m, open_time, grace_enabled, grace_minutes FROM stores WHERE public_id = ?",
+      "SELECT id, user_id, name, public_id, lat, lng, radius_m, open_time, grace_enabled, grace_minutes FROM stores WHERE public_id = ?",
       [storePublicId]
     );
     if (!store) return res.status(404).send("Store not found.");

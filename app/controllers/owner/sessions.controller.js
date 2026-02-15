@@ -1,14 +1,12 @@
 const bcrypt = require("bcryptjs");
 const { dbGet } = require("../../db/helpers");
 const { setRememberMeCookie, deleteSessionsByNeedle } = require("../../utils/session.utils");
-const { parseSqliteDateTimeToMs } = require("../../utils/time.utils");
 
-// Renders the login form
 exports.new = (req, res) => {
-  if (req.session?.adminId) {
+  if (req.session?.userId) {
     return res.redirect("/owner/dashboard");
   }
-  if (req.session?.managerId && req.session?.managerAdminId) {
+  if (req.session?.managerId && req.session?.managerUserId) {
     return res.redirect("/manager/dashboard");
   }
   res.renderPage("owner/sessions/new", {
@@ -17,7 +15,6 @@ exports.new = (req, res) => {
   });
 };
 
-// Handles login form submission (authentication)
 exports.create = async (req, res) => {
   try {
     const email = String(req.body.email || "").trim().toLowerCase();
@@ -29,35 +26,34 @@ exports.create = async (req, res) => {
 
     const blocked = (msg) => res.renderPage("owner/sessions/new", { title: "Login", error: msg });
 
-    // 1) Try ADMIN login
-    const admin = await dbGet(
-      "SELECT id, password_hash, status, expires_at FROM admins WHERE email = ?",
+    const user = await dbGet(
+      "SELECT id, password_hash, status FROM users WHERE email = ?",
       [email]
     );
 
-    if (admin) {
-      const ok = await bcrypt.compare(password, admin.password_hash);
+    if (user) {
+      const ok = await bcrypt.compare(password, user.password_hash);
       if (!ok) return invalid();
 
-      if (admin.status !== "active") return blocked("Your account is pending approval or disabled.");
-      if (!admin.expires_at) return blocked("Your account is not active yet. Please contact support.");
-
-      const expMs = parseSqliteDateTimeToMs(admin.expires_at);
-      if (!expMs) return blocked("Your account expiry is invalid. Please contact support.");
-      if (expMs < Date.now()) return blocked("Your subscription has expired. Please contact support.");
+      if (user.status !== "active") return blocked("Your account is disabled. Please contact support.");
 
       delete req.session.managerId;
-      delete req.session.managerAdminId;
+      delete req.session.managerUserId;
 
-      req.session.adminId = admin.id;
+      req.session.userId = user.id;
       setRememberMeCookie(req, rememberMe);
 
-      return res.redirect("/owner/dashboard");
+      req.session.save((err) => {
+        if (err) {
+          console.error("Session save error:", err);
+          return res.renderPage("owner/sessions/new", { title: "Login", error: "Server error." });
+        }
+        return res.redirect("/owner/dashboard");
+      });
     }
 
-    // 2) Try MANAGER login
     const manager = await dbGet(
-      "SELECT id, admin_id, email, password_hash, is_active FROM managers WHERE email = ?",
+      "SELECT id, user_id, email, password_hash, is_active FROM managers WHERE email = ?",
       [email]
     );
 
@@ -67,35 +63,35 @@ exports.create = async (req, res) => {
     const okMgr = await bcrypt.compare(password, manager.password_hash);
     if (!okMgr) return invalid();
 
-    const parentAdmin = await dbGet(
-      "SELECT id, status, expires_at FROM admins WHERE id = ?",
-      [manager.admin_id]
+    const parentUser = await dbGet(
+      "SELECT id, status FROM users WHERE id = ?",
+      [manager.user_id]
     );
 
-    if (!parentAdmin) return blocked("Your admin account was not found. Please contact support.");
-    if (parentAdmin.status !== "active") return blocked("Your admin account is not active.");
-    if (!parentAdmin.expires_at) return blocked("Your admin account is not active yet.");
+    if (!parentUser) return blocked("Your owner account was not found. Please contact support.");
+    if (parentUser.status !== "active") return blocked("Your owner account is not active.");
 
-    const expMs2 = parseSqliteDateTimeToMs(parentAdmin.expires_at);
-    if (!expMs2) return blocked("Your admin account expiry is invalid.");
-    if (expMs2 < Date.now()) return blocked("Your subscription has expired.");
-
-    delete req.session.adminId;
+    delete req.session.userId;
     req.session.managerId = manager.id;
-    req.session.managerAdminId = manager.admin_id;
+    req.session.managerUserId = manager.user_id;
     setRememberMeCookie(req, rememberMe);
 
-    return res.redirect("/manager/dashboard");
+    req.session.save((err) => {
+      if (err) {
+        console.error("Session save error:", err);
+        return res.renderPage("owner/sessions/new", { title: "Login", error: "Server error." });
+      }
+      return res.redirect("/manager/dashboard");
+    });
   } catch (err) {
     console.error(err);
     return res.renderPage("owner/sessions/new", { title: "Login", error: "Something went wrong." });
   }
 };
 
-// Handles logout
 exports.destroy = async (req, res) => {
   try {
-    const adminId = req.session?.adminId || null;
+    const userId = req.session?.userId || null;
     const managerId = req.session?.managerId || null;
 
     const destroyCurrent = () =>
@@ -104,8 +100,8 @@ exports.destroy = async (req, res) => {
         req.session.destroy(() => resolve());
       });
 
-    if (adminId) {
-      await deleteSessionsByNeedle(`"adminId":${Number(adminId)}`);
+    if (userId) {
+      await deleteSessionsByNeedle(`"userId":${Number(userId)}`);
     } else if (managerId) {
       await deleteSessionsByNeedle(`"managerId":${Number(managerId)}`);
     }

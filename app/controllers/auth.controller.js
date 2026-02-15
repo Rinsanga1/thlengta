@@ -59,7 +59,16 @@ exports.create = async (req, res) => {
     req.session.userId = userId;
     setRememberMeCookie(req, rememberMe);
 
-    return res.redirect("/");
+    req.session.save((err) => {
+      if (err) {
+        console.error("Session save error:", err);
+        return res.renderPage("registration/new", {
+          title: "Sign Up",
+          error: "Server error. Please try again."
+        });
+      }
+      return res.redirect("/");
+    });
   } catch (e) {
     console.error(e);
     return res.renderPage("registration/new", {
@@ -126,7 +135,16 @@ exports.registerFreeSubmit = async (req, res) => {
     const userId = result.lastID;
     req.session.userId = userId;
 
-    return res.redirect("/owner/dashboard");
+    req.session.save((err) => {
+      if (err) {
+        console.error("Session save error:", err);
+        return res.renderPage("registration/free", {
+          title: "Sign Up - Free Plan",
+          error: "Server error. Please try again."
+        });
+      }
+      return res.redirect("/owner/dashboard");
+    });
   } catch (e) {
     console.error(e);
     return res.renderPage("registration/free", {

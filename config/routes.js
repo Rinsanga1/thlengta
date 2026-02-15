@@ -70,6 +70,7 @@ router.get("/owner/dashboard", requireOwner, ownerDashboard.index);
 router.get("/owner", ownerDashboard.gateway);
 
 // Stores (Workplace)
+//router.get("/owner/stores/new", requireOwner, ownerStores.new);
 router.get("/owner/stores/new", requireOwner, ownerStores.new);
 router.get("/owner/stores/new/step-1", requireOwner, ownerStores.new_step1_get);
 router.post("/owner/stores/new/step-1", requireOwner, upload.single("logo"), ownerStores.new_step1_post);

@@ -1,15 +1,14 @@
 const { dbGet, dbAll } = require("../../db/helpers");
 const { getManagerStoreOrNull } = require("../../utils/manager.utils");
 
-// Displays the manager dashboard
 exports.index = async (req, res) => {
   try {
     const managerId = req.session.managerId;
-    const adminId = req.session.managerAdminId;
+    const userId = req.session.managerUserId;
 
     const manager = await dbGet(
-      "SELECT id, admin_id, email, is_active FROM managers WHERE id = ? AND admin_id = ?",
-      [managerId, adminId]
+      "SELECT id, user_id, email, is_active FROM managers WHERE id = ? AND user_id = ?",
+      [managerId, userId]
     );
 
     if (!manager || !manager.is_active) {
@@ -17,11 +16,10 @@ exports.index = async (req, res) => {
       return res.redirect("/owner/login");
     }
 
-    const admin = await dbGet("SELECT id, email, plan FROM admins WHERE id = ?", [adminId]);
+    const user = await dbGet("SELECT id, email, plan FROM users WHERE id = ?", [userId]);
 
     const stores = await dbAll(
-      `
-      SELECT
+      `SELECT
         s.id,
         s.name,
         s.public_id,
@@ -31,16 +29,15 @@ exports.index = async (req, res) => {
       FROM stores s
       INNER JOIN manager_stores ms ON ms.store_id = s.id
       WHERE ms.manager_id = ?
-        AND s.admin_id = ?
-      ORDER BY s.id DESC
-      `,
-      [managerId, adminId]
+        AND s.user_id = ?
+      ORDER BY s.id DESC`,
+      [managerId, userId]
     );
 
-    return res.renderPage("manager/dashboard/index", { // Renamed view
+    return res.renderPage("manager/dashboard/index", {
       title: "Manager Dashboard",
       manager,
-      admin,
+      user,
       stores
     });
   } catch (err) {

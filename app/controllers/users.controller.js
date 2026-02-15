@@ -76,7 +76,17 @@ exports.create = async (req, res) => {
     req.session.userId = user.id;
     setRememberMeCookie(req, rememberMe);
 
-    return res.redirect(redirect);
+    req.session.save((err) => {
+      if (err) {
+        console.error("Session save error:", err);
+        return res.renderPage("users/signin", {
+          title: "Sign In",
+          error: "Server error. Please try again.",
+          redirect
+        });
+      }
+      return res.redirect(redirect);
+    });
   } catch (err) {
     console.error(err);
     return res.renderPage("users/signin", {

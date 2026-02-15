@@ -1,7 +1,7 @@
 const { dbGet, dbRun, dbAll } = require("../../db/helpers");
 const { nanoid } = require("nanoid");
-const path = require("path"); // For updateLogo and debugFrame
-const fs = require("fs"); // For updateLogo and debugFrame
+const path = require("path");
+const fs = require("fs");
 
 const { toPngBuffer, makeFramedQrPng } = require("../../utils/qr");
 const {
@@ -10,22 +10,22 @@ const {
   parseTime12hToHHMM,
   isValidLatLng,
 } = require("../../utils/store.utils");
-const { getOwnerId, getOwnerType } = require("../../middleware/auth");
+const { getOwnerId } = require("../../middleware/auth");
 
-// Helper function from original admin.routes.js, might be needed in controller or new utils
 function getBaseUrl(req) {
   const envBase = process.env.BASE_URL;
   if (envBase) return envBase.replace(/\/+$/, "");
   return `${req.protocol}://${req.get("host")}`;
 }
 
-// Displays the form for creating a new store (Step 1 of the wizard)
+// this one is failing ?
+// this is not called at all ?
 exports.new = (req, res) => {
-  clearWorkplaceDraft(req); // Clear any previous draft when starting new
+  console.log("this is not run for some reason");
+  clearWorkplaceDraft(req);
   return res.redirect("/owner/stores/new/step-1");
 };
 
-// Wizard: Step 1 (Workplace info) - GET
 exports.new_step1_get = (req, res) => {
   const draft = ensureWorkplaceDraft(req);
   return res.renderPage("owner/stores/new_step1", {
@@ -35,17 +35,8 @@ exports.new_step1_get = (req, res) => {
   });
 };
 
-// Wizard: Step 1 (Workplace info) - POST
+
 exports.new_step1_post = async (req, res) => {
-  // Force session to be created by accessing a property
-  req.session._createdAt = Date.now();
-  console.log("[DEBUG] Session touched, ID:", req.sessionID);
-  
-  // If session ID is still undefined, try to regenerate
-  if (!req.sessionID) {
-    console.log("[DEBUG] Session ID is undefined, attempting to regenerate");
-  }
-  
   const draft = ensureWorkplaceDraft(req);
 
   const name = (req.body.name || "").trim();
@@ -83,28 +74,11 @@ exports.new_step1_post = async (req, res) => {
     draft.logo_filename = req.file.filename;
   }
 
-  console.log("[DEBUG] Draft after setting:", draft);
-  console.log("[DEBUG] SessionID:", req.sessionID);
-
-  // Ensure session is saved before redirect
-  req.session.save((err) => {
-    if (err) {
-      console.error("[DEBUG] Session save error:", err);
-      return res.renderPage("owner/stores/new_step1", {
-        title: "Create Workplace",
-        draft,
-        error: "Session error. Please try again."
-      });
-    }
-    console.log("[DEBUG] Session saved successfully");
-    return res.redirect("/owner/stores/new/step-2");
-  });
+  return res.redirect("/owner/stores/new/step-2");
 };
 
-// Wizard: Step 2 (Location) - GET
 exports.new_step2_get = (req, res) => {
   const draft = ensureWorkplaceDraft(req);
-  console.log("[DEBUG Step2 GET] Draft:", draft);
   if (!draft.name) return res.redirect("/owner/stores/new/step-1");
 
   return res.renderPage("owner/stores/new_step2_location", {
@@ -114,7 +88,6 @@ exports.new_step2_get = (req, res) => {
   });
 };
 
-// Wizard: Step 2 (Location) - POST
 exports.new_step2_post = (req, res) => {
   const draft = ensureWorkplaceDraft(req);
   if (!draft.name) return res.redirect("/owner/stores/new/step-1");
@@ -136,7 +109,6 @@ exports.new_step2_post = (req, res) => {
   return res.redirect("/owner/stores/new/step-3");
 };
 
-// Wizard: Step 3 (Radius) - GET
 exports.new_step3_get = (req, res) => {
   const draft = ensureWorkplaceDraft(req);
   if (!draft.lat || !draft.lng) return res.redirect("/owner/stores/new/step-2");
@@ -150,7 +122,6 @@ exports.new_step3_get = (req, res) => {
   });
 };
 
-// Wizard: Step 3 (Radius) - POST
 exports.new_step3_post = (req, res) => {
   const draft = ensureWorkplaceDraft(req);
   if (!draft.lat || !draft.lng) return res.redirect("/owner/stores/new/step-2");
@@ -168,7 +139,6 @@ exports.new_step3_post = (req, res) => {
   return res.redirect("/owner/stores/new/step-4");
 };
 
-// Wizard: Step 4 (Review) - GET
 exports.new_step4_get = (req, res) => {
   const draft = ensureWorkplaceDraft(req);
   if (!draft.radius_m) return res.redirect("/owner/stores/new/step-3");
@@ -180,32 +150,24 @@ exports.new_step4_get = (req, res) => {
   });
 };
 
-// Wizard: Finish (Create store/workplace + redirect to QR) - POST (This is the 'create' action for stores)
 exports.create = async (req, res) => {
   try {
-    const adminId = getOwnerId(req);
-    const ownerType = getOwnerType(req);
+    const userId = getOwnerId(req);
     const draft = ensureWorkplaceDraft(req);
 
     if (!draft || !draft.name || !draft.lat || !draft.lng || !draft.radius_m) {
       return res.redirect("/owner/stores/new/step-1");
     }
 
-    let plan = "free";
-    if (ownerType === "admin") {
-      const adminRow = await dbGet("SELECT plan FROM admins WHERE id = ?", [adminId]);
-      plan = String(adminRow?.plan || "free").toLowerCase();
-    } else {
-      const userRow = await dbGet("SELECT plan FROM users WHERE id = ?", [adminId]);
-      plan = String(userRow?.plan || "free").toLowerCase();
-    }
+    const userRow = await dbGet("SELECT plan FROM users WHERE id = ?", [userId]);
+    const plan = String(userRow?.plan || "free").toLowerCase();
 
     let maxStores = 1;
     if (plan === "plus") maxStores = 1;
     if (plan === "pro") maxStores = 20;
     if (plan === "enterprise") maxStores = Number.POSITIVE_INFINITY;
 
-    const countRow = await dbGet("SELECT COUNT(*) AS cnt FROM stores WHERE admin_id = ?", [adminId]);
+    const countRow = await dbGet("SELECT COUNT(*) AS cnt FROM stores WHERE user_id = ?", [userId]);
     const currentCount = Number(countRow?.cnt || 0);
 
     if (currentCount >= maxStores) {
@@ -227,16 +189,14 @@ exports.create = async (req, res) => {
     const close_time = String(draft.closing_time || "").trim();
 
     const result = await dbRun(
-      `
-      INSERT INTO stores (
-        admin_id, name, public_id, lat, lng, radius_m,
+      `INSERT INTO stores (
+        user_id, name, public_id, lat, lng, radius_m,
         logo_path, open_time, close_time,
         grace_enabled, grace_minutes
       )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 10)
-      `,
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 10)`,
       [
-        adminId,
+        userId,
         draft.name,
         public_id,
         draft.lat,
@@ -252,7 +212,7 @@ exports.create = async (req, res) => {
     const storeId = result.lastID;
     clearWorkplaceDraft(req);
 
-    return res.redirect(`/owner/stores/${storeId}/qr`); // Redirect to new store's QR view
+    return res.redirect(`/owner/stores/${storeId}/qr`);
   } catch (err) {
     console.error(err);
     return res.renderPage("owner/stores/new_step4_review", {
@@ -263,29 +223,27 @@ exports.create = async (req, res) => {
   }
 };
 
-// Displays store details, including QR (show action)
 exports.show = async (req, res) => {
-  const adminId = getOwnerId(req);
+  const userId = getOwnerId(req);
   const storeId = Number(req.params.storeId);
 
-  const store = await dbGet("SELECT id, name, public_id FROM stores WHERE id = ? AND admin_id = ?", [
+  const store = await dbGet("SELECT id, name, public_id FROM stores WHERE id = ? AND user_id = ?", [
     storeId,
-    adminId
+    userId
   ]);
   if (!store) return res.status(404).send("Store not found.");
 
   const scanUrl = `${getBaseUrl(req)}/e/scan/${store.public_id}?src=qr`;
-  res.renderPage("owner/stores/show", { title: "Store QR", store, scanUrl }); // Renamed view
+  res.renderPage("owner/stores/show", { title: "Store QR", store, scanUrl });
 };
 
-// Serves the store's QR code as a PNG
 exports.qrPng = async (req, res) => {
-  const adminId = getOwnerId(req);
+  const userId = getOwnerId(req);
   const storeId = Number(req.params.storeId);
 
-  const store = await dbGet("SELECT id, public_id FROM stores WHERE id = ? AND admin_id = ?", [
+  const store = await dbGet("SELECT id, public_id FROM stores WHERE id = ? AND user_id = ?", [
     storeId,
-    adminId
+    userId
   ]);
   if (!store) return res.status(404).send("Store not found.");
 
@@ -297,26 +255,18 @@ exports.qrPng = async (req, res) => {
   res.send(png);
 };
 
-// Displays the form for editing store settings (edit action)
 exports.edit = async (req, res) => {
-  const adminId = getOwnerId(req);
-  const ownerType = getOwnerType(req);
+  const userId = getOwnerId(req);
   const storeId = Number(req.params.storeId);
 
   const store = await dbGet(
-    "SELECT id, name, public_id, logo_path, open_time, close_time, grace_enabled, grace_minutes FROM stores WHERE id = ? AND admin_id = ?",
-    [storeId, adminId]
+    "SELECT id, name, public_id, logo_path, open_time, close_time, grace_enabled, grace_minutes FROM stores WHERE id = ? AND user_id = ?",
+    [storeId, userId]
   );
   if (!store) return res.status(404).send("Store not found.");
 
-  let plan = "free";
-  if (ownerType === "admin") {
-    const adminRow = await dbGet("SELECT plan FROM admins WHERE id = ?", [adminId]);
-    plan = adminRow?.plan || "free";
-  } else {
-    const userRow = await dbGet("SELECT plan FROM users WHERE id = ?", [adminId]);
-    plan = userRow?.plan || "free";
-  }
+  const userRow = await dbGet("SELECT plan FROM users WHERE id = ?", [userId]);
+  const plan = userRow?.plan || "free";
 
   res.renderPage("owner/stores/edit", {
     title: "Store Settings",
@@ -327,11 +277,9 @@ exports.edit = async (req, res) => {
   });
 };
 
-
-// Updates store settings (update action)
 exports.update = async (req, res) => {
   try {
-    const adminId = getOwnerId(req);
+    const userId = getOwnerId(req);
     const storeId = Number(req.params.storeId);
 
     const open_time = String(req.body.open_time || "").trim();
@@ -339,8 +287,8 @@ exports.update = async (req, res) => {
     const grace_enabled = req.body.grace_enabled ? 1 : 0;
 
     await dbRun(
-      "UPDATE stores SET open_time = ?, close_time = ?, grace_enabled = ? WHERE id = ? AND admin_id = ?",
-      [open_time || null, close_time || null, grace_enabled, storeId, adminId]
+      "UPDATE stores SET open_time = ?, close_time = ?, grace_enabled = ? WHERE id = ? AND user_id = ?",
+      [open_time || null, close_time || null, grace_enabled, storeId, userId]
     );
 
     return res.redirect(`/owner/stores/${storeId}/edit?msg=` + encodeURIComponent("Store times saved."));
@@ -350,20 +298,18 @@ exports.update = async (req, res) => {
   }
 };
 
-
-// Updates store logo (part of update action, handled separately by multer)
 exports.updateLogo = async (req, res) => {
   try {
-    const adminId = getOwnerId(req);
+    const userId = getOwnerId(req);
     const storeId = Number(req.params.storeId);
 
     if (!req.file || !req.file.filename) {
       return res.redirect(`/owner/stores/${storeId}/edit?msg=` + encodeURIComponent("No file uploaded."));
     }
 
-    const store = await dbGet("SELECT id, logo_path FROM stores WHERE id = ? AND admin_id = ?", [
+    const store = await dbGet("SELECT id, logo_path FROM stores WHERE id = ? AND user_id = ?", [
       storeId,
-      adminId
+      userId
     ]);
     if (!store) return res.status(404).send("Store not found.");
 
@@ -378,10 +324,10 @@ exports.updateLogo = async (req, res) => {
       }
     }
 
-    await dbRun("UPDATE stores SET logo_path = ? WHERE id = ? AND admin_id = ?", [
+    await dbRun("UPDATE stores SET logo_path = ? WHERE id = ? AND user_id = ?", [
       newLogoPath,
       storeId,
-      adminId
+      userId
     ]);
 
     return res.redirect(`/owner/stores/${storeId}/edit?msg=` + encodeURIComponent("Logo updated."));
@@ -391,15 +337,14 @@ exports.updateLogo = async (req, res) => {
   }
 };
 
-// Deletes a store (destroy action)
 exports.destroy = async (req, res) => {
   try {
-    const adminId = getOwnerId(req);
+    const userId = getOwnerId(req);
     const storeId = Number(req.params.storeId);
 
-    const store = await dbGet("SELECT id, logo_path FROM stores WHERE id = ? AND admin_id = ?", [
+    const store = await dbGet("SELECT id, logo_path FROM stores WHERE id = ? AND user_id = ?", [
       storeId,
-      adminId
+      userId
     ]);
     if (!store) return res.status(404).send("Store not found.");
 
@@ -420,7 +365,7 @@ exports.destroy = async (req, res) => {
 
     await dbRun("DELETE FROM attendance_logs WHERE store_id = ?", [storeId]);
     await dbRun("DELETE FROM employees WHERE store_id = ?", [storeId]);
-    await dbRun("DELETE FROM stores WHERE id = ? AND admin_id = ?", [storeId, adminId]);
+    await dbRun("DELETE FROM stores WHERE id = ? AND user_id = ?", [storeId, userId]);
 
     res.redirect("/owner/dashboard");
   } catch (err) {
@@ -429,34 +374,32 @@ exports.destroy = async (req, res) => {
   }
 };
 
-// Rotates QR code public ID (custom action)
 exports.rotateQr = async (req, res) => {
-  const adminId = getOwnerId(req);
+  const userId = getOwnerId(req);
   const storeId = Number(req.params.storeId);
 
-  const store = await dbGet("SELECT id FROM stores WHERE id = ? AND admin_id = ?", [
+  const store = await dbGet("SELECT id FROM stores WHERE id = ? AND user_id = ?", [
     storeId,
-    adminId
+    userId
   ]);
   if (!store) return res.status(404).send("Store not found.");
 
   const newPublicId = nanoid(10);
 
-  await dbRun("UPDATE stores SET public_id = ? WHERE id = ? AND admin_id = ?", [
+  await dbRun("UPDATE stores SET public_id = ? WHERE id = ? AND user_id = ?", [
     newPublicId,
     storeId,
-    adminId
+    userId
   ]);
 
   res.redirect(`/owner/stores/${storeId}/edit?msg=` + encodeURIComponent("QR rotated. Print the new QR now."));
 };
 
-// Admin Test QR Download (custom actions)
 exports.testQrDownload = async (req, res) => {
-  const adminId = getOwnerId(req);
+  const userId = getOwnerId(req);
   const stores = await dbAll(
-    "SELECT id, name FROM stores WHERE admin_id = ? ORDER BY id DESC",
-    [adminId]
+    "SELECT id, name FROM stores WHERE user_id = ? ORDER BY id DESC",
+    [userId]
   );
   return res.renderPage("owner/stores/test_qr_download", {
     title: "Test QR Download",
@@ -465,12 +408,12 @@ exports.testQrDownload = async (req, res) => {
 };
 
 exports.testQrDownloadRawPng = async (req, res) => {
-  const adminId = getOwnerId(req);
+  const userId = getOwnerId(req);
   const storeId = Number(req.params.storeId);
 
   const store = await dbGet(
-    "SELECT id, public_id, name FROM stores WHERE id = ? AND admin_id = ?",
-    [storeId, adminId]
+    "SELECT id, public_id, name FROM stores WHERE id = ? AND user_id = ?",
+    [storeId, userId]
   );
   if (!store) return res.status(404).send("Store not found.");
 
@@ -484,12 +427,12 @@ exports.testQrDownloadRawPng = async (req, res) => {
 };
 
 exports.testQrDownloadFramedPng = async (req, res) => {
-  const adminId = getOwnerId(req);
+  const userId = getOwnerId(req);
   const storeId = Number(req.params.storeId);
 
   const store = await dbGet(
-    "SELECT id, public_id, name FROM stores WHERE id = ? AND admin_id = ?",
-    [storeId, adminId]
+    "SELECT id, public_id, name FROM stores WHERE id = ? AND user_id = ?",
+    [storeId, userId]
   );
   if (!store) return res.status(404).send("Store not found.");
 

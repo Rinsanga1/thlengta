@@ -1,55 +1,41 @@
 const { dbGet, dbAll } = require("../../db/helpers");
-const { getOwnerId, getOwnerType } = require("../../middleware/auth");
+const { getOwnerId } = require("../../middleware/auth");
 
 
 exports.index = async (req, res) => {
-  const ownerId = getOwnerId(req);
-  const ownerType = getOwnerType(req);
+  console.log("dashboard ran");
+  const userId = getOwnerId(req);
 
-  if (!ownerId) {
+  if (!userId) {
     return res.redirect("/users/signin");
   }
 
-  let admin;
-  if (ownerType === "user") {
-    admin = await dbGet("SELECT id, email, plan FROM users WHERE id = ?", [ownerId]);
-  } else {
-    admin = await dbGet("SELECT id, email, plan FROM admins WHERE id = ?", [ownerId]);
-  }
+  const user = await dbGet("SELECT id, email, plan FROM users WHERE id = ?", [userId]);
 
-  if (!admin) {
+  if (!user) {
     req.session.destroy();
     return res.redirect("/users/signin");
   }
 
-  const stores = await dbAll("SELECT id, name, public_id FROM stores WHERE admin_id = ?", [ownerId]);
-
-  const pendingUpgrade = await dbGet(
-    `SELECT id, from_plan, to_plan, status, created_at
-     FROM upgrade_requests
-     WHERE admin_id = ? AND status = 'pending'
-     ORDER BY id DESC
-     LIMIT 1`,
-    [ownerId]
-  );
+  const stores = await dbAll("SELECT id, name, public_id FROM stores WHERE user_id = ?", [userId]);
 
   return res.renderPage("owner/dashboard/index", {
-    title: ownerType === "user" ? "Dashboard" : "Admin Dashboard",
-    admin,
+    title: "Dashboard",
+    admin: user,
     stores,
-    pendingUpgrade
+    pendingUpgrade: null
   });
 };
 
 
 exports.gateway = (req, res) => {
-  const ownerId = getOwnerId(req);
+  const userId = getOwnerId(req);
 
-  if (ownerId) {
+  if (userId) {
     return res.redirect("/owner/dashboard");
   }
 
-  if (req.session?.managerId && req.session?.managerAdminId) {
+  if (req.session?.managerId && req.session?.managerUserId) {
     return res.redirect("/manager/dashboard");
   }
 

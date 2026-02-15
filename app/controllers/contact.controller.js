@@ -7,7 +7,6 @@ function create(req, res) {
     return res.status(400).send("Please fill all fields.");
   }
 
-  console.log("[CONTACT]", { name, email, message });
   return res.status(200).send("OK");
 }
 

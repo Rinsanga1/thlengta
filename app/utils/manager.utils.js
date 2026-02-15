@@ -1,11 +1,11 @@
 const { dbGet } = require("../db/helpers");
 
-async function getManagerStoreOrNull(managerId, adminId, storeId) {
+async function getManagerStoreOrNull(managerId, userId, storeId) {
   return dbGet(
     `
     SELECT
       s.id,
-      s.admin_id,
+      s.user_id,
       s.name,
       s.public_id,
       s.lat,
@@ -17,10 +17,10 @@ async function getManagerStoreOrNull(managerId, adminId, storeId) {
     FROM stores s
     INNER JOIN manager_stores ms ON ms.store_id = s.id
     WHERE ms.manager_id = ?
-      AND s.admin_id = ?
+      AND s.user_id = ?
       AND s.id = ?
     `,
-    [managerId, adminId, storeId]
+    [managerId, userId, storeId]
   );
 }
 

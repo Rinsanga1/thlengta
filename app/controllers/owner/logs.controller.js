@@ -26,12 +26,12 @@ async function cleanupOldLogs(storeId) {
 
 // Lists attendance logs for a given store and date (index action)
 exports.index = async (req, res) => {
-  const adminId = getOwnerId(req);
+  const userId = getOwnerId(req);
   const storeId = Number(req.params.storeId);
 
   const store = await dbGet(
-    "SELECT id, name, open_time, grace_enabled, grace_minutes FROM stores WHERE id = ? AND admin_id = ?",
-    [storeId, adminId]
+    "SELECT id, name, open_time, grace_enabled, grace_minutes FROM stores WHERE id = ? AND user_id = ?",
+    [storeId, userId]
   );
   if (!store) return res.status(404).send("Store not found.");
 
@@ -96,12 +96,12 @@ exports.index = async (req, res) => {
 
 // Downloads daily attendance logs as CSV (custom action)
 exports.downloadDayCsv = async (req, res) => {
-  const adminId = getOwnerId(req);
+  const userId = getOwnerId(req);
   const storeId = Number(req.params.storeId);
 
   const store = await dbGet(
-    "SELECT id, name, open_time, grace_enabled, grace_minutes FROM stores WHERE id = ? AND admin_id = ?",
-    [storeId, adminId]
+    "SELECT id, name, open_time, grace_enabled, grace_minutes FROM stores WHERE id = ? AND user_id = ?",
+    [storeId, userId]
   );
   if (!store) return res.status(404).send("Store not found.");
 
@@ -195,12 +195,12 @@ exports.downloadDayCsv = async (req, res) => {
 
 // Downloads monthly attendance logs as CSV (custom action)
 exports.downloadMonthCsv = async (req, res) => {
-  const adminId = getOwnerId(req);
+  const userId = getOwnerId(req);
   const storeId = Number(req.params.storeId);
 
   const store = await dbGet(
-    "SELECT id, name, open_time, grace_enabled, grace_minutes FROM stores WHERE id = ? AND admin_id = ?",
-    [storeId, adminId]
+    "SELECT id, name, open_time, grace_enabled, grace_minutes FROM stores WHERE id = ? AND user_id = ?",
+    [storeId, userId]
   );
   if (!store) return res.status(404).send("Store not found.");
 
