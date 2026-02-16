@@ -1,6 +1,6 @@
 <section class="section" style="padding-top:46px;">
   <div style="max-width:720px;margin:0 auto 20px;">
-    <a class="btn" href="/owner/workplaces/<%= workplace.id %>/managers" style="width:auto;">← Back to Managers</a>
+    <a class="btn" href="/owner/workplaces/<%= workplace.id %>?tab=managers" style="width:auto;">← Back to Workplace</a>
   </div>
   <div class="card pad" style="max-width:720px;margin:0 auto;">
     <div class="topbar" style="margin-bottom:14px;">
@@ -21,7 +21,7 @@
       <div class="error"><%= error %></div>
 
       <div class="actions" style="margin-top:12px;">
-        <a class="btn" href="/owner/workplaces/<%= workplace.id %>/managers">Back</a>
+        <a class="btn" href="/owner/workplaces/<%= workplace.id %>?tab=managers">Back</a>
       </div>
     <% } else { %>
 
@@ -45,7 +45,7 @@
 
         <div class="actions" style="margin-top:12px;">
           <button class="btn primary" type="submit" style="width:auto;">Save</button>
-          <a class="btn" href="/owner/workplaces/<%= workplace.id %>/managers">Cancel</a>
+          <a class="btn" href="/owner/workplaces/<%= workplace.id %>?tab=managers">Cancel</a>
         </div>
       </form>
 

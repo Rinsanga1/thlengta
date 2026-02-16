@@ -35,13 +35,14 @@
       <div class="notice">Managers are available only on Enterprise plan. Upgrade to gain this useful feature!</div>
 
       <div class="actions" style="margin-top:12px;">
-        <a class="btn" href="/owner/dashboard">Back</a>
+        <a class="btn" href="/owner/workplaces/<%= workplace.id %>?tab=managers">Back</a>
       </div>
     <% } else { %>
 
-      <div class="actions" style="margin:12px 0 8px;">
-            <a class="btn primary" href="/owner/workplaces/<%= workplace.id %>/managers/new">Add Manager</a>
-      </div>
+    <div class="actions" style="margin:12px 0 8px;">
+        <a class="btn" href="/owner/workplaces/<%= workplace.id %>?tab=managers">← Back to Workplace</a>
+        <a class="btn primary" href="/owner/workplaces/<%= workplace.id %>/managers/new">Add Manager</a>
+    </div>
 
       <div class="notice" style="margin:10px 0 16px;">
         <div style="font-weight:900;">Access scope</div>
