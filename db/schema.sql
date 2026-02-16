@@ -324,3 +324,17 @@ JOIN users u ON s.user_id = u.id
 JOIN plan_limits pl ON pl.plan = u.plan
 LEFT JOIN employees e ON e.store_id = s.id
 GROUP BY s.id;
+
+
+-- =========================
+-- VIEWS
+-- =========================
+CREATE TABLE IF NOT EXISTS sessions (
+  sid TEXT PRIMARY KEY,
+  sess TEXT NOT NULL,
+  expired INTEGER NOT NULL,
+  created_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now') * 1000),
+  updated_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now') * 1000)
+);
+
+CREATE INDEX IF NOT EXISTS idx_sessions_expired ON sessions(expired);

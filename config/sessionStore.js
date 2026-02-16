@@ -3,12 +3,18 @@ const { EventEmitter } = require("events");
 const { Session } = require("express-session");
 
 class BunSqliteSessionStore extends EventEmitter {
-  constructor(options = {}) {
+  constructor(dbOrPath, options = {}) {
     super();
-    this.dbPath = options.db || "sessions.sqlite";
-    this.db = new Database(this.dbPath);
-    this.prefix = options.prefix || "sess:";
+    
+    if (typeof dbOrPath === 'string') {
+      this.db = new Database(dbOrPath);
+    } else {
+      this.db = dbOrPath;
+    }
+    
+    this.tableName = options.tableName || 'sessions';
     this.ttl = options.ttl || 86400000;
+    this.prefix = options.prefix || "sess:";
     this.Session = Session;
     this.cleanupInterval = options.cleanupInterval || 600000;
     this.cleanupOnInit = options.cleanupOnInit !== false;
@@ -22,14 +28,14 @@ class BunSqliteSessionStore extends EventEmitter {
   initTable() {
     try {
       this.db.exec(`
-        CREATE TABLE IF NOT EXISTS sessions (
+        CREATE TABLE IF NOT EXISTS ${this.tableName} (
           sid TEXT PRIMARY KEY,
           sess TEXT NOT NULL,
           expired INTEGER NOT NULL
         )
       `);
       this.db.exec(`
-        CREATE INDEX IF NOT EXISTS idx_sessions_expired ON sessions(expired)
+        CREATE INDEX IF NOT EXISTS idx_sessions_expired ON ${this.tableName}(expired)
       `);
     } catch (err) {
       console.error("[SessionStore] Failed to initialize table:", err.message);
@@ -39,15 +45,13 @@ class BunSqliteSessionStore extends EventEmitter {
 
   get(sid, callback) {
     try {
-      const stmt = this.db.prepare("SELECT sess, expired FROM sessions WHERE sid = ?");
-      const row = stmt.get(sid);
+      const now = Math.floor(Date.now() / 1000);
+      const stmt = this.db.prepare(
+        `SELECT sess, expired FROM ${this.tableName} WHERE sid = ? AND expired > ?`
+      );
+      const row = stmt.get(sid, now);
       
       if (!row) {
-        return callback(null, null);
-      }
-
-      if (row.expired * 1000 < Date.now()) {
-        this.destroy(sid, callback);
         return callback(null, null);
       }
 
@@ -67,7 +71,7 @@ class BunSqliteSessionStore extends EventEmitter {
       const expired = Math.floor(Date.now() / 1000) + Math.floor(ttl / 1000);
       
       const stmt = this.db.prepare(`
-        INSERT OR REPLACE INTO sessions (sid, sess, expired) VALUES (?, ?, ?)
+        INSERT OR REPLACE INTO ${this.tableName} (sid, sess, expired) VALUES (?, ?, ?)
       `);
       stmt.run(sid, sess, expired);
       callback(null);
@@ -79,7 +83,7 @@ class BunSqliteSessionStore extends EventEmitter {
 
   destroy(sid, callback) {
     try {
-      const stmt = this.db.prepare("DELETE FROM sessions WHERE sid = ?");
+      const stmt = this.db.prepare(`DELETE FROM ${this.tableName} WHERE sid = ?`);
       stmt.run(sid);
       callback(null);
     } catch (err) {
@@ -94,12 +98,9 @@ class BunSqliteSessionStore extends EventEmitter {
       const ttl = maxAge ? maxAge : this.ttl;
       const expired = Math.floor(Date.now() / 1000) + Math.floor(ttl / 1000);
       
-      const stmt = this.db.prepare("UPDATE sessions SET expired = ? WHERE sid = ?");
+      const stmt = this.db.prepare(`UPDATE ${this.tableName} SET expired = ? WHERE sid = ?`);
       const result = stmt.run(expired, sid);
       
-      if (result.changes === 0) {
-        return callback(null);
-      }
       callback(null);
     } catch (err) {
       this.emit("error", err);
@@ -110,7 +111,7 @@ class BunSqliteSessionStore extends EventEmitter {
   cleanup(callback) {
     try {
       const now = Math.floor(Date.now() / 1000);
-      const stmt = this.db.prepare("DELETE FROM sessions WHERE expired < ?");
+      const stmt = this.db.prepare(`DELETE FROM ${this.tableName} WHERE expired < ?`);
       const result = stmt.run(now);
       
       if (result.changes > 0) {

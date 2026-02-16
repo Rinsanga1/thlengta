@@ -10,8 +10,8 @@ function setRememberMeCookie(req, remember) {
 }
 
 function deleteSessionsByNeedle(needle) {
-  const sessionsDbPath = path.join(process.cwd(), "sessions.sqlite");
-  const db = new Database(sessionsDbPath);
+  const dbPath = path.join(process.cwd(), "data.sqlite");
+  const db = new Database(dbPath);
   
   const like = `%${needle}%`;
   const stmt = db.prepare("DELETE FROM sessions WHERE sess LIKE ?");
