@@ -12,11 +12,19 @@ const { getOwnerId } = require("../../middleware/auth");
 const { canAddWorkplace } = require("../../../db/validators");
 const bcrypt = require("bcryptjs");
 
+const ITEMS_PER_PAGE = 10;
+
 function getBaseUrl(req) {
   const envBase = process.env.BASE_URL;
   if (envBase) return envBase.replace(/\/+$/, "");
   return `${req.protocol}://${req.get("host")}`;
 }
+
+// Redirect old /edit route to settings tab
+exports.editRedirect = (req, res) => {
+  const workplaceId = req.params.workplaceId;
+  return res.redirect(`/owner/workplaces/${workplaceId}?tab=settings`);
+};
 
 // GET /owner/workplaces/:workplaceId - Unified dashboard with tabs
 exports.dashboard = async (req, res) => {
@@ -40,13 +48,26 @@ exports.dashboard = async (req, res) => {
   let managers = [];
   let todayLogs = [];
   let msg = req.query.msg || null;
+  let employeePage = 1;
+  let employeeTotalPages = 1;
+  let employeeTotalItems = 0;
 
   if (activeTab === "employees") {
+    employeePage = Math.max(1, Number(req.query.empPage) || 1);
+    const offset = (employeePage - 1) * ITEMS_PER_PAGE;
+
+    const countResult = await dbGet(
+      "SELECT COUNT(*) as total FROM employees WHERE workplace_id = ?",
+      [workplaceId]
+    );
+    employeeTotalItems = countResult?.total || 0;
+    employeeTotalPages = Math.ceil(employeeTotalItems / ITEMS_PER_PAGE);
+
     employees = await dbAll(
       `SELECT e.*, 
         CASE WHEN EXISTS (SELECT 1 FROM employee_devices d WHERE d.employee_id = e.id) THEN 1 ELSE 0 END as has_device
-       FROM employees e WHERE e.workplace_id = ? ORDER BY e.id DESC`,
-      [workplaceId]
+       FROM employees e WHERE e.workplace_id = ? ORDER BY e.id DESC LIMIT ? OFFSET ?`,
+      [workplaceId, ITEMS_PER_PAGE, offset]
     );
   }
 
@@ -81,7 +102,10 @@ exports.dashboard = async (req, res) => {
     managers,
     logs: todayLogs,
     msg,
-    isEnterprise: plan === "enterprise"
+    isEnterprise: plan === "enterprise",
+    employeePage,
+    employeeTotalPages,
+    employeeTotalItems
   });
 };
 

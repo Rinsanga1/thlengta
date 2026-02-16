@@ -74,6 +74,8 @@ router.get("/owner/workplaces/new", requireOwner, ownerWorkplaces.new);
 router.post("/owner/workplaces", requireOwner, upload.single("logo"), ownerWorkplaces.create);
 // Unified workplace dashboard (with tabs)
 router.get("/owner/workplaces/:workplaceId", requireOwner, ownerWorkplaces.dashboard);
+router.get("/owner/workplaces/:workplaceId/edit", requireOwner, ownerWorkplaces.editRedirect); // Legacy redirect
+router.get("/owner/workplaces/:workplaceId/qr", requireOwner, ownerWorkplaces.editRedirect); // Legacy redirect
 router.get("/owner/workplaces/:workplaceId/qr.png", requireOwner, ownerWorkplaces.qrPng);
 router.post("/owner/workplaces/:workplaceId/settings", requireOwner, upload.single("logo"), ownerWorkplaces.update);
 router.post("/owner/workplaces/:workplaceId/logo", requireOwner, upload.single("logo"), ownerWorkplaces.updateLogo);

@@ -66,7 +66,7 @@
       <!-- EMPLOYEES TAB -->
       <% if (activeTab === 'employees') { %>
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; flex-wrap:wrap; gap:10px;">
-          <h3 style="margin:0;">Employees (<%= employees.length %>)</h3>
+          <h3 style="margin:0;">Employees (<%= employeeTotalItems %>)</h3>
           <a class="btn primary" href="/owner/workplaces/<%= workplace.id %>/employees/new">+ Add Employee</a>
         </div>
 
@@ -113,6 +113,18 @@
               </tbody>
             </table>
           </div>
+
+          <% if (employeeTotalPages > 1) { %>
+          <div style="display:flex; justify-content:center; align-items:center; gap:10px; margin-top:20px;">
+            <% if (employeePage > 1) { %>
+              <a class="btn" href="/owner/workplaces/<%= workplace.id %>?tab=employees&empPage=<%= employeePage - 1 %>">← Prev</a>
+            <% } %>
+            <span class="small muted">Page <%= employeePage %> of <%= employeeTotalPages %></span>
+            <% if (employeePage < employeeTotalPages) { %>
+              <a class="btn" href="/owner/workplaces/<%= workplace.id %>?tab=employees&empPage=<%= employeePage + 1 %>">Next →</a>
+            <% } %>
+          </div>
+          <% } %>
         <% } %>
       <% } %>
 

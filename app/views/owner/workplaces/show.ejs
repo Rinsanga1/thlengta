@@ -21,8 +21,8 @@
       
       <div style="margin-top:20px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
         <a class="btn primary" href="/owner/workplaces/<%= workplace.id %>/qr.png" download="workplace-<%= workplace.id %>-qr.png">Download QR</a>
-        <a class="btn" href="/owner/workplaces/<%= workplace.id %>/employees">Employees</a>
-        <a class="btn" href="/owner/workplaces/<%= workplace.id %>/edit">Settings</a>
+        <a class="btn" href="/owner/workplaces/<%= workplace.id %>?tab=employees">Employees</a>
+        <a class="btn" href="/owner/workplaces/<%= workplace.id %>?tab=settings">Settings</a>
         <a class="btn" href="/owner/dashboard">Dashboard</a>
       </div>
     </div>

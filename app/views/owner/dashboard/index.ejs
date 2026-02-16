@@ -64,7 +64,6 @@ Plan:
               <div class="list">
                 <% workplaces.forEach(w => { %>
                     <a href="/owner/workplaces/<%= w.id %>" class="item" style="text-decoration:none;color:inherit;display:block;">
-                    <div class="icon">WP</div>
                     <div style="flex:1;">
                     <div style="font-weight:900;"><%= w.name %></div>
                     <div class="small muted" style="margin-top:6px;">
@@ -75,6 +74,18 @@ Plan:
                     </a>
                     <% }) %>
                 </div>
+
+                <% if (totalPages > 1) { %>
+                <div style="display:flex; justify-content:center; align-items:center; gap:10px; margin-top:20px;">
+                  <% if (page > 1) { %>
+                    <a class="btn" href="/owner/dashboard?page=<%= page - 1 %>">← Prev</a>
+                  <% } %>
+                  <span class="small muted">Page <%= page %> of <%= totalPages %></span>
+                  <% if (page < totalPages) { %>
+                    <a class="btn" href="/owner/dashboard?page=<%= page + 1 %>">Next →</a>
+                  <% } %>
+                </div>
+                <% } %>
                 <% } %>
 
                 </div>
