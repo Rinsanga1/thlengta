@@ -10,12 +10,80 @@ const {
 } = require("../../utils/workplace.utils");
 const { getOwnerId } = require("../../middleware/auth");
 const { canAddWorkplace } = require("../../../db/validators");
+const bcrypt = require("bcryptjs");
 
 function getBaseUrl(req) {
   const envBase = process.env.BASE_URL;
   if (envBase) return envBase.replace(/\/+$/, "");
   return `${req.protocol}://${req.get("host")}`;
 }
+
+// GET /owner/workplaces/:workplaceId - Unified dashboard with tabs
+exports.dashboard = async (req, res) => {
+  const userId = getOwnerId(req);
+  const workplaceId = Number(req.params.workplaceId);
+  const activeTab = req.query.tab || "qr";
+
+  const workplace = await dbGet(
+    "SELECT * FROM workplaces WHERE id = ? AND user_id = ?",
+    [workplaceId, userId]
+  );
+  if (!workplace) return res.status(404).send("Workplace not found.");
+
+  const user = await dbGet("SELECT plan FROM users WHERE id = ?", [userId]);
+  const plan = user?.plan || "free";
+
+  const scanUrl = `${getBaseUrl(req)}/e/scan/${workplace.public_id}?src=qr`;
+
+  // Data for each tab
+  let employees = [];
+  let managers = [];
+  let todayLogs = [];
+  let msg = req.query.msg || null;
+
+  if (activeTab === "employees") {
+    employees = await dbAll(
+      `SELECT e.*, 
+        CASE WHEN EXISTS (SELECT 1 FROM employee_devices d WHERE d.employee_id = e.id) THEN 1 ELSE 0 END as has_device
+       FROM employees e WHERE e.workplace_id = ? ORDER BY e.id DESC`,
+      [workplaceId]
+    );
+  }
+
+  if (activeTab === "managers" && plan === "enterprise") {
+    managers = await dbAll(
+      `SELECT m.* FROM manager_workplaces mw 
+       JOIN managers m ON m.id = mw.manager_id 
+       WHERE mw.workplace_id = ? AND m.user_id = ? ORDER BY m.id DESC`,
+      [workplaceId, userId]
+    );
+  }
+
+  if (activeTab === "logs") {
+    const today = new Date().toISOString().split("T")[0];
+    todayLogs = await dbAll(
+      `SELECT a.*, e.email as employee_email 
+       FROM attendance_logs a 
+       LEFT JOIN employees e ON e.id = a.employee_id 
+       WHERE a.workplace_id = ? AND DATE(a.created_at) = ? 
+       ORDER BY a.id DESC LIMIT 100`,
+      [workplaceId, today]
+    );
+  }
+
+  res.renderPage("owner/workplaces/dashboard", {
+    title: workplace.name,
+    workplace,
+    plan,
+    scanUrl,
+    activeTab,
+    employees,
+    managers,
+    logs: todayLogs,
+    msg,
+    isEnterprise: plan === "enterprise"
+  });
+};
 
 // GET /owner/workplaces/new - Show combined form
 exports.new = (req, res) => {

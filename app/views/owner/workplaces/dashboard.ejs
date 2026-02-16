@@ -1,0 +1,305 @@
+<section class="section" style="padding-top:20px;">
+  <!-- Back Button -->
+  <div style="max-width:1200px;margin:0 auto 15px;">
+    <a class="btn" href="/owner/dashboard" style="width:auto;">← Back to Dashboard</a>
+  </div>
+
+  <!-- Workplace Header -->
+  <div class="card" style="max-width:1200px;margin:0 auto 20px;padding:20px;">
+    <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:15px;">
+      <div>
+        <h2 style="margin:0;"><%= workplace.name %></h2>
+        <div class="small" style="margin-top:4px;">
+          <% if (workplace.address) { %><%= workplace.address %> · <% } %>
+          <%= workplace.open_time || '--:--' %> - <%= workplace.close_time || '--:--' %>
+        </div>
+      </div>
+      <div style="display:flex; gap:10px;">
+        <a href="/owner/workplaces/<%= workplace.id %>?tab=qr" class="btn">View QR</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="card" style="max-width:1200px;margin:0 auto;padding:0;">
+    <div style="display:flex; border-bottom:1px solid var(--border); flex-wrap:wrap;">
+      <a href="/owner/workplaces/<%= workplace.id %>?tab=qr" 
+         class="tab<%= activeTab === 'qr' ? ' active' : '' %>"
+         style="flex:1; min-width:120px;">QR</a>
+      <a href="/owner/workplaces/<%= workplace.id %>?tab=employees" 
+         class="tab<%= activeTab === 'employees' ? ' active' : '' %>"
+         style="flex:1; min-width:120px;">Employees</a>
+      <a href="/owner/workplaces/<%= workplace.id %>?tab=logs" 
+         class="tab<%= activeTab === 'logs' ? ' active' : '' %>"
+         style="flex:1; min-width:120px;">Logs</a>
+      <% if (isEnterprise) { %>
+      <a href="/owner/workplaces/<%= workplace.id %>?tab=managers" 
+         class="tab<%= activeTab === 'managers' ? ' active' : '' %>"
+         style="flex:1; min-width:120px;">Managers</a>
+      <% } %>
+      <a href="/owner/workplaces/<%= workplace.id %>?tab=settings" 
+         class="tab<%= activeTab === 'settings' ? ' active' : '' %>"
+         style="flex:1; min-width:120px;">Settings</a>
+    </div>
+
+    <!-- Tab Content -->
+    <div style="padding:20px;">
+      
+      <% if (msg) { %>
+        <div class="notice" style="background:#eaf6f0; margin-bottom:15px;"><%= msg %></div>
+      <% } %>
+
+      <!-- QR TAB -->
+      <% if (activeTab === 'qr') { %>
+        <div style="text-align:center;">
+          <img src="/owner/workplaces/<%= workplace.id %>/qr.png" alt="QR Code" style="max-width:280px; margin:10px auto; display:block; border:1px solid #ddd; border-radius:8px;" />
+          <div style="margin:15px 0;">
+            <a class="btn primary" href="/owner/workplaces/<%= workplace.id %>/qr.png" download="workplace-<%= workplace.id %>-qr.png">Download QR</a>
+          </div>
+          <div class="small muted">
+            Print and place at workplace entrance<br/>
+            Employees scan with phone camera
+          </div>
+        </div>
+      <% } %>
+
+      <!-- EMPLOYEES TAB -->
+      <% if (activeTab === 'employees') { %>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; flex-wrap:wrap; gap:10px;">
+          <h3 style="margin:0;">Employees (<%= employees.length %>)</h3>
+          <a class="btn primary" href="/owner/workplaces/<%= workplace.id %>/employees/new">+ Add Employee</a>
+        </div>
+
+        <% if (!employees.length) { %>
+          <div class="muted">No employees yet. Add your first employee.</div>
+        <% } else { %>
+          <div style="overflow-x:auto;">
+            <table style="width:100%; border-collapse:collapse;">
+              <thead>
+                <tr style="border-bottom:2px solid var(--border);">
+                  <th style="text-align:left; padding:10px;">Email</th>
+                  <th style="text-align:left; padding:10px;">Added</th>
+                  <th style="text-align:center; padding:10px;">Device</th>
+                  <th style="text-align:center; padding:10px;">Status</th>
+                  <th style="text-align:right; padding:10px;">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% employees.forEach(e => { %>
+                <tr style="border-bottom:1px solid var(--border);">
+                  <td style="padding:10px;"><%= e.email %></td>
+                  <td style="padding:10px;" class="small"><%= e.created_at ? e.created_at.split(' ')[0] : '-' %></td>
+                  <td style="padding:10px; text-align:center;">
+                    <% if (e.has_device) { %>
+                      <span class="chip" style="background:#eaf6f0;">Registered</span>
+                    <% } else { %>
+                      <span class="chip" style="background:#fff3e0;">Not set</span>
+                    <% } %>
+                  </td>
+                  <td style="padding:10px; text-align:center;">
+                    <% if (e.is_active) { %>
+                      <span class="chip" style="background:#e8f5e9;">Active</span>
+                    <% } else { %>
+                      <span class="chip" style="background:#ffebee;">Inactive</span>
+                    <% } %>
+                  </td>
+                  <td style="padding:10px; text-align:right;">
+                    <form method="post" action="/owner/workplaces/<%= workplace.id %>/employees/<%= e.id %>/toggle" style="display:inline;">
+                      <button type="submit" class="btn" style="padding:4px 8px; font-size:12px;"><%= e.is_active ? 'Deactivate' : 'Activate' %></button>
+                    </form>
+                  </td>
+                </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        <% } %>
+      <% } %>
+
+      <!-- LOGS TAB -->
+      <% if (activeTab === 'logs') { %>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; flex-wrap:wrap; gap:10px;">
+          <h3 style="margin:0;">Today's Logs</h3>
+          <a class="btn" href="/owner/workplaces/<%= workplace.id %>/logs">View Full Logs</a>
+        </div>
+
+        <% if (!logs.length) { %>
+          <div class="muted">No check-ins recorded today.</div>
+        <% } else { %>
+          <div style="overflow-x:auto;">
+            <table style="width:100%; border-collapse:collapse;">
+              <thead>
+                <tr style="border-bottom:2px solid var(--border);">
+                  <th style="text-align:left; padding:10px;">Time</th>
+                  <th style="text-align:left; padding:10px;">Employee</th>
+                  <th style="text-align:left; padding:10px;">Event</th>
+                  <th style="text-align:center; padding:10px;">GPS</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% logs.forEach(l => { %>
+                <tr style="border-bottom:1px solid var(--border);">
+                  <td style="padding:10px;"><%= l.created_at ? l.created_at.split(' ')[1].substring(0,8) : '-' %></td>
+                  <td style="padding:10px;"><%= l.employee_email || 'Unknown' %></td>
+                  <td style="padding:10px;">
+                    <% if (l.event_type === 'checkin') { %>
+                      <span class="chip" style="background:#e8f5e9;">Check-in</span>
+                    <% } else if (l.event_type === 'checkout') { %>
+                      <span class="chip" style="background:#e3f2fd;">Check-out</span>
+                    <% } else { %>
+                      <%= l.event_type %>
+                    <% } %>
+                  </td>
+                  <td style="padding:10px; text-align:center;">
+                    <% if (l.gps_ok) { %>
+                      <span style="color:green;">✓</span>
+                    <% } else { %>
+                      <span style="color:red;">✗</span>
+                    <% } %>
+                  </td>
+                </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        <% } %>
+      <% } %>
+
+      <!-- MANAGERS TAB -->
+      <% if (activeTab === 'managers') { %>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; flex-wrap:wrap; gap:10px;">
+          <h3 style="margin:0;">Managers</h3>
+          <a class="btn primary" href="/owner/workplaces/<%= workplace.id %>/managers/new">+ Add Manager</a>
+        </div>
+
+        <% if (!managers.length) { %>
+          <div class="muted">No managers assigned. Managers can help manage this workplace.</div>
+        <% } else { %>
+          <div style="overflow-x:auto;">
+            <table style="width:100%; border-collapse:collapse;">
+              <thead>
+                <tr style="border-bottom:2px solid var(--border);">
+                  <th style="text-align:left; padding:10px;">Email</th>
+                  <th style="text-align:left; padding:10px;">Added</th>
+                  <th style="text-align:center; padding:10px;">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% managers.forEach(m => { %>
+                <tr style="border-bottom:1px solid var(--border);">
+                  <td style="padding:10px;"><%= m.email %></td>
+                  <td style="padding:10px;" class="small"><%= m.created_at ? m.created_at.split(' ')[0] : '-' %></td>
+                  <td style="padding:10px; text-align:center;">
+                    <% if (m.is_active) { %>
+                      <span class="chip" style="background:#e8f5e9;">Active</span>
+                    <% } else { %>
+                      <span class="chip" style="background:#ffebee;">Inactive</span>
+                    <% } %>
+                  </td>
+                </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        <% } %>
+      <% } %>
+
+      <!-- SETTINGS TAB -->
+      <% if (activeTab === 'settings') { %>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:20px;">
+          
+          <!-- Hours -->
+          <div class="card pad" style="background:#fff;">
+            <h3 style="margin:0 0 15px;">Workplace Hours</h3>
+            <form method="post" action="/owner/workplaces/<%= workplace.id %>/settings">
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                <div class="field">
+                  <label>Open Time</label>
+                  <input type="text" name="open_time" value="<%= workplace.open_time || '' %>" placeholder="09:00" />
+                </div>
+                <div class="field">
+                  <label>Close Time</label>
+                  <input type="text" name="close_time" value="<%= workplace.close_time || '' %>" placeholder="18:00" />
+                </div>
+              </div>
+              <div class="field" style="margin-top:10px;">
+                <label>
+                  <input type="checkbox" name="grace_enabled" value="1" <%= workplace.grace_enabled ? 'checked' : '' %> />
+                  Enable grace period
+                </label>
+              </div>
+              <button type="submit" class="btn primary" style="margin-top:10px;">Save Hours</button>
+            </form>
+          </div>
+
+          <!-- Location & Radius -->
+          <div class="card pad" style="background:#fff;">
+            <h3 style="margin:0 0 15px;">Location & Radius</h3>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+              <div class="field">
+                <label>Latitude</label>
+                <input type="number" step="any" name="lat" value="<%= workplace.lat || '' %>" />
+              </div>
+              <div class="field">
+                <label>Longitude</label>
+                <input type="number" step="any" name="lng" value="<%= workplace.lng || '' %>" />
+              </div>
+            </div>
+            <div class="field" style="margin-top:10px;">
+              <label>Check-in Radius (m)</label>
+              <input type="number" name="radius_m" value="<%= workplace.radius_m || 70 %>" min="10" max="1000" />
+            </div>
+          </div>
+
+          <!-- Logo -->
+          <div class="card pad" style="background:#fff;">
+            <h3 style="margin:0 0 15px;">Logo</h3>
+            <% if (workplace.logo_path) { %>
+              <img src="<%= workplace.logo_path %>" style="max-width:120px; margin-bottom:10px; border-radius:8px;" />
+            <% } %>
+            <form method="post" action="/owner/workplaces/<%= workplace.id %>/logo" enctype="multipart/form-data">
+              <div class="field">
+                <input type="file" name="logo" accept="image/*" />
+              </div>
+              <button type="submit" class="btn" style="margin-top:5px;">Update Logo</button>
+            </form>
+          </div>
+
+          <!-- Danger Zone -->
+          <div class="card pad" style="background:#fff3f3;">
+            <h3 style="margin:0 0 15px; color:#d32f2f;">Danger Zone</h3>
+            <p class="small">Deleting will remove all employees and logs. This cannot be undone.</p>
+            <form method="post" action="/owner/workplaces/<%= workplace.id %>/delete" 
+                  onsubmit="return confirm('Delete this workplace and ALL its data?');">
+              <button type="submit" class="btn" style="background:#d32f2f; color:white;">Delete Workplace</button>
+            </form>
+          </div>
+        </div>
+      <% } %>
+
+    </div>
+  </div>
+</section>
+
+<style>
+.tab {
+  display:block;
+  padding:12px 20px;
+  text-align:center;
+  text-decoration:none;
+  color:var(--muted);
+  border-bottom:3px solid transparent;
+  font-weight:500;
+}
+.tab:hover {
+  background:#f5f5f5;
+}
+.tab.active {
+  color:var(--primary);
+  border-bottom-color:var(--primary);
+  background:#fafafa;
+}
+@media (max-width:600px) {
+  .tab { padding:10px 15px; font-size:14px; }
+}
+</style>

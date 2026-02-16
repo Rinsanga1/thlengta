@@ -72,10 +72,9 @@ router.get("/owner", ownerDashboard.gateway);
 // Workplaces
 router.get("/owner/workplaces/new", requireOwner, ownerWorkplaces.new);
 router.post("/owner/workplaces", requireOwner, upload.single("logo"), ownerWorkplaces.create);
-router.get("/owner/workplaces/:workplaceId", requireOwner, ownerWorkplaces.show); // Show QR
-router.get("/owner/workplaces/:workplaceId/qr", requireOwner, ownerWorkplaces.show); // Alternative QR URL
+// Unified workplace dashboard (with tabs)
+router.get("/owner/workplaces/:workplaceId", requireOwner, ownerWorkplaces.dashboard);
 router.get("/owner/workplaces/:workplaceId/qr.png", requireOwner, ownerWorkplaces.qrPng);
-router.get("/owner/workplaces/:workplaceId/edit", requireOwner, ownerWorkplaces.edit); // Settings
 router.post("/owner/workplaces/:workplaceId/settings", requireOwner, upload.single("logo"), ownerWorkplaces.update);
 router.post("/owner/workplaces/:workplaceId/logo", requireOwner, upload.single("logo"), ownerWorkplaces.updateLogo);
 router.post("/owner/workplaces/:workplaceId/delete", requireOwner, ownerWorkplaces.destroy);
