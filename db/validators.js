@@ -17,7 +17,7 @@ function clearPlanLimitsCache() {
   planLimitsCache.clear();
 }
 
-async function canAddStore(userId) {
+async function canAddWorkplace(userId) {
   const user = await dbGet("SELECT plan FROM users WHERE id = ?", [userId]);
   if (!user) {
     return { allowed: false, reason: "User not found" };
@@ -28,25 +28,25 @@ async function canAddStore(userId) {
     return { allowed: false, reason: "Invalid plan" };
   }
 
-  const current = await dbGet("SELECT COUNT(*) as count FROM stores WHERE user_id = ?", [userId]);
+  const current = await dbGet("SELECT COUNT(*) as count FROM workplaces WHERE user_id = ?", [userId]);
 
-  if (limits.max_stores !== -1 && current.count >= limits.max_stores) {
+  if (limits.max_workplaces !== -1 && current.count >= limits.max_workplaces) {
     return {
       allowed: false,
-      reason: `Plan limit: ${user.plan} allows ${limits.max_stores} store(s). Please upgrade.`
+      reason: `Plan limit: ${user.plan} allows ${limits.max_workplaces} workplace(s). Please upgrade.`
     };
   }
 
   return { allowed: true };
 }
 
-async function canAddEmployee(storeId) {
-  const store = await dbGet("SELECT user_id FROM stores WHERE id = ?", [storeId]);
-  if (!store) {
-    return { allowed: false, reason: "Store not found" };
+async function canAddEmployee(workplaceId) {
+  const workplace = await dbGet("SELECT user_id FROM workplaces WHERE id = ?", [workplaceId]);
+  if (!workplace) {
+    return { allowed: false, reason: "Workplace not found" };
   }
 
-  const user = await dbGet("SELECT plan FROM users WHERE id = ?", [store.user_id]);
+  const user = await dbGet("SELECT plan FROM users WHERE id = ?", [workplace.user_id]);
   if (!user) {
     return { allowed: false, reason: "User not found" };
   }
@@ -57,14 +57,14 @@ async function canAddEmployee(storeId) {
   }
 
   const current = await dbGet(
-    "SELECT COUNT(*) as count FROM employees WHERE store_id = ? AND is_active = 1",
-    [storeId]
+    "SELECT COUNT(*) as count FROM employees WHERE workplace_id = ? AND is_active = 1",
+    [workplaceId]
   );
 
-  if (limits.max_employees_per_store !== -1 && current.count >= limits.max_employees_per_store) {
+  if (limits.max_employees_per_workplace !== -1 && current.count >= limits.max_employees_per_workplace) {
     return {
       allowed: false,
-      reason: `Plan limit: ${user.plan} allows ${limits.max_employees_per_store} employees per store. Please upgrade.`
+      reason: `Plan limit: ${user.plan} allows ${limits.max_employees_per_workplace} employees per workplace. Please upgrade.`
     };
   }
 
@@ -113,20 +113,20 @@ async function getUserPlanUsage(userId) {
   return await dbGet("SELECT * FROM user_plan_usage WHERE user_id = ?", [userId]);
 }
 
-async function getStoreEmployeeCount(storeId) {
+async function getWorkplaceEmployeeCount(workplaceId) {
   return await dbGet(
-    "SELECT * FROM store_employee_counts WHERE store_id = ?",
-    [storeId]
+    "SELECT * FROM workplace_employee_counts WHERE workplace_id = ?",
+    [workplaceId]
   );
 }
 
 module.exports = {
   getPlanLimits,
   clearPlanLimitsCache,
-  canAddStore,
+  canAddWorkplace,
   canAddEmployee,
   canAddManager,
   canDownloadReports,
   getUserPlanUsage,
-  getStoreEmployeeCount,
+  getWorkplaceEmployeeCount,
 };

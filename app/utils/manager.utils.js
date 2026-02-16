@@ -1,29 +1,29 @@
 const { dbGet } = require("../../db/helpers");
 
-async function getManagerStoreOrNull(managerId, userId, storeId) {
+async function getManagerWorkplaceOrNull(managerId, userId, workplaceId) {
   return dbGet(
     `
     SELECT
-      s.id,
-      s.user_id,
-      s.name,
-      s.public_id,
-      s.lat,
-      s.lng,
-      s.radius_m,
-      s.open_time,
-      s.grace_enabled,
-      s.grace_minutes
-    FROM stores s
-    INNER JOIN manager_stores ms ON ms.store_id = s.id
-    WHERE ms.manager_id = ?
-      AND s.user_id = ?
-      AND s.id = ?
+      w.id,
+      w.user_id,
+      w.name,
+      w.public_id,
+      w.lat,
+      w.lng,
+      w.radius_m,
+      w.open_time,
+      w.grace_enabled,
+      w.grace_minutes
+    FROM workplaces w
+    INNER JOIN manager_workplaces mw ON mw.workplace_id = w.id
+    WHERE mw.manager_id = ?
+      AND w.user_id = ?
+      AND w.id = ?
     `,
-    [managerId, userId, storeId]
+    [managerId, userId, workplaceId]
   );
 }
 
 module.exports = {
-  getManagerStoreOrNull,
+  getManagerWorkplaceOrNull,
 };

@@ -1,24 +1,7 @@
-<header class="nav">
-    <div class="container nav-inner">
-      <a class="brand" href="dashboard">
-        <span>
-           <img src="/assets/img/thlengtalogo.png" alt="Thlengta logo" width="80px"/>
-        </span>
-        <span class="small">
-          <img src="/assets/img/thlengtalogotext.png" atl="Thlengta logo type" width="195px"/>
-        </span>
-        <span class="small">
-          <img src="/assets/img/com.png" atl="Thlengta logo type" width="75px" style="margin-left: -10px"/>
-        </span>
-      </a>
-
-      <nav class="nav-links">
-        <a class="btn" href="/superadmin/dashboard">Back</a>
-      </nav>
-    </div>
-  </header>
-<!---Below is the fucntional stuff -->
 <section class="section" style="padding-top:46px;">
+  <div style="max-width:980px;margin:0 auto 20px;">
+    <a class="btn" href="/superadmin/dashboard" style="width:auto;">← Back to Dashboard</a>
+  </div>
   <div class="card pad super" style="max-width:980px;margin:0 auto;">
     <div class="topbar" style="margin-bottom:14px;">
       <div>
@@ -95,13 +78,13 @@
           <label>Plan</label>
         <select name="plan" required>
           <option value="free" <%= (String(admin.plan || 'free') === 'free') ? 'selected' : '' %>>
-          Free (1 store, 2 employees)
+          Free (1 workplace, 2 employees)
           </option>
           <option value="plus" <%= (String(admin.plan || 'free') === 'plus') ? 'selected' : '' %>>
-          Plus (1 store, 10 employees)
+          Plus (1 workplace, 10 employees)
           </option>
           <option value="pro" <%= (String(admin.plan || 'free') === 'pro') ? 'selected' : '' %>>
-          Pro (20 stores, 200 employees)
+          Pro (20 workplaces, 200 employees)
           </option>
         <option value="enterprise" <%= (String(admin.plan || 'free') === 'enterprise') ? 'selected' : '' %>>
           Enterprise (unlimited)

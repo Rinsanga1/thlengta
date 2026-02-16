@@ -1,0 +1,47 @@
+<section class="section" style="padding-top:46px;">
+  <div style="max-width:800px;margin:0 auto 20px;">
+    <a class="btn" href="/owner/dashboard" style="width:auto;">← Back to Dashboard</a>
+  </div>
+  <div class="card pad super" style="max-width:800px;margin:0 auto;">
+    <div class="topbar" style="margin-bottom:14px;">
+      <div>
+        <div class="h-eyebrow">
+          <span class="chip">Workplace</span>
+          <span class="chip">QR Code</span>
+        </div>
+        <h2 style="margin:10px 0 0;"><%= workplace.name %></h2>
+        <div class="small" style="margin-top:6px;">
+          Print this QR and place it at your workplace entrance.
+        </div>
+      </div>
+    </div>
+
+    <div class="card pad" style="background:#fff; text-align:center;">
+      <img src="/owner/workplaces/<%= workplace.id %>/qr.png" alt="QR Code" style="max-width:300px; margin:20px auto; display:block;" />
+      
+      <div style="margin-top:20px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+        <a class="btn primary" href="/owner/workplaces/<%= workplace.id %>/qr.png" download="workplace-<%= workplace.id %>-qr.png">Download QR</a>
+        <a class="btn" href="/owner/workplaces/<%= workplace.id %>/employees">Employees</a>
+        <a class="btn" href="/owner/workplaces/<%= workplace.id %>/edit">Settings</a>
+        <a class="btn" href="/owner/dashboard">Dashboard</a>
+      </div>
+    </div>
+
+    <div class="card pad" style="background:#fff7df; margin-top:20px;">
+      <h3 style="margin:0 0 10px;">QR Code Security</h3>
+      <p class="small">If your QR code is compromised or shared with unauthorized people, rotate it to generate a new one. The old QR will stop working immediately.</p>
+      <form method="post" action="/owner/workplaces/<%= workplace.id %>/qr/rotate" onsubmit="return confirm('This will invalidate the old QR code. Continue?');">
+        <button type="submit" class="btn" style="width:auto;">Rotate QR Code</button>
+      </form>
+    </div>
+
+    <div class="notice" style="margin-top:20px;">
+      <div style="font-weight:900;">How employees check in</div>
+      <div class="small" style="margin-top:6px;">
+        1) Scan QR with phone camera<br/>
+        2) Enter their PIN<br/>
+        3) GPS verifies they are inside the workplace boundary
+      </div>
+    </div>
+  </div>
+</section>

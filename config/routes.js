@@ -7,7 +7,7 @@ const users = require("../app/controllers/users.controller");
 const ownerSessions = require("../app/controllers/owner/sessions.controller");
 const ownerDashboard = require("../app/controllers/owner/dashboard.controller");
 const { requireOwner } = require("../app/middleware/auth"); // Import requireOwner
-const ownerStores = require("../app/controllers/owner/stores.controller"); // Import ownerStores
+const ownerWorkplaces = require("../app/controllers/owner/workplaces.controller"); // Import ownerWorkplaces
 const ownerEmployees = require("../app/controllers/owner/employees.controller"); // Import ownerEmployees
 const ownerManagers = require("../app/controllers/owner/managers.controller"); // Import ownerManagers
 const ownerLogs = require("../app/controllers/owner/logs.controller"); // Import ownerLogs
@@ -69,80 +69,74 @@ router.get("/owner/logout", ownerSessions.destroy);
 router.get("/owner/dashboard", requireOwner, ownerDashboard.index);
 router.get("/owner", ownerDashboard.gateway);
 
-// Stores (Workplace)
-router.get("/owner/stores/new", requireOwner, ownerStores.new);
-router.get("/owner/stores/new/step-1", requireOwner, ownerStores.new_step1_get);
-router.post("/owner/stores/new/step-1", requireOwner, upload.single("logo"), ownerStores.new_step1_post);
-router.get("/owner/stores/new/step-2", requireOwner, ownerStores.new_step2_get);
-router.post("/owner/stores/new/step-2", requireOwner, ownerStores.new_step2_post);
-router.get("/owner/stores/new/step-3", requireOwner, ownerStores.new_step3_get);
-router.post("/owner/stores/new/step-3", requireOwner, ownerStores.new_step3_post);
-router.get("/owner/stores/new/step-4", requireOwner, ownerStores.new_step4_get);
-router.post("/owner/stores/new/finish", requireOwner, ownerStores.create);
-router.get("/owner/stores/:storeId", requireOwner, ownerStores.show); // Show QR
-router.get("/owner/stores/:storeId/qr.png", requireOwner, ownerStores.qrPng);
-router.get("/owner/stores/:storeId/edit", requireOwner, ownerStores.edit); // Settings
-router.post("/owner/stores/:storeId/settings", requireOwner, ownerStores.update);
-router.post("/owner/stores/:storeId/logo", requireOwner, upload.single("logo"), ownerStores.updateLogo);
-router.post("/owner/stores/:storeId/delete", requireOwner, ownerStores.destroy);
-router.post("/owner/stores/:storeId/qr/rotate", requireOwner, ownerStores.rotateQr);
+// Workplaces
+router.get("/owner/workplaces/new", requireOwner, ownerWorkplaces.new);
+router.post("/owner/workplaces", requireOwner, upload.single("logo"), ownerWorkplaces.create);
+router.get("/owner/workplaces/:workplaceId", requireOwner, ownerWorkplaces.show); // Show QR
+router.get("/owner/workplaces/:workplaceId/qr", requireOwner, ownerWorkplaces.show); // Alternative QR URL
+router.get("/owner/workplaces/:workplaceId/qr.png", requireOwner, ownerWorkplaces.qrPng);
+router.get("/owner/workplaces/:workplaceId/edit", requireOwner, ownerWorkplaces.edit); // Settings
+router.post("/owner/workplaces/:workplaceId/settings", requireOwner, upload.single("logo"), ownerWorkplaces.update);
+router.post("/owner/workplaces/:workplaceId/logo", requireOwner, upload.single("logo"), ownerWorkplaces.updateLogo);
+router.post("/owner/workplaces/:workplaceId/delete", requireOwner, ownerWorkplaces.destroy);
+router.post("/owner/workplaces/:workplaceId/qr/rotate", requireOwner, ownerWorkplaces.rotateQr);
 
 // Test QR Download routes
-router.get("/owner/test_qr_download", requireOwner, ownerStores.testQrDownload);
-router.get("/owner/test_qr_download/raw/:storeId.png", requireOwner, ownerStores.testQrDownloadRawPng);
-router.get("/owner/test_qr_download/framed/:storeId.png", requireOwner, ownerStores.testQrDownloadFramedPng);
-router.get("/owner/test_qr_download/debug_frame", requireOwner, ownerStores.debugFrame);
+router.get("/owner/test_qr_download", requireOwner, ownerWorkplaces.testQrDownload);
+router.get("/owner/test_qr_download/raw/:workplaceId.png", requireOwner, ownerWorkplaces.testQrDownloadRawPng);
+router.get("/owner/test_qr_download/framed/:workplaceId.png", requireOwner, ownerWorkplaces.testQrDownloadFramedPng);
+router.get("/owner/test_qr_download/debug_frame", requireOwner, ownerWorkplaces.debugFrame);
 
 // Admin Employees
-router.get("/owner/stores/:storeId/employees", requireOwner, ownerEmployees.index);
-router.get("/owner/stores/:storeId/employees/new", requireOwner, ownerEmployees.new);
-router.post("/owner/stores/:storeId/employees", requireOwner, ownerEmployees.create); // POST to root collection
-router.post("/owner/stores/:storeId/employees/:employeeId/toggle", requireOwner, ownerEmployees.updateStatus);
-router.post("/owner/stores/:storeId/employees/:employeeId/device/reset", requireOwner, ownerEmployees.resetDevice);
-router.post("/owner/stores/:storeId/employees/:employeeId/delete", requireOwner, ownerEmployees.destroy);
+router.get("/owner/workplaces/:workplaceId/employees", requireOwner, ownerEmployees.index);
+router.get("/owner/workplaces/:workplaceId/employees/new", requireOwner, ownerEmployees.new);
+router.post("/owner/workplaces/:workplaceId/employees", requireOwner, ownerEmployees.create);
+router.post("/owner/workplaces/:workplaceId/employees/:employeeId/toggle", requireOwner, ownerEmployees.updateStatus);
+router.post("/owner/workplaces/:workplaceId/employees/:employeeId/device/reset", requireOwner, ownerEmployees.resetDevice);
+router.post("/owner/workplaces/:workplaceId/employees/:employeeId/delete", requireOwner, ownerEmployees.destroy);
 
 // Managers
-router.get("/owner/stores/:storeId/managers", requireOwner, ownerManagers.index);
-router.get("/owner/stores/:storeId/managers/new", requireOwner, ownerManagers.new);
-router.post("/owner/stores/:storeId/managers", requireOwner, ownerManagers.create); // POST to root collection
-router.post("/owner/stores/:storeId/managers/:managerId/toggle", requireOwner, ownerManagers.updateStatus);
-router.post("/owner/stores/:storeId/managers/:managerId/remove", requireOwner, ownerManagers.destroy);
+router.get("/owner/workplaces/:workplaceId/managers", requireOwner, ownerManagers.index);
+router.get("/owner/workplaces/:workplaceId/managers/new", requireOwner, ownerManagers.new);
+router.post("/owner/workplaces/:workplaceId/managers", requireOwner, ownerManagers.create);
+router.post("/owner/workplaces/:workplaceId/managers/:managerId/toggle", requireOwner, ownerManagers.updateStatus);
+router.post("/owner/workplaces/:workplaceId/managers/:managerId/remove", requireOwner, ownerManagers.destroy);
 
 // Logs
-router.get("/owner/stores/:storeId/logs", requireOwner, ownerLogs.index);
-router.get("/owner/stores/:storeId/logs.csv", requireOwner, ownerLogs.downloadDayCsv);
-router.get("/owner/stores/:storeId/logs_month.csv", requireOwner, ownerLogs.downloadMonthCsv);
+router.get("/owner/workplaces/:workplaceId/logs", requireOwner, ownerLogs.index);
+router.get("/owner/workplaces/:workplaceId/logs.csv", requireOwner, ownerLogs.downloadDayCsv);
+router.get("/owner/workplaces/:workplaceId/logs_month.csv", requireOwner, ownerLogs.downloadMonthCsv);
 
 // Upgrades
 router.get("/owner/upgrade", requireOwner, ownerUpgrades.new);
 router.post("/owner/upgrade", requireOwner, ownerUpgrades.create);
 
 // Employee Scans
-router.get("/e/scan/:storePublicId", employeeScans.index);
+router.get("/e/scan/:workplacePublicId", employeeScans.index);
 
 // Employee Device Approvals
-router.post("/e/scan/:storePublicId/device/approve", employeeDeviceApprovals.create);
+router.post("/e/scan/:workplacePublicId/device/approve", employeeDeviceApprovals.create);
 
 // Employee Choices (Break / Resume / Checkout)
-router.post("/e/scan/:storePublicId/choice", employeeChoices.create);
-router.post("/e/scan/:storePublicId/action", employeeChoices.create);
+router.post("/e/scan/:workplacePublicId/choice", employeeChoices.create);
+router.post("/e/scan/:workplacePublicId/action", employeeChoices.create);
 
 // Manager Dashboard
 router.get("/manager/dashboard", requireManager, managerDashboard.index);
 
-// Manager Store QR
-router.get("/manager/store/:storeId/qr", requireManager, managerQrs.show);
-router.get("/manager/store/:storeId/qr.png", requireManager, managerQrs.png);
+// Manager Workplace QR
+router.get("/manager/workplace/:workplaceId/qr", requireManager, managerQrs.show);
+router.get("/manager/workplace/:workplaceId/qr.png", requireManager, managerQrs.png);
 
 // Manager Logs
-router.get("/manager/store/:storeId/logs", requireManager, managerLogs.index);
-router.get("/manager/store/:storeId/logs.csv", requireManager, managerLogs.downloadDayCsv);
+router.get("/manager/workplace/:workplaceId/logs", requireManager, managerLogs.index);
+router.get("/manager/workplace/:workplaceId/logs.csv", requireManager, managerLogs.downloadDayCsv);
 
 // Manager Employees
-router.get("/manager/store/:storeId/employees", requireManager, managerEmployees.index);
-router.get("/manager/store/:storeId/employees/new", requireManager, managerEmployees.new);
-router.post("/manager/store/:storeId/employees", requireManager, managerEmployees.create);
-router.post("/manager/store/:storeId/employees/:employeeId/toggle", requireManager, managerEmployees.updateStatus);
+router.get("/manager/workplace/:workplaceId/employees", requireManager, managerEmployees.index);
+router.get("/manager/workplace/:workplaceId/employees/new", requireManager, managerEmployees.new);
+router.post("/manager/workplace/:workplaceId/employees", requireManager, managerEmployees.create);
+router.post("/manager/workplace/:workplaceId/employees/:employeeId/toggle", requireManager, managerEmployees.updateStatus);
 
 // Manager Logout
 router.get("/manager/logout", managerSessions.destroy);

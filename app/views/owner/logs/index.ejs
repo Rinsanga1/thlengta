@@ -1,23 +1,7 @@
-<header class="nav">
-  <div class="container nav-inner">
-    <div class="brand">
-      <span>
-        <img src="/assets/img/thlengtalogo.png" alt="Thlengta logo" width="80px"/>
-      </span>
-      <span class="small">
-        <img src="/assets/img/thlengtalogotext.png" alt="Thlengta logo type" width="195px"/>
-      </span>
-      <span class="small">
-        <img src="/assets/img/com.png" alt="Thlengta logo type" width="75px" style="margin-left:-10px"/>
-      </span>
-    </div>
-    <nav class="nav-links">
-      <a class="btn" href="/owner/dashboard">Back</a>
-    </nav>
-  </div>
-</header>
-
 <section class="section" style="padding-top:46px;">
+  <div style="max-width:1100px;margin:0 auto 20px;">
+    <a class="btn" href="/owner/dashboard" style="width:auto;">← Back to Dashboard</a>
+  </div>
   <div class="card pad super" style="margin:0 auto;">
     <div class="topbar" style="margin-bottom:14px;">
       <div>
@@ -27,19 +11,19 @@
         </div>
         <h2 style="margin:10px 0 0;">Attendance Logs</h2>
         <div class="small" style="margin-top:6px;">
-          Store: <b><%= store.name %></b>
+          Workplace: <b><%= workplace.name %></b>
         </div>
       </div>
     </div>
 
     <div class="actions" style="margin:10px 0 14px;">
-      <a class="btn" href="/owner/stores/<%= store.id %>/">QR</a>
-      <a class="btn" href="/owner/stores/<%= store.id %>/employees">Employees</a>
-      <a class="btn" href="/owner/stores/<%= store.id %>/edit">Settings</a>
+      <a class="btn" href="/owner/workplaces/<%= workplace.id %>/">QR</a>
+      <a class="btn" href="/owner/workplaces/<%= workplace.id %>/employees">Employees</a>
+      <a class="btn" href="/owner/workplaces/<%= workplace.id %>/edit">Settings</a>
     </div>
 
     <div class="card pad" style="background:#f8faf9;">
-      <form method="get" action="/owner/stores/<%= store.id %>/logs">
+      <form method="get" action="/owner/workplaces/<%= workplace.id %>/logs">
         <div class="field">
           <label>Date</label>
           <input type="date" name="date" value="<%= selectedDate %>" required />
@@ -48,11 +32,11 @@
         <div class="actions" style="margin-top:10px;">
           <button class="btn primary" type="submit">View</button>
 
-          <a class="btn" href="/owner/stores/<%= store.id %>/logs.csv?date=<%= selectedDate %>">
+          <a class="btn" href="/owner/workplaces/<%= workplace.id %>/logs.csv?date=<%= selectedDate %>">
             Download Day CSV
           </a>
 
-          <a class="btn" href="/owner/stores/<%= store.id %>/logs_month.csv?month=<%= selectedDate.slice(0,7) %>">
+          <a class="btn" href="/owner/workplaces/<%= workplace.id %>/logs_month.csv?month=<%= selectedDate.slice(0,7) %>">
             Download Month CSV
           </a>
         </div>

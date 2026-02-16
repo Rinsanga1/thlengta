@@ -2,16 +2,16 @@ const bcrypt = require("bcryptjs");
 const { dbGet, dbRun, dbAll } = require("../../../db/helpers");
 const { getOwnerId } = require("../../middleware/auth");
 
-// Lists all employees for a given store (index action)
+// Lists all employees for a given workplace (index action)
 exports.index = async (req, res) => {
   const userId = getOwnerId(req);
-  const storeId = Number(req.params.storeId);
+  const workplaceId = Number(req.params.workplaceId);
 
-  const store = await dbGet("SELECT id, name FROM stores WHERE id = ? AND user_id = ?", [
-    storeId,
+  const workplace = await dbGet("SELECT id, name FROM workplaces WHERE id = ? AND user_id = ?", [
+    workplaceId,
     userId
   ]);
-  if (!store) return res.status(404).send("Store not found.");
+  if (!workplace) return res.status(404).send("Workplace not found.");
 
   const employees = await dbAll(
     `
@@ -25,15 +25,15 @@ exports.index = async (req, res) => {
         THEN 1 ELSE 0
       END AS device_registered
     FROM employees e
-    WHERE e.store_id = ?
+    WHERE e.workplace_id = ?
     ORDER BY e.id DESC
     `,
-    [storeId]
+    [workplaceId]
   );
 
-  res.renderPage("owner/employees/index", { // Renamed view
+  res.renderPage("owner/employees/index", {
     title: "Employees",
-    store,
+    workplace,
     employees,
     msg: req.query.msg || null
   });
@@ -42,17 +42,17 @@ exports.index = async (req, res) => {
 // Displays the form for adding a new employee (new action)
 exports.new = async (req, res) => {
   const userId = getOwnerId(req);
-  const storeId = Number(req.params.storeId);
+  const workplaceId = Number(req.params.workplaceId);
 
-  const store = await dbGet("SELECT id, name FROM stores WHERE id = ? AND user_id = ?", [
-    storeId,
+  const workplace = await dbGet("SELECT id, name FROM workplaces WHERE id = ? AND user_id = ?", [
+    workplaceId,
     userId
   ]);
-  if (!store) return res.status(404).send("Store not found.");
+  if (!workplace) return res.status(404).send("Workplace not found.");
 
-  res.renderPage("owner/employees/new", { // Renamed view
+  res.renderPage("owner/employees/new", {
     title: "Add Employee",
-    store,
+    workplace,
     error: null
   });
 };
@@ -61,13 +61,13 @@ exports.new = async (req, res) => {
 exports.create = async (req, res) => {
   try {
     const userId = getOwnerId(req);
-    const storeId = Number(req.params.storeId);
+    const workplaceId = Number(req.params.workplaceId);
 
-    const store = await dbGet("SELECT id, name FROM stores WHERE id = ? AND user_id = ?", [
-      storeId,
+    const workplace = await dbGet("SELECT id, name FROM workplaces WHERE id = ? AND user_id = ?", [
+      workplaceId,
       userId
     ]);
-    if (!store) return res.status(404).send("Store not found.");
+    if (!workplace) return res.status(404).send("Workplace not found.");
 
     const email = String(req.body.email || "").trim().toLowerCase();
     const pin = String(req.body.pin || "").trim();
@@ -75,7 +75,7 @@ exports.create = async (req, res) => {
     if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
       return res.renderPage("owner/employees/new", {
         title: "Add Employee",
-        store,
+        workplace,
         error: "Enter a valid email."
       });
     }
@@ -83,33 +83,33 @@ exports.create = async (req, res) => {
     if (!/^\d{4,8}$/.test(pin)) {
       return res.renderPage("owner/employees/new", {
         title: "Add Employee",
-        store,
+        workplace,
         error: "PIN must be 4 to 8 digits."
       });
     }
 
-    const existing = await dbGet("SELECT id FROM employees WHERE store_id = ? AND email = ?", [
-      storeId,
+    const existing = await dbGet("SELECT id FROM employees WHERE workplace_id = ? AND email = ?", [
+      workplaceId,
       email
     ]);
     if (existing) {
       return res.renderPage("owner/employees/new", {
         title: "Add Employee",
-        store,
-        error: "Employee already exists for this store."
+        workplace,
+        error: "Employee already exists for this workplace."
       });
     }
 
     const pin_hash = await bcrypt.hash(pin, 12);
 
-    await dbRun("INSERT INTO employees (store_id, email, pin_hash, is_active) VALUES (?, ?, ?, 1)", [
-      storeId,
+    await dbRun("INSERT INTO employees (workplace_id, email, pin_hash, is_active) VALUES (?, ?, ?, 1)", [
+      workplaceId,
       email,
       pin_hash
     ]);
 
     return res.redirect(
-      `/owner/stores/${storeId}/employees?msg=` +
+      `/owner/workplaces/${workplaceId}/employees?msg=` +
         encodeURIComponent("Employee added. They can login with email + PIN.")
     );
   } catch (err) {
@@ -122,30 +122,30 @@ exports.create = async (req, res) => {
 exports.updateStatus = async (req, res) => {
   try {
     const userId = getOwnerId(req);
-    const storeId = Number(req.params.storeId);
+    const workplaceId = Number(req.params.workplaceId);
     const employeeId = Number(req.params.employeeId);
 
-    const store = await dbGet("SELECT id FROM stores WHERE id = ? AND user_id = ?", [
-      storeId,
+    const workplace = await dbGet("SELECT id FROM workplaces WHERE id = ? AND user_id = ?", [
+      workplaceId,
       userId
     ]);
-    if (!store) return res.status(404).send("Store not found.");
+    if (!workplace) return res.status(404).send("Workplace not found.");
 
-    const emp = await dbGet("SELECT id, is_active FROM employees WHERE id = ? AND store_id = ?", [
+    const emp = await dbGet("SELECT id, is_active FROM employees WHERE id = ? AND workplace_id = ?", [
       employeeId,
-      storeId
+      workplaceId
     ]);
     if (!emp) return res.status(404).send("Employee not found.");
 
     const newVal = emp.is_active ? 0 : 1;
 
-    await dbRun("UPDATE employees SET is_active = ? WHERE id = ? AND store_id = ?", [
+    await dbRun("UPDATE employees SET is_active = ? WHERE id = ? AND workplace_id = ?", [
       newVal,
       employeeId,
-      storeId
+      workplaceId
     ]);
 
-    return res.redirect(`/owner/stores/${storeId}/employees`);
+    return res.redirect(`/owner/workplaces/${workplaceId}/employees`);
   } catch (err) {
     console.error(err);
     return res.status(500).send("Server error");
@@ -155,25 +155,25 @@ exports.updateStatus = async (req, res) => {
 // Resets employee device (custom update action)
 exports.resetDevice = async (req, res) => {
   const userId = getOwnerId(req);
-  const storeId = Number(req.params.storeId);
+  const workplaceId = Number(req.params.workplaceId);
   const employeeId = Number(req.params.employeeId);
 
-  const store = await dbGet("SELECT id FROM stores WHERE id = ? AND user_id = ?", [
-    storeId,
+  const workplace = await dbGet("SELECT id FROM workplaces WHERE id = ? AND user_id = ?", [
+    workplaceId,
     userId
   ]);
-  if (!store) return res.status(404).send("Store not found.");
+  if (!workplace) return res.status(404).send("Workplace not found.");
 
-  const emp = await dbGet("SELECT id FROM employees WHERE id = ? AND store_id = ?", [
+  const emp = await dbGet("SELECT id FROM employees WHERE id = ? AND workplace_id = ?", [
     employeeId,
-    storeId
+    workplaceId
   ]);
   if (!emp) return res.status(404).send("Employee not found.");
 
   await dbRun("DELETE FROM employee_devices WHERE employee_id = ?", [employeeId]);
 
   return res.redirect(
-    `/owner/stores/${storeId}/employees?msg=` +
+    `/owner/workplaces/${workplaceId}/employees?msg=` +
       encodeURIComponent("Device reset. Employee can login again with email + PIN.")
   );
 };
@@ -182,30 +182,30 @@ exports.resetDevice = async (req, res) => {
 exports.destroy = async (req, res) => {
   try {
     const userId = getOwnerId(req);
-    const storeId = Number(req.params.storeId);
+    const workplaceId = Number(req.params.workplaceId);
     const employeeId = Number(req.params.employeeId);
 
-    const store = await dbGet("SELECT id FROM stores WHERE id = ? AND user_id = ?", [
-      storeId,
+    const workplace = await dbGet("SELECT id FROM workplaces WHERE id = ? AND user_id = ?", [
+      workplaceId,
       userId
     ]);
-    if (!store) return res.status(404).send("Store not found.");
+    if (!workplace) return res.status(404).send("Workplace not found.");
 
-    const emp = await dbGet("SELECT id, email FROM employees WHERE id = ? AND store_id = ?", [
+    const emp = await dbGet("SELECT id, email FROM employees WHERE id = ? AND workplace_id = ?", [
       employeeId,
-      storeId
+      workplaceId
     ]);
     if (!emp) return res.status(404).send("Employee not found.");
 
     await dbRun("DELETE FROM employee_devices WHERE employee_id = ?", [employeeId]);
-    await dbRun("DELETE FROM attendance_logs WHERE employee_id = ? AND store_id = ?", [
+    await dbRun("DELETE FROM attendance_logs WHERE employee_id = ? AND workplace_id = ?", [
       employeeId,
-      storeId
+      workplaceId
     ]);
-    await dbRun("DELETE FROM employees WHERE id = ? AND store_id = ?", [employeeId, storeId]);
+    await dbRun("DELETE FROM employees WHERE id = ? AND workplace_id = ?", [employeeId, workplaceId]);
 
     return res.redirect(
-      `/owner/stores/${storeId}/employees?msg=` + encodeURIComponent(`Deleted employee ${emp.email}.`)
+      `/owner/workplaces/${workplaceId}/employees?msg=` + encodeURIComponent(`Deleted employee ${emp.email}.`)
     );
   } catch (err) {
     console.error(err);

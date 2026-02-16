@@ -1,8 +1,8 @@
 <div class="scan-container">
   <div class="scan-card">
     <div class="scan-header">
-      <h2 class="scan-store-name"><%= store.name %></h2>
-      <p class="scan-store-subtitle">Employee Check-in</p>
+      <h2 class="scan-workplace-name"><%= workplace.name %></h2>
+      <p class="scan-workplace-subtitle">Employee Check-in</p>
     </div>
 
     <% if (error) { %>
@@ -18,7 +18,7 @@
     </div>
           <h2 style="margin:10px 0 0;">Thlengta Scan</h2>
           <div class="small" style="margin-top:6px;">
-            Store: <b><%= store.name %></b>
+            Workplace: <b><%= workplace.name %></b>
           </div>
         </div>
       </div>
@@ -30,11 +30,11 @@
       <div class="notice" style="margin:12px 0; background:#f8faf9;">
         <div style="font-weight:900;">Before you continue</div>
         <div class="small" style="margin-top:6px;">
-          Turn on Location (GPS). We’ll verify you are inside the store boundary.
+          Turn on Location (GPS). We’ll verify you are inside the workplace boundary.
         </div>
       </div>
 
-      <form class="scan-form" id="scanForm" method="post" action="/e/scan/<%= store.public_id %>">
+      <form class="scan-form" id="scanForm" method="post" action="/e/scan/<%= workplace.public_id %>">
         <input type="hidden" name="lat" id="lat" value="" />
         <input type="hidden" name="lng" id="lng" value="" />
 
@@ -106,7 +106,7 @@
           </div>
           <h2 style="margin:10px 0 0;">Open in Safari</h2>
           <div class="small" style="margin-top:6px;">
-            Store: <b><%= store.name %></b>
+            Workplace: <b><%= workplace.name %></b>
           </div>
         </div>
       </div>

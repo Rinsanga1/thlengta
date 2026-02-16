@@ -1,5 +1,5 @@
 const { dbGet } = require("../../../db/helpers");
-const { getManagerStoreOrNull } = require("../../utils/manager.utils");
+const { getManagerWorkplaceOrNull } = require("../../utils/manager.utils");
 const { toPngBuffer } = require("../../utils/qr"); // Assuming toPngBuffer is in qr.js
 
 function getBaseUrl(req) { // This helper is needed here and also in adminStoresController
@@ -8,21 +8,21 @@ function getBaseUrl(req) { // This helper is needed here and also in adminStores
   return `${req.protocol}://${req.get("host")}`;
 }
 
-// Displays the store QR code page
+// Displays the workplace QR code page
 exports.show = async (req, res) => {
   try {
     const managerId = req.session.managerId;
     const adminId = req.session.managerAdminId;
-    const storeId = Number(req.params.storeId);
+    const workplaceId = Number(req.params.workplaceId);
 
-    const store = await getManagerStoreOrNull(managerId, adminId, storeId);
-    if (!store) return res.status(404).send("Store not found.");
+    const workplace = await getManagerWorkplaceOrNull(managerId, adminId, workplaceId);
+    if (!workplace) return res.status(404).send("Workplace not found.");
 
-    const scanUrl = `${getBaseUrl(req)}/e/scan/${store.public_id}?src=qr`;
+    const scanUrl = `${getBaseUrl(req)}/e/scan/${workplace.public_id}?src=qr`;
 
-    return res.renderPage("manager/qrs/show", { // Renamed view
-      title: "Store QR",
-      store,
+    return res.renderPage("manager/qrs/show", {
+      title: "Workplace QR",
+      workplace,
       scanUrl
     });
   } catch (err) {
@@ -31,17 +31,17 @@ exports.show = async (req, res) => {
   }
 };
 
-// Serves the store's QR code as a PNG
+// Serves the workplace's QR code as a PNG
 exports.png = async (req, res) => {
   try {
     const managerId = req.session.managerId;
     const adminId = req.session.managerAdminId;
-    const storeId = Number(req.params.storeId);
+    const workplaceId = Number(req.params.workplaceId);
 
-    const store = await getManagerStoreOrNull(managerId, adminId, storeId);
-    if (!store) return res.status(404).send("Store not found.");
+    const workplace = await getManagerWorkplaceOrNull(managerId, adminId, workplaceId);
+    if (!workplace) return res.status(404).send("Workplace not found.");
 
-    const scanUrl = `${getBaseUrl(req)}/e/scan/${store.public_id}?src=qr`;
+    const scanUrl = `${getBaseUrl(req)}/e/scan/${workplace.public_id}?src=qr`;
     const png = await toPngBuffer(scanUrl);
 
     res.setHeader("Content-Type", "image/png");

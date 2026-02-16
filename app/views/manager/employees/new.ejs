@@ -1,23 +1,7 @@
-<header class="nav">
-  <div class="container nav-inner">
-    <div class="brand">
-      <span>
-        <img src="/assets/img/thlengtalogo.png" alt="Thlengta logo" width="80px"/>
-      </span>
-      <span class="small">
-        <img src="/assets/img/thlengtalogotext.png" atl="Thlengta logo type" width="195px"/>
-      </span>
-      <span class="small">
-        <img src="/assets/img/com.png" atl="Thlengta logo type" width="75px" style="margin-left: -10px"/>
-      </span>
-    <div>
-    <nav class="nav-links">
-      <a class="btn" href="/manager/store/<%= store.id %>/employees">Back</a>
-    </nav>
-  </div>
-</header>
-
 <section class="section" style="padding-top:46px;">
+  <div style="max-width:720px;margin:0 auto 20px;">
+    <a class="btn" href="/manager/workplace/<%= workplace.id %>/employees" style="width:auto;">← Back to Employees</a>
+  </div>
   <div class="card pad" style="max-width:720px;margin:0 auto;">
     <div class="topbar" style="margin-bottom:14px;">
       <div>
@@ -27,7 +11,7 @@
         </div>
         <h2 style="margin:10px 0 0;">Add Employee</h2>
         <div class="small" style="margin-top:6px;">
-          Store: <b><%= store.name %></b>
+          Workplace: <b><%= workplace.name %></b>
         </div>
       </div>
     </div>
@@ -36,7 +20,7 @@
       <div class="error"><%= error %></div>
     <% } %>
 
-    <form class="form" method="post" action="/manager/store/<%= store.id %>/employees/new" style="margin-top:12px;">
+    <form class="form" method="post" action="/manager/workplace/<%= workplace.id %>/employees/new" style="margin-top:12px;">
       <div class="field">
         <label>Employee Email</label>
         <input type="email" name="email" required placeholder="staff@example.com" />

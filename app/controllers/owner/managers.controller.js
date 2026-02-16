@@ -5,13 +5,13 @@ const { getOwnerId } = require("../../middleware/auth");
 
 exports.index = async (req, res) => {
   const userId = getOwnerId(req);
-  const storeId = Number(req.params.storeId);
+  const workplaceId = Number(req.params.workplaceId);
 
-  const store = await dbGet("SELECT id, name FROM stores WHERE id = ? AND user_id = ?", [
-    storeId,
+  const workplace = await dbGet("SELECT id, name FROM workplaces WHERE id = ? AND user_id = ?", [
+    workplaceId,
     userId
   ]);
-  if (!store) return res.status(404).send("Store not found.");
+  if (!workplace) return res.status(404).send("Workplace not found.");
 
   const user = await dbGet("SELECT id, plan FROM users WHERE id = ?", [userId]);
   const plan = String(user?.plan || "").toLowerCase();
@@ -19,7 +19,7 @@ exports.index = async (req, res) => {
   if (plan !== "enterprise") {
     return res.renderPage("owner/managers/index", {
       title: "Managers",
-      store,
+      workplace,
       managers: [],
       enterpriseOnly: true,
       msg: "Managers are available only on Enterprise plan. Upgrade to gain this useful feature!",
@@ -33,12 +33,12 @@ exports.index = async (req, res) => {
       m.email,
       m.is_active,
       m.created_at
-    FROM manager_stores ms
-    JOIN managers m ON m.id = ms.manager_id
-    WHERE ms.store_id = ?
+    FROM manager_workplaces mw
+    JOIN managers m ON m.id = mw.manager_id
+    WHERE mw.workplace_id = ?
       AND m.user_id = ?
     ORDER BY m.id DESC`,
-    [storeId, userId]
+    [workplaceId, userId]
   );
 
   const msg = req.query.msg ? String(req.query.msg) : null;
@@ -46,7 +46,7 @@ exports.index = async (req, res) => {
 
   return res.renderPage("owner/managers/index", {
     title: "Managers",
-    store,
+    workplace,
     managers,
     enterpriseOnly: false,
     msg,
@@ -56,20 +56,20 @@ exports.index = async (req, res) => {
 
 exports.new = async (req, res) => {
   const userId = getOwnerId(req);
-  const storeId = Number(req.params.storeId);
+  const workplaceId = Number(req.params.workplaceId);
 
-  const store = await dbGet("SELECT id, name FROM stores WHERE id = ? AND user_id = ?", [
-    storeId,
+  const workplace = await dbGet("SELECT id, name FROM workplaces WHERE id = ? AND user_id = ?", [
+    workplaceId,
     userId
   ]);
-  if (!store) return res.status(404).send("Store not found.");
+  if (!workplace) return res.status(404).send("Workplace not found.");
 
   const user = await dbGet("SELECT id, plan FROM users WHERE id = ?", [userId]);
   const plan = String(user?.plan || "").toLowerCase();
   if (plan !== "enterprise") {
     return res.renderPage("owner/managers/new", {
       title: "Add Manager",
-      store,
+      workplace,
       error: "Managers are available only on Enterprise plan.",
       enterpriseOnly: true
     });
@@ -77,7 +77,7 @@ exports.new = async (req, res) => {
 
   return res.renderPage("owner/managers/new", {
     title: "Add Manager",
-    store,
+    workplace,
     error: null,
     enterpriseOnly: false
   });
@@ -86,20 +86,20 @@ exports.new = async (req, res) => {
 exports.create = async (req, res) => {
   try {
     const userId = getOwnerId(req);
-    const storeId = Number(req.params.storeId);
+    const workplaceId = Number(req.params.workplaceId);
 
-    const store = await dbGet("SELECT id, name FROM stores WHERE id = ? AND user_id = ?", [
-      storeId,
+    const workplace = await dbGet("SELECT id, name FROM workplaces WHERE id = ? AND user_id = ?", [
+      workplaceId,
       userId
     ]);
-    if (!store) return res.status(404).send("Store not found.");
+    if (!workplace) return res.status(404).send("Workplace not found.");
 
     const user = await dbGet("SELECT id, plan FROM users WHERE id = ?", [userId]);
     const plan = String(user?.plan || "").toLowerCase();
     if (plan !== "enterprise") {
       return res.renderPage("owner/managers/new", {
         title: "Add Manager",
-        store,
+        workplace,
         error: "Managers are available only on Enterprise plan.",
         enterpriseOnly: true
       });
@@ -111,7 +111,7 @@ exports.create = async (req, res) => {
     if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
       return res.renderPage("owner/managers/new", {
         title: "Add Manager",
-        store,
+        workplace,
         error: "Enter a valid email.",
         enterpriseOnly: false
       });
@@ -122,7 +122,7 @@ exports.create = async (req, res) => {
     if (manager && Number(manager.user_id) !== Number(userId)) {
       return res.renderPage("owner/managers/new", {
         title: "Add Manager",
-        store,
+        workplace,
         error: "This email is already used by another company. Use a different email.",
         enterpriseOnly: false
       });
@@ -132,7 +132,7 @@ exports.create = async (req, res) => {
       if (!password || password.length < 8) {
         return res.renderPage("owner/managers/new", {
           title: "Add Manager",
-          store,
+          workplace,
           error: "Password must be at least 8 characters.",
           enterpriseOnly: false
         });
@@ -149,20 +149,20 @@ exports.create = async (req, res) => {
     }
 
     const existsMap = await dbGet(
-      "SELECT id FROM manager_stores WHERE manager_id = ? AND store_id = ?",
-      [manager.id, storeId]
+      "SELECT id FROM manager_workplaces WHERE manager_id = ? AND workplace_id = ?",
+      [manager.id, workplaceId]
     );
 
     if (!existsMap) {
-      await dbRun("INSERT INTO manager_stores (manager_id, store_id) VALUES (?, ?)", [
+      await dbRun("INSERT INTO manager_workplaces (manager_id, workplace_id) VALUES (?, ?)", [
         manager.id,
-        storeId
+        workplaceId
       ]);
     }
 
     return res.redirect(
-      `/owner/stores/${storeId}/managers?type=success&msg=` +
-        encodeURIComponent("Manager assigned to this store.")
+      `/owner/workplaces/${workplaceId}/managers?type=success&msg=` +
+        encodeURIComponent("Manager assigned to this workplace.")
     );
   } catch (err) {
     console.error(err);
@@ -173,14 +173,14 @@ exports.create = async (req, res) => {
 exports.updateStatus = async (req, res) => {
   try {
     const userId = getOwnerId(req);
-    const storeId = Number(req.params.storeId);
+    const workplaceId = Number(req.params.workplaceId);
     const managerId = Number(req.params.managerId);
 
-    const store = await dbGet("SELECT id FROM stores WHERE id = ? AND user_id = ?", [
-      storeId,
+    const workplace = await dbGet("SELECT id FROM workplaces WHERE id = ? AND user_id = ?", [
+      workplaceId,
       userId
     ]);
-    if (!store) return res.status(404).send("Store not found.");
+    if (!workplace) return res.status(404).send("Workplace not found.");
 
     const mgr = await dbGet("SELECT id, is_active FROM managers WHERE id = ? AND user_id = ?", [
       managerId,
@@ -196,7 +196,7 @@ exports.updateStatus = async (req, res) => {
     ]);
 
     return res.redirect(
-      `/owner/stores/${storeId}/managers?type=success&msg=` +
+      `/owner/workplaces/${workplaceId}/managers?type=success&msg=` +
         encodeURIComponent("Manager status updated.")
     );
   } catch (err) {
@@ -208,14 +208,14 @@ exports.updateStatus = async (req, res) => {
 exports.destroy = async (req, res) => {
   try {
     const userId = getOwnerId(req);
-    const storeId = Number(req.params.storeId);
+    const workplaceId = Number(req.params.workplaceId);
     const managerId = Number(req.params.managerId);
 
-    const store = await dbGet("SELECT id FROM stores WHERE id = ? AND user_id = ?", [
-      storeId,
+    const workplace = await dbGet("SELECT id FROM workplaces WHERE id = ? AND user_id = ?", [
+      workplaceId,
       userId
     ]);
-    if (!store) return res.status(404).send("Store not found.");
+    if (!workplace) return res.status(404).send("Workplace not found.");
 
     const mgr = await dbGet("SELECT id FROM managers WHERE id = ? AND user_id = ?", [
       managerId,
@@ -223,14 +223,14 @@ exports.destroy = async (req, res) => {
     ]);
     if (!mgr) return res.status(404).send("Manager not found.");
 
-    await dbRun("DELETE FROM manager_stores WHERE manager_id = ? AND store_id = ?", [
+    await dbRun("DELETE FROM manager_workplaces WHERE manager_id = ? AND workplace_id = ?", [
       managerId,
-      storeId
+      workplaceId
     ]);
 
     return res.redirect(
-      `/owner/stores/${storeId}/managers?type=success&msg=` +
-        encodeURIComponent("Manager removed from this store.")
+      `/owner/workplaces/${workplaceId}/managers?type=success&msg=` +
+        encodeURIComponent("Manager removed from this workplace.")
     );
   } catch (err) {
     console.error(err);

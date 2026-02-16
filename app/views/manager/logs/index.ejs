@@ -1,24 +1,7 @@
-<header class="nav">
-  <div class="container nav-inner">
-    <div class="brand">
-      <span>
-        <img src="/assets/img/thlengtalogo.png" alt="Thlengta logo" width="80px"/>
-      </span>
-      <span class="small">
-        <img src="/assets/img/thlengtalogotext.png" atl="Thlengta logo type" width="195px"/>
-      </span>
-      <span class="small">
-        <img src="/assets/img/com.png" atl="Thlengta logo type" width="75px" style="margin-left: -10px"/>
-      </span>
-    </div>
-
-    <nav class="nav-links">
-      <a class="btn" href="/manager/dashboard">Back</a>
-    </nav>
-  </div>
-</header>
-
 <section class="section" style="padding-top:46px;">
+  <div style="max-width:1100px;margin:0 auto 20px;">
+    <a class="btn" href="/manager/dashboard" style="width:auto;">← Back to Dashboard</a>
+  </div>
   <div class="card pad super" style="margin:0 auto;">
     <div class="topbar" style="margin-bottom:14px;">
       <div>
@@ -28,14 +11,14 @@
         </div>
         <h2 style="margin:10px 0 0;">Attendance Logs</h2>
         <div class="small" style="margin-top:6px;">
-          Store: <b><%= store.name %></b>
+          Workplace: <b><%= workplace.name %></b>
         </div>
       </div>
     </div>
 
     <div class="card pad" style="background:#f8faf9; margin-bottom:14px;">
       <div class="actions" style="align-items:end;">
-        <form method="get" action="/manager/store/<%= store.id %>/logs" style="display:flex; gap:10px; flex-wrap:wrap; align-items:end;">
+        <form method="get" action="/manager/workplace/<%= workplace.id %>/logs" style="display:flex; gap:10px; flex-wrap:wrap; align-items:end;">
           <div class="field" style="margin:0;">
             <label>Date</label>
             <input type="date" name="date" value="<%= selectedDate %>" />
@@ -46,10 +29,10 @@
         <div style="flex:1;"></div>
 
         <div class="actions" style="margin:0; gap:10px;">
-          <a class="btn" href="/manager/store/<%= store.id %>/logs.csv?date=<%= selectedDate %>" style="width:auto;">Export Day CSV</a>
+          <a class="btn" href="/manager/workplace/<%= workplace.id %>/logs.csv?date=<%= selectedDate %>" style="width:auto;">Export Day CSV</a>
           <a
             class="btn"
-            href="/manager/store/<%= store.id %>/logs_month.csv?month=<%= selectedDate.slice(0,7) %>"
+            href="/manager/workplace/<%= workplace.id %>/logs_month.csv?month=<%= selectedDate.slice(0,7) %>"
             style="width:auto;"
           >
             Export Month CSV
@@ -127,8 +110,8 @@
     <% } %>
 
     <div class="actions" style="margin-top:14px;">
-      <a class="btn" href="/manager/store/<%= store.id %>/qr">QR</a>
-      <a class="btn" href="/manager/store/<%= store.id %>/employees">Employees</a>
+      <a class="btn" href="/manager/workplace/<%= workplace.id %>/qr">QR</a>
+      <a class="btn" href="/manager/workplace/<%= workplace.id %>/employees">Employees</a>
     </div>
 
   </div>

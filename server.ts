@@ -83,9 +83,9 @@ initDb()
   .then(() => {
     const db = getDb();
 
-    // Initialize session middleware with the database connection
-    sessionMiddleware = createSessionMiddleware(db);
-    superadminSessionMiddleware = createSuperadminSessionMiddleware(db);
+    // Initialize session middleware
+    sessionMiddleware = createSessionMiddleware();
+    superadminSessionMiddleware = createSuperadminSessionMiddleware();
 
     console.log("[Session] Session store initialized with SQLite");
 

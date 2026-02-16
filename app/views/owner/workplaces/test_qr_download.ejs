@@ -1,0 +1,37 @@
+<section class="section" style="padding-top:46px;">
+  <div class="card pad super" style="max-width:800px;margin:0 auto;">
+    <div class="topbar" style="margin-bottom:14px;">
+      <div>
+        <div class="h-eyebrow">
+          <span class="chip">Test</span>
+          <span class="chip">QR Download</span>
+        </div>
+        <h2 style="margin:10px 0 0;">Download Test QR Codes</h2>
+      </div>
+    </div>
+
+    <div class="card pad" style="background:#fff;">
+      <% if (!workplaces || !workplaces.length) { %>
+        <div class="muted">No workplaces found.</div>
+      <% } else { %>
+        <div class="list">
+          <% workplaces.forEach(w => { %>
+            <div class="item">
+              <div style="flex:1;">
+                <div style="font-weight:900;"><%= w.name %></div>
+                <div class="small" style="margin-top:6px; display:flex; gap:12px; flex-wrap:wrap;">
+                  <a href="/owner/test_qr_download/raw/<%= w.id %>.png">Download Raw PNG</a>
+                  <a href="/owner/test_qr_download/framed/<%= w.id %>.png">Download Framed PNG</a>
+                </div>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+      <% } %>
+    </div>
+
+    <div style="margin-top:20px;">
+      <a href="/owner/dashboard" class="btn">Back to Dashboard</a>
+    </div>
+  </div>
+</section>

@@ -1,5 +1,5 @@
 const { dbGet, dbAll } = require("../../../db/helpers");
-const { getManagerStoreOrNull } = require("../../utils/manager.utils");
+const { getManagerWorkplaceOrNull } = require("../../utils/manager.utils");
 
 exports.index = async (req, res) => {
   try {
@@ -18,19 +18,19 @@ exports.index = async (req, res) => {
 
     const user = await dbGet("SELECT id, email, plan FROM users WHERE id = ?", [userId]);
 
-    const stores = await dbAll(
+    const workplaces = await dbAll(
       `SELECT
-        s.id,
-        s.name,
-        s.public_id,
-        s.lat,
-        s.lng,
-        s.radius_m
-      FROM stores s
-      INNER JOIN manager_stores ms ON ms.store_id = s.id
-      WHERE ms.manager_id = ?
-        AND s.user_id = ?
-      ORDER BY s.id DESC`,
+        w.id,
+        w.name,
+        w.public_id,
+        w.lat,
+        w.lng,
+        w.radius_m
+      FROM workplaces w
+      INNER JOIN manager_workplaces mw ON mw.workplace_id = w.id
+      WHERE mw.manager_id = ?
+        AND w.user_id = ?
+      ORDER BY w.id DESC`,
       [managerId, userId]
     );
 
@@ -38,7 +38,7 @@ exports.index = async (req, res) => {
       title: "Manager Dashboard",
       manager,
       user,
-      stores
+      workplaces
     });
   } catch (err) {
     console.error("Manager dashboard error:", err);

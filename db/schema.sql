@@ -5,8 +5,8 @@ PRAGMA foreign_keys = ON;
 -- =========================
 CREATE TABLE IF NOT EXISTS plan_limits (
   plan TEXT PRIMARY KEY,
-  max_stores INTEGER NOT NULL,
-  max_employees_per_store INTEGER NOT NULL,
+  max_workplaces INTEGER NOT NULL,
+  max_employees_per_workplace INTEGER NOT NULL,
   can_add_managers INTEGER NOT NULL DEFAULT 0,
   can_download_reports INTEGER NOT NULL DEFAULT 0,
   has_priority_support INTEGER NOT NULL DEFAULT 0,
@@ -38,9 +38,9 @@ CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
 CREATE INDEX IF NOT EXISTS idx_users_plan ON users(plan);
 
 -- =========================
--- STORES (Workplaces)
+-- WORKPLACES (Previously STORES)
 -- =========================
-CREATE TABLE IF NOT EXISTS stores (
+CREATE TABLE IF NOT EXISTS workplaces (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   user_id INTEGER NOT NULL,
   name TEXT NOT NULL,
@@ -49,6 +49,7 @@ CREATE TABLE IF NOT EXISTS stores (
   lat REAL,
   lng REAL,
   radius_m INTEGER DEFAULT 100,
+  address TEXT,
 
   timezone TEXT NOT NULL DEFAULT 'Asia/Kolkata',
   open_time TEXT,
@@ -64,8 +65,8 @@ CREATE TABLE IF NOT EXISTS stores (
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
-CREATE INDEX IF NOT EXISTS idx_stores_user_id ON stores(user_id);
-CREATE INDEX IF NOT EXISTS idx_stores_public_id ON stores(public_id);
+CREATE INDEX IF NOT EXISTS idx_workplaces_user_id ON workplaces(user_id);
+CREATE INDEX IF NOT EXISTS idx_workplaces_public_id ON workplaces(public_id);
 
 -- =========================
 -- MANAGERS (Paid Plans Only)
@@ -83,28 +84,28 @@ CREATE TABLE IF NOT EXISTS managers (
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS manager_stores (
+CREATE TABLE IF NOT EXISTS manager_workplaces (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   manager_id INTEGER NOT NULL,
-  store_id INTEGER NOT NULL,
+  workplace_id INTEGER NOT NULL,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 
-  UNIQUE(manager_id, store_id),
+  UNIQUE(manager_id, workplace_id),
   FOREIGN KEY (manager_id) REFERENCES managers(id) ON DELETE CASCADE,
-  FOREIGN KEY (store_id) REFERENCES stores(id) ON DELETE CASCADE
+  FOREIGN KEY (workplace_id) REFERENCES workplaces(id) ON DELETE CASCADE
 );
 
 CREATE INDEX IF NOT EXISTS idx_managers_user_id ON managers(user_id);
 CREATE INDEX IF NOT EXISTS idx_managers_email ON managers(email);
-CREATE INDEX IF NOT EXISTS idx_manager_stores_manager_id ON manager_stores(manager_id);
-CREATE INDEX IF NOT EXISTS idx_manager_stores_store_id ON manager_stores(store_id);
+CREATE INDEX IF NOT EXISTS idx_manager_workplaces_manager_id ON manager_workplaces(manager_id);
+CREATE INDEX IF NOT EXISTS idx_manager_workplaces_workplace_id ON manager_workplaces(workplace_id);
 
 -- =========================
 -- EMPLOYEES
 -- =========================
 CREATE TABLE IF NOT EXISTS employees (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  store_id INTEGER NOT NULL,
+  workplace_id INTEGER NOT NULL,
   email TEXT NOT NULL,
   name TEXT NOT NULL DEFAULT '',
   pin_hash TEXT NOT NULL,
@@ -116,13 +117,13 @@ CREATE TABLE IF NOT EXISTS employees (
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 
-  UNIQUE(store_id, email),
-  FOREIGN KEY (store_id) REFERENCES stores(id) ON DELETE CASCADE
+  UNIQUE(workplace_id, email),
+  FOREIGN KEY (workplace_id) REFERENCES workplaces(id) ON DELETE CASCADE
 );
 
-CREATE INDEX IF NOT EXISTS idx_employees_store_id ON employees(store_id);
+CREATE INDEX IF NOT EXISTS idx_employees_workplace_id ON employees(workplace_id);
 CREATE INDEX IF NOT EXISTS idx_employees_email ON employees(email);
-CREATE INDEX IF NOT EXISTS idx_employees_active ON employees(store_id, is_active);
+CREATE INDEX IF NOT EXISTS idx_employees_active ON employees(workplace_id, is_active);
 
 -- =========================
 -- EMPLOYEE DEVICES
@@ -151,15 +152,15 @@ CREATE INDEX IF NOT EXISTS idx_employee_devices_active ON employee_devices(emplo
 -- =========================
 CREATE TABLE IF NOT EXISTS qr_tokens (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  store_id INTEGER NOT NULL,
+  workplace_id INTEGER NOT NULL,
   token TEXT NOT NULL UNIQUE,
   expires_at DATETIME NOT NULL,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 
-  FOREIGN KEY (store_id) REFERENCES stores(id) ON DELETE CASCADE
+  FOREIGN KEY (workplace_id) REFERENCES workplaces(id) ON DELETE CASCADE
 );
 
-CREATE INDEX IF NOT EXISTS idx_qr_tokens_store_id ON qr_tokens(store_id);
+CREATE INDEX IF NOT EXISTS idx_qr_tokens_workplace_id ON qr_tokens(workplace_id);
 CREATE INDEX IF NOT EXISTS idx_qr_tokens_expires_at ON qr_tokens(expires_at);
 
 -- =========================
@@ -167,7 +168,7 @@ CREATE INDEX IF NOT EXISTS idx_qr_tokens_expires_at ON qr_tokens(expires_at);
 -- =========================
 CREATE TABLE IF NOT EXISTS attendance_logs (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  store_id INTEGER NOT NULL,
+  workplace_id INTEGER NOT NULL,
   employee_id INTEGER NOT NULL,
   event_type TEXT NOT NULL,
 
@@ -181,14 +182,14 @@ CREATE TABLE IF NOT EXISTS attendance_logs (
   user_agent TEXT,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 
-  FOREIGN KEY (store_id) REFERENCES stores(id) ON DELETE CASCADE,
+  FOREIGN KEY (workplace_id) REFERENCES workplaces(id) ON DELETE CASCADE,
   FOREIGN KEY (employee_id) REFERENCES employees(id) ON DELETE RESTRICT
 );
 
-CREATE INDEX IF NOT EXISTS idx_attendance_store_date ON attendance_logs(store_id, DATE(created_at));
+CREATE INDEX IF NOT EXISTS idx_attendance_workplace_date ON attendance_logs(workplace_id, DATE(created_at));
 CREATE INDEX IF NOT EXISTS idx_attendance_employee_date ON attendance_logs(employee_id, DATE(created_at));
 CREATE INDEX IF NOT EXISTS idx_attendance_employee_event ON attendance_logs(employee_id, event_type, created_at);
-CREATE INDEX IF NOT EXISTS idx_attendance_store_time ON attendance_logs(store_id, created_at);
+CREATE INDEX IF NOT EXISTS idx_attendance_workplace_time ON attendance_logs(workplace_id, created_at);
 
 -- =========================
 -- ATTENDANCE EDITS (Manual Corrections)
@@ -218,7 +219,7 @@ CREATE INDEX IF NOT EXISTS idx_attendance_edits_log_id ON attendance_edits(log_i
 -- =========================
 CREATE TABLE IF NOT EXISTS device_approval_requests (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  store_id INTEGER NOT NULL,
+  workplace_id INTEGER NOT NULL,
   employee_id INTEGER NOT NULL,
 
   requested_device_token_hash TEXT NOT NULL,
@@ -236,14 +237,14 @@ CREATE TABLE IF NOT EXISTS device_approval_requests (
 
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 
-  FOREIGN KEY (store_id) REFERENCES stores(id) ON DELETE CASCADE,
+  FOREIGN KEY (workplace_id) REFERENCES workplaces(id) ON DELETE CASCADE,
   FOREIGN KEY (employee_id) REFERENCES employees(id) ON DELETE CASCADE,
   FOREIGN KEY (approved_by_user_id) REFERENCES users(id) ON DELETE SET NULL,
   FOREIGN KEY (approved_by_manager_id) REFERENCES managers(id) ON DELETE SET NULL
 );
 
 CREATE INDEX IF NOT EXISTS idx_device_approval_status ON device_approval_requests(status);
-CREATE INDEX IF NOT EXISTS idx_device_approval_store ON device_approval_requests(store_id, status);
+CREATE INDEX IF NOT EXISTS idx_device_approval_workplace ON device_approval_requests(workplace_id, status);
 CREATE INDEX IF NOT EXISTS idx_device_approval_employee ON device_approval_requests(employee_id);
 
 -- =========================
@@ -251,7 +252,7 @@ CREATE INDEX IF NOT EXISTS idx_device_approval_employee ON device_approval_reque
 -- =========================
 CREATE TABLE IF NOT EXISTS invitations (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  store_id INTEGER NOT NULL,
+  workplace_id INTEGER NOT NULL,
   email TEXT NOT NULL,
   role TEXT NOT NULL,
 
@@ -264,12 +265,12 @@ CREATE TABLE IF NOT EXISTS invitations (
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   accepted_at DATETIME,
 
-  FOREIGN KEY (store_id) REFERENCES stores(id) ON DELETE CASCADE,
+  FOREIGN KEY (workplace_id) REFERENCES workplaces(id) ON DELETE CASCADE,
   FOREIGN KEY (invited_by_user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE INDEX IF NOT EXISTS idx_invitations_token ON invitations(token);
-CREATE INDEX IF NOT EXISTS idx_invitations_store_status ON invitations(store_id, status);
+CREATE INDEX IF NOT EXISTS idx_invitations_workplace_status ON invitations(workplace_id, status);
 CREATE INDEX IF NOT EXISTS idx_invitations_expires ON invitations(expires_at);
 
 -- =========================
@@ -302,32 +303,32 @@ SELECT
   u.id as user_id,
   u.email,
   u.plan,
-  COUNT(DISTINCT s.id) as stores_count,
-  pl.max_stores,
-  pl.max_employees_per_store,
+  COUNT(DISTINCT w.id) as workplaces_count,
+  pl.max_workplaces,
+  pl.max_employees_per_workplace,
   pl.can_add_managers,
   pl.can_download_reports
 FROM users u
-LEFT JOIN stores s ON s.user_id = u.id
+LEFT JOIN workplaces w ON w.user_id = u.id
 JOIN plan_limits pl ON pl.plan = u.plan
 GROUP BY u.id;
 
-CREATE VIEW IF NOT EXISTS store_employee_counts AS
+CREATE VIEW IF NOT EXISTS workplace_employee_counts AS
 SELECT
-  s.id as store_id,
-  s.name as store_name,
+  w.id as workplace_id,
+  w.name as workplace_name,
   COUNT(CASE WHEN e.is_active = 1 THEN 1 END) as active_employees,
   COUNT(e.id) as total_employees,
-  pl.max_employees_per_store
-FROM stores s
-JOIN users u ON s.user_id = u.id
+  pl.max_employees_per_workplace
+FROM workplaces w
+JOIN users u ON w.user_id = u.id
 JOIN plan_limits pl ON pl.plan = u.plan
-LEFT JOIN employees e ON e.store_id = s.id
-GROUP BY s.id;
+LEFT JOIN employees e ON e.workplace_id = w.id
+GROUP BY w.id;
 
 
 -- =========================
--- VIEWS
+-- SESSIONS (for express-session)
 -- =========================
 CREATE TABLE IF NOT EXISTS sessions (
   sid TEXT PRIMARY KEY,

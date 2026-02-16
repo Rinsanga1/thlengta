@@ -10,22 +10,22 @@ const { decideNextStepForToday, isTooSoon, computeCheckinTimeStatus } = require(
 exports.index = async (req, res) => {
   await ensureFpTable();
 
-  const storePublicId = String(req.params.storePublicId);
-  const store = await dbGet(
-    "SELECT id, user_id, name, public_id, lat, lng, radius_m, open_time, grace_enabled, grace_minutes FROM stores WHERE public_id = ?",
-    [storePublicId]
+  const workplacePublicId = String(req.params.workplacePublicId);
+  const workplace = await dbGet(
+    "SELECT id, user_id, name, public_id, lat, lng, radius_m, open_time, grace_enabled, grace_minutes FROM workplaces WHERE public_id = ?",
+    [workplacePublicId]
   );
-  if (!store) return res.status(404).send("Store not found.");
+  if (!workplace) return res.status(404).send("Workplace not found.");
 
   const deviceToken = req.cookies.thlengta_device || null;
 
   let mode = "first";
   if (deviceToken) {
-    const employee = await getEmployeeByDeviceCookie(store.id, req);
+    const employee = await getEmployeeByDeviceCookie(workplace.id, req);
     mode = employee ? "pin" : "first";
   }
 
-  res.renderPage("employee/scan/index", { title: "Scan", store, mode, error: null }); // Renamed view
+  res.renderPage("employee/scan/index", { title: "Scan", workplace, mode, error: null });
 };
 
 // POST scan submit (3-layer device recognition)
@@ -33,13 +33,13 @@ exports.create = async (req, res) => {
   await ensureFpTable();
 
   try {
-    const storePublicId = String(req.params.storePublicId);
+    const workplacePublicId = String(req.params.workplacePublicId);
 
-    const store = await dbGet(
-      "SELECT id, user_id, name, public_id, lat, lng, radius_m, open_time, grace_enabled, grace_minutes FROM stores WHERE public_id = ?",
-      [storePublicId]
+    const workplace = await dbGet(
+      "SELECT id, user_id, name, public_id, lat, lng, radius_m, open_time, grace_enabled, grace_minutes FROM workplaces WHERE public_id = ?",
+      [workplacePublicId]
     );
-    if (!store) return res.status(404).send("Store not found.");
+    if (!workplace) return res.status(404).send("Workplace not found.");
 
     const lat = Number(req.body.lat);
     const lng = Number(req.body.lng);
@@ -51,7 +51,7 @@ exports.create = async (req, res) => {
     if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
       return res.renderPage("employee/scan/index", {
         title: "Scan",
-        store,
+        workplace,
         mode: "first",
         error: "GPS not captured. Allow location and refresh."
       });
@@ -63,14 +63,14 @@ exports.create = async (req, res) => {
 
     // ---- Layer 1: cookie -> DB device match ----
     if (deviceToken) {
-      employee = await getEmployeeByDeviceCookie(store.id, req);
+      employee = await getEmployeeByDeviceCookie(workplace.id, req);
 
       if (employee) {
         const ok = await bcrypt.compare(pin, employee.pin_hash);
         if (!ok) {
           return res.renderPage("employee/scan/index", {
             title: "Scan",
-            store,
+            workplace,
             mode: "pin",
             error: "Invalid PIN."
           });
@@ -90,21 +90,21 @@ exports.create = async (req, res) => {
       if (!email) {
         return res.renderPage("employee/scan/index", {
           title: "Scan",
-          store,
+          workplace,
           mode: "first",
           error: "Email is required for first-time login."
         });
       }
 
       const row = await dbGet(
-        "SELECT id, store_id, pin_hash, email FROM employees WHERE store_id = ? AND email = ? AND is_active = 1",
-        [store.id, email]
+        "SELECT id, workplace_id, pin_hash, email FROM employees WHERE workplace_id = ? AND email = ? AND is_active = 1",
+        [workplace.id, email]
       );
 
       if (!row) {
         return res.renderPage("employee/scan/index", {
           title: "Scan",
-          store,
+          workplace,
           mode: "first",
           error: "Employee not found. Ask admin to add you."
         });
@@ -114,7 +114,17 @@ exports.create = async (req, res) => {
       if (!ok) {
         return res.renderPage("employee/scan/index", {
           title: "Scan",
-          store,
+          workplace,
+          mode: "first",
+          error: "Invalid PIN."
+        });
+      }
+
+      // row is already defined and validated above
+      if (!ok) {
+        return res.renderPage("employee/scan/index", {
+          title: "Scan",
+          workplace,
           mode: "first",
           error: "Invalid PIN."
         });
@@ -170,11 +180,11 @@ exports.create = async (req, res) => {
           deviceToken = newToken;
         } else {
           // Layer 3: require manager/admin approval
-          const deniedLogId = await logDeniedDevice(store.id, employee.id, lat, lng, req);
+          const deniedLogId = await logDeniedDevice(workplace.id, employee.id, lat, lng, req);
 
           return res.renderPage("employee/device_approvals/new", { // Renamed view
             title: "Approval needed",
-            store,
+            workplace,
             employeeEmail: employee.email,
             lat,
             lng,
@@ -196,36 +206,36 @@ exports.create = async (req, res) => {
     }
 
     // 2) Geofence check
-    const gf = isInsideGeofence(store.lat, store.lng, store.radius_m, lat, lng);
+    const gf = isInsideGeofence(workplace.lat, workplace.lng, workplace.radius_m, lat, lng);
     if (!gf.ok) {
       await dbRun(
         `
         INSERT INTO attendance_logs
-          (store_id, employee_id, event_type, device_ok, gps_ok, lat, lng, user_agent, ip, time_status, minutes_late)
+          (workplace_id, employee_id, event_type, device_ok, gps_ok, lat, lng, user_agent, ip, time_status, minutes_late)
         VALUES
           (?, ?, 'denied_gps', 1, 0, ?, ?, ?, ?, NULL, NULL)
         `,
-        [store.id, employee.id, lat, lng, req.get("user-agent") || "", req.ip]
+        [workplace.id, employee.id, lat, lng, req.get("user-agent") || "", req.ip]
       );
 
       return res.renderPage("employee/check_results/show", { // Renamed view
         title: "Check failed",
         ok: false,
-        store,
+        workplace,
         employeeEmail: employee.email || null,
-        message: `You are not at the store location. Distance ${gf.distance_m}m (allowed ${store.radius_m}m).`
+        message: `You are not at the workplace location. Distance ${gf.distance_m}m (allowed ${workplace.radius_m}m).`
       });
     }
 
     // 3) Decide step for today
-    const decision = await decideNextStepForToday(store.id, employee.id);
+    const decision = await decideNextStepForToday(workplace.id, employee.id);
     const { step, mode: workMode, lastRow } = decision;
 
     if (isTooSoon(lastRow, 6) && step !== "need_choice") {
       return res.renderPage("employee/check_results/show", { // Renamed view
         title: "Already recorded",
         ok: true,
-        store,
+        workplace,
         employeeEmail: employee.email || null,
         message: "Already recorded. Please wait a moment before scanning again."
       });
@@ -235,7 +245,7 @@ exports.create = async (req, res) => {
       return res.renderPage("employee/check_results/show", { // Renamed view
         title: "Already checked out",
         ok: true,
-        store,
+        workplace,
         employeeEmail: employee.email || null,
         message: "You have already checked out for today."
       });
@@ -244,8 +254,31 @@ exports.create = async (req, res) => {
     if (step === "need_choice") {
       return res.renderPage("employee/choices/new", { // Renamed view
         title: "Choose action",
-        store,
-        storePublicId: store.public_id,
+        workplace,
+        workplacePublicId: workplace.public_id,
+        employeeEmail: employee.email || null,
+        mode: workMode === "on_break" ? "on_break" : "checked_in",
+        lat,
+        lng,
+        error: null
+      });
+    }
+
+    if (step === "already_checked_out") {
+      return res.renderPage("employee/check_results/show", {
+        title: "Already checked out",
+        ok: true,
+        workplace,
+        employeeEmail: employee.email || null,
+        message: "You have already checked out for today."
+      });
+    }
+
+    if (step === "need_choice") {
+      return res.renderPage("employee/choices/new", {
+        title: "Choose action",
+        workplace,
+        workplacePublicId: workplace.public_id,
         employeeEmail: employee.email || null,
         mode: workMode === "on_break" ? "on_break" : "checked_in",
         lat,
@@ -255,17 +288,17 @@ exports.create = async (req, res) => {
     }
 
     // 4) Checkin
-    const ts = computeCheckinTimeStatus(store);
+    const ts = computeCheckinTimeStatus(workplace);
 
     await dbRun(
       `
       INSERT INTO attendance_logs
-        (store_id, employee_id, event_type, device_ok, gps_ok, lat, lng, user_agent, ip, time_status, minutes_late)
+        (workplace_id, employee_id, event_type, device_ok, gps_ok, lat, lng, user_agent, ip, time_status, minutes_late)
       VALUES
         (?, ?, 'checkin', 1, 1, ?, ?, ?, ?, ?, ?)
       `,
       [
-        store.id,
+        workplace.id,
         employee.id,
         lat,
         lng,
@@ -279,7 +312,7 @@ exports.create = async (req, res) => {
     return res.renderPage("employee/check_results/show", { // Renamed view
       title: "Check-in successful",
       ok: true,
-      store,
+      workplace,
       employeeEmail: employee.email || null,
       message: "Checked in."
     });

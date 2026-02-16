@@ -17,12 +17,12 @@ exports.index = async (req, res) => {
     return res.redirect("/users/signin");
   }
 
-  const stores = await dbAll("SELECT id, name, public_id FROM stores WHERE user_id = ?", [userId]);
+  const workplaces = await dbAll("SELECT id, name, public_id FROM workplaces WHERE user_id = ?", [userId]);
 
   return res.renderPage("owner/dashboard/index", {
     title: "Dashboard",
     admin: user,
-    stores,
+    workplaces,
     pendingUpgrade: null
   });
 };

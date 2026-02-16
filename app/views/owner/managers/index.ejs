@@ -1,24 +1,5 @@
-<header class="nav">
-  <div class="container nav-inner">
-    <div class="brand">
-      <span>
-        <img src="/assets/img/thlengtalogo.png" alt="Thlengta logo" width="80px"/>
-      </span>
-      <span class="small">
-        <img src="/assets/img/thlengtalogotext.png" alt="Thlengta logo type" width="195px"/>
-      </span>
-      <span class="small">
-        <img src="/assets/img/com.png" alt="Thlengta logo type" width="75px" style="margin-left: -10px"/>
-      </span>
-    </div>
-
-    <nav class="nav-links">
-      <a class="btn" href="/owner/dashboard">Back</a>
-    </nav>
-  </div>
-</header>
-
 <%
+  // Safe defaults to prevent "undefined" crashes
   // Safe defaults to prevent "undefined" crashes
   const _msg = (typeof msg !== "undefined") ? msg : null;
   const _alertType = (typeof alertType !== "undefined" && alertType) ? String(alertType) : null; // "success" | "error"
@@ -36,7 +17,7 @@
 
         <h2 style="margin:10px 0 0;">Managers</h2>
         <div class="small" style="margin-top:6px;">
-          Store: <b><%= store.name %></b>
+          Workplace: <b><%= workplace.name %></b>
         </div>
       </div>
     </div>
@@ -59,13 +40,13 @@
     <% } else { %>
 
       <div class="actions" style="margin:12px 0 8px;">
-        <a class="btn primary" href="/owner/stores/<%= store.id %>/managers/new">Add Manager</a>
+            <a class="btn primary" href="/owner/workplaces/<%= workplace.id %>/managers/new">Add Manager</a>
       </div>
 
       <div class="notice" style="margin:10px 0 16px;">
         <div style="font-weight:900;">Access scope</div>
         <div class="small">
-          Managers can only access stores they are assigned to. They cannot edit store settings.
+          Managers can only access workplaces they are assigned to. They cannot edit workplace settings.
         </div>
       </div>
 
@@ -73,10 +54,10 @@
         <div class="card pad" style="background:#f8faf9;">
           <div style="font-weight:900;">No managers assigned yet</div>
           <div class="small" style="margin-top:6px;">
-            Add a manager to help monitor attendance and manage employees for this store.
+            Add a manager to help monitor attendance and manage employees for this workplace.
           </div>
           <div class="actions" style="margin-top:12px;">
-            <a class="btn primary" href="/owner/stores/<%= store.id %>/managers/new">Add Manager</a>
+        <a class="btn primary" href="/owner/workplaces/<%= workplace.id %>/managers/new">Add Manager</a>
           </div>
         </div>
       <% } else { %>
@@ -110,7 +91,7 @@
 
                   <td style="padding:12px; border-bottom:1px solid rgba(0,0,0,0.08); white-space:nowrap;">
                     <div class="actions" style="gap:8px; margin:0;">
-                      <form method="post" action="/owner/stores/<%= store.id %>/managers/<%= m.id %>/toggle" style="display:inline; margin:0;">
+                      <form method="post" action="/owner/workplaces/<%= workplace.id %>/managers/<%= m.id %>/toggle" style="display:inline; margin:0;">
                         <button type="submit" style="width:auto; margin:0;">
                           <%= m.is_active ? "Disable" : "Enable" %>
                         </button>
@@ -118,9 +99,9 @@
 
                       <form
                         method="post"
-                        action="/owner/stores/<%= store.id %>/managers/<%= m.id %>/remove"
+                        action="/owner/workplaces/<%= workplace.id %>/managers/<%= m.id %>/remove"
                         style="display:inline; margin:0;"
-                        onsubmit="return confirm('Remove this manager from this store?');"
+                        onsubmit="return confirm('Remove this manager from this workplace?');"
                       >
                         <button type="submit" style="width:auto; margin:0; background:#fff1f1;">
                           Remove

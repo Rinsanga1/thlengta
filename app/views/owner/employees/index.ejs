@@ -1,23 +1,7 @@
-<header class="nav">
-    <div class="container nav-inner">
-      <div class="brand">
-        <span>
-           <img src="/assets/img/thlengtalogo.png" alt="Thlengta logo" width="80px"/>
-        </span>
-        <span class="small">
-          <img src="/assets/img/thlengtalogotext.png" atl="Thlengta logo type" width="195px"/>
-        </span>
-        <span class="small">
-          <img src="/assets/img/com.png" atl="Thlengta logo type" width="75px" style="margin-left: -10px"/>
-        </span>
-      </div>
-      <nav class="nav-links">
-            <a class="btn" href="/owner/dashboard">Back</a>
-      </nav>
-    </div>
-  </header>
-<!---Below is the fucntional stuff -->
 <section class="section" style="padding-top:46px;">
+  <div style="max-width:1100px;margin:0 auto 20px;">
+    <a class="btn" href="/owner/dashboard" style="width:auto;">← Back to Dashboard</a>
+  </div>
   <div class="card pad super" style="margin:0 auto;">
     <div class="topbar" style="margin-bottom:14px;">
       <div>
@@ -27,7 +11,7 @@
         </div>
         <h2 style="margin:10px 0 0;">Employees</h2>
         <div class="small" style="margin-top:6px;">
-          Store: <b><%= store.name %></b>
+          Workplace: <b><%= workplace.name %></b>
         </div>
       </div>
     </div>
@@ -40,8 +24,8 @@
     <% } %>
 
     <div class="actions" style="margin:12px 0 8px;">
-      <a class="btn" href="/owner/stores/<%= store.id %>/">View QR</a>
-      <a class="btn primary" href="/owner/stores/<%= store.id %>/employees/new">Add Employee</a>
+      <a class="btn" href="/owner/workplaces/<%= workplace.id %>/">View QR</a>
+      <a class="btn primary" href="/owner/workplaces/<%= workplace.id %>/employees/new">Add Employee</a>
     </div>
 
     <div class="notice" style="margin:10px 0 16px;">
@@ -56,7 +40,7 @@
         <div style="font-weight:900;">No employees yet</div>
         <div class="small" style="margin-top:6px;">Add your first employee to enable check-in.</div>
         <div class="actions" style="margin-top:12px;">
-          <a class="btn primary" href="/owner/stores/<%= store.id %>/employees/new">Add Employee</a>
+          <a class="btn primary" href="/owner/workplaces/<%= workplace.id %>/employees/new">Add Employee</a>
         </div>
       </div>
     <% } else { %>
@@ -96,7 +80,7 @@
 
                 <td style="padding:12px; border-bottom:1px solid rgba(0,0,0,0.08); white-space:nowrap;">
                   <div class="actions" style="gap:8px; margin:0;">
-                    <form method="post" action="/owner/stores/<%= store.id %>/employees/<%= e.id %>/toggle" style="display:inline;">
+                    <form method="post" action="/owner/workplaces/<%= workplace.id %>/employees/<%= e.id %>/toggle" style="display:inline;">
                       <button type="submit" style="width:auto; margin:0;">
                         <%= e.is_active ? "Disable" : "Enable" %>
                       </button>
@@ -105,7 +89,7 @@
                     <% if (e.is_active && e.device_registered) { %>
                       <form
                         method="post"
-                        action="/owner/stores/<%= store.id %>/employees/<%= e.id %>/device/reset"
+                        action="/owner/workplaces/<%= workplace.id %>/employees/<%= e.id %>/device/reset"
                         style="display:inline; margin:0;"
                         onsubmit="return confirm('Reset device for this employee? They will need email + PIN again on a new phone.');"
                       >
@@ -117,7 +101,7 @@
 
                     <form
                       method="post"
-                      action="/owner/stores/<%= store.id %>/employees/<%= e.id %>/delete"
+                      action="/owner/workplaces/<%= workplace.id %>/employees/<%= e.id %>/delete"
                       style="display:inline; margin:0;"
                       onsubmit="return confirm('Delete this employee? This cannot be undone.');"
                     >

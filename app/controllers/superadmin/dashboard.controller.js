@@ -8,35 +8,35 @@ exports.index = async (req, res) => {
 
   const stats = await dbAll(
     `SELECT
-      s.user_id AS user_id,
-      COUNT(DISTINCT s.id) AS store_count,
+      w.user_id AS user_id,
+      COUNT(DISTINCT w.id) AS workplace_count,
       COUNT(DISTINCT e.id) AS employee_count
-    FROM stores s
-    LEFT JOIN employees e ON e.store_id = s.id
-    GROUP BY s.user_id
+    FROM workplaces w
+    LEFT JOIN employees e ON e.workplace_id = w.id
+    GROUP BY w.user_id
     `,
     []
   );
 
-  const storeNames = await dbAll(
-    `SELECT user_id, GROUP_CONCAT(name, ', ') AS store_names
-    FROM stores
+  const workplaceNames = await dbAll(
+    `SELECT user_id, GROUP_CONCAT(name, ', ') AS workplace_names
+    FROM workplaces
     GROUP BY user_id
     `,
     []
   );
 
   const statMap = new Map(stats.map((r) => [r.user_id, r]));
-  const nameMap = new Map(storeNames.map((r) => [r.user_id, r.store_names || ""]));
+  const nameMap = new Map(workplaceNames.map((r) => [r.user_id, r.workplace_names || ""]));
 
   const rows = users.map((u) => {
-    const st = statMap.get(u.id) || { store_count: 0, employee_count: 0 };
-    const stores = nameMap.get(u.id) || "";
+    const st = statMap.get(u.id) || { workplace_count: 0, employee_count: 0 };
+    const workplaces = nameMap.get(u.id) || "";
     return {
       ...u,
-      store_count: st.store_count,
+      workplace_count: st.workplace_count,
       employee_count: st.employee_count,
-      store_names: stores
+      workplace_names: workplaces
     };
   });
 

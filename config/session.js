@@ -1,9 +1,13 @@
 const session = require("express-session");
 const { BunSqliteSessionStore } = require("./sessionStore");
 const crypto = require("crypto");
+const path = require("path");
 
-function createSessionMiddleware(db) {
-  const store = new BunSqliteSessionStore(db, {
+function createSessionMiddleware() {
+  const dbPath = path.join(process.cwd(), "data.sqlite");
+  const sessionDb = new (require("bun:sqlite").Database)(dbPath);
+  
+  const store = new BunSqliteSessionStore(sessionDb, {
     tableName: 'sessions',
     ttl: 7 * 24 * 60 * 60 * 1000,
     cleanupInterval: 15 * 60 * 1000,
@@ -27,8 +31,11 @@ function createSessionMiddleware(db) {
   });
 }
 
-function createSuperadminSessionMiddleware(db) {
-  const store = new BunSqliteSessionStore(db, {
+function createSuperadminSessionMiddleware() {
+  const dbPath = path.join(process.cwd(), "data.sqlite");
+  const sessionDb = new (require("bun:sqlite").Database)(dbPath);
+  
+  const store = new BunSqliteSessionStore(sessionDb, {
     tableName: 'sessions',
     ttl: 24 * 60 * 60 * 1000,
     cleanupInterval: 15 * 60 * 1000,

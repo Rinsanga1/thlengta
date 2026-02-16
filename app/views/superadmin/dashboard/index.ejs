@@ -1,25 +1,3 @@
-<header class="nav">
-    <div class="container nav-inner">
-      <a class="brand" href="dashboard">
-        <span>
-           <img src="/assets/img/thlengtalogo.png" alt="Thlengta logo" width="80px"/>
-        </span>
-        <span class="small">
-          <img src="/assets/img/thlengtalogotext.png" atl="Thlengta logo type" width="195px"/>
-        </span>
-        <span class="small">
-          <img src="/assets/img/com.png" atl="Thlengta logo type" width="75px" style="margin-left: -10px"/>
-        </span>
-      </a>
-
-      <nav class="nav-links">
-        <form method="post" action="/superadmin/logout" style="margin:0;">
-        <button class="btn" type="submit" style="width:auto;">Logout</button>
-      </form>
-      </nav>
-    </div>
-  </header>
-<!-- below is what was working lol-->
 <section class="section" style="padding-top:46px;">
   <div class="card pad super" style="max-width:1200px;margin:0 auto;">
     <div class="topbar" style="margin-bottom:14px;">
@@ -55,7 +33,7 @@
       <div class="notice" style="margin:12px 0; background:#f8faf9;">
         <div style="font-weight:900;">Tip</div>
         <div class="small" style="margin-top:6px;">
-          Scroll horizontally if your screen is small. The table includes store and employee counts.
+          Scroll horizontally if your screen is small. The table includes workplace and employee counts.
         </div>
       </div>
 
@@ -67,9 +45,9 @@
               <th style="text-align:left; padding:12px; border-bottom:2px solid rgba(0,0,0,0.12);">Status</th>
               <th style="text-align:left; padding:12px; border-bottom:2px solid rgba(0,0,0,0.12);">Expiry</th>
               <th style="text-align:left; padding:12px; border-bottom:2px solid rgba(0,0,0,0.12);">Requested Plan</th>
-              <th style="text-align:left; padding:12px; border-bottom:2px solid rgba(0,0,0,0.12);">Stores</th>
+              <th style="text-align:left; padding:12px; border-bottom:2px solid rgba(0,0,0,0.12);">Workplaces</th>
               <th style="text-align:left; padding:12px; border-bottom:2px solid rgba(0,0,0,0.12);">Employees</th>
-              <th style="text-align:left; padding:12px; border-bottom:2px solid rgba(0,0,0,0.12);">Store Names</th>
+              <th style="text-align:left; padding:12px; border-bottom:2px solid rgba(0,0,0,0.12);">Workplace Names</th>
               <th style="text-align:left; padding:12px; border-bottom:2px solid rgba(0,0,0,0.12);">Actions</th>
             </tr>
           </thead>
@@ -130,7 +108,7 @@
                 <td style="padding:12px; border-bottom:1px solid rgba(0,0,0,0.08);">
                   <span class="badge" style="background:#f8faf9;">
                     <span class="dot" style="background:var(--accent2);"></span>
-                    <%= a.store_count %>
+                    <%= a.workplace_count %>
                   </span>
                 </td>
 
@@ -142,7 +120,7 @@
                 </td>
 
                 <td style="padding:12px; border-bottom:1px solid rgba(0,0,0,0.08);">
-                  <span class="small"><%= a.store_names || "-" %></span>
+                  <span class="small"><%= a.workplace_names || "-" %></span>
                 </td>
 
                 <td style="padding:12px; border-bottom:1px solid rgba(0,0,0,0.08); white-space:nowrap;">
@@ -173,7 +151,7 @@
                       method="post"
                       action="/superadmin/admins/<%= a.id %>/delete"
                       style="display:inline; margin:0;"
-                      onsubmit="return confirm('Delete this admin and ALL their stores, employees, logs, and uploaded logos? This cannot be undone.');"
+                      onsubmit="return confirm('Delete this admin and ALL their workplaces, employees, logs, and uploaded logos? This cannot be undone.');"
                     >
                       <button class="btn" type="submit" style="width:auto; background:#fff1f1;">
                         Delete

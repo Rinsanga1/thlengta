@@ -1,5 +1,5 @@
 const { dbGet, dbAll, dbRun } = require("../../../db/helpers");
-const { getManagerStoreOrNull } = require("../../utils/manager.utils");
+const { getManagerWorkplaceOrNull } = require("../../utils/manager.utils");
 const { todayIST_yyyy_mm_dd, parseSqliteTimeToMinutes, to12Hour } = require("../../utils/time.utils");
 const { sqlInListPlaceholders } = require("../../utils/db.utils");
 
@@ -12,28 +12,28 @@ const MANAGER_VISIBLE_EVENTS = [
   "denied_gps"
 ];
 
-async function cleanupOldLogs(storeId) {
+async function cleanupOldLogs(workplaceId) {
   await dbRun(
     `
     DELETE FROM attendance_logs
-    WHERE store_id = ?
+    WHERE workplace_id = ?
       AND datetime(created_at) < datetime('now', '-90 days')
     `,
-    [storeId]
+    [workplaceId]
   );
 }
 
-// Lists attendance logs for a given store and date (index action)
+// Lists attendance logs for a given workplace and date (index action)
 exports.index = async (req, res) => {
   try {
     const managerId = req.session.managerId;
     const adminId = req.session.managerAdminId;
-    const storeId = Number(req.params.storeId);
+    const workplaceId = Number(req.params.workplaceId);
 
-    const store = await getManagerStoreOrNull(managerId, adminId, storeId);
-    if (!store) return res.status(404).send("Store not found.");
+    const workplace = await getManagerWorkplaceOrNull(managerId, adminId, workplaceId);
+    if (!workplace) return res.status(404).send("Workplace not found.");
 
-    await cleanupOldLogs(storeId);
+    await cleanupOldLogs(workplaceId);
 
     const selectedDate = String(req.query.date || todayIST_yyyy_mm_dd());
     const placeholders = sqlInListPlaceholders(MANAGER_VISIBLE_EVENTS.length);
@@ -50,16 +50,16 @@ exports.index = async (req, res) => {
         e.email AS employee_email
       FROM attendance_logs a
       LEFT JOIN employees e ON e.id = a.employee_id
-      WHERE a.store_id = ?
+      WHERE a.workplace_id = ?
         AND date(datetime(a.created_at, '+5 hours', '+30 minutes')) = ?
         AND a.event_type IN (${placeholders})
       ORDER BY a.id DESC
       `,
-      [storeId, selectedDate, ...MANAGER_VISIBLE_EVENTS]
+      [workplaceId, selectedDate, ...MANAGER_VISIBLE_EVENTS]
     );
 
-    const openMin = parseSqliteTimeToMinutes(store.open_time);
-    const graceMin = store.grace_enabled ? Number(store.grace_minutes || 10) : 0;
+    const openMin = parseSqliteTimeToMinutes(workplace.open_time);
+    const graceMin = workplace.grace_enabled ? Number(workplace.grace_minutes || 10) : 0;
 
     const logs = rows.map((r) => {
       let timePart = "";
@@ -89,9 +89,9 @@ exports.index = async (req, res) => {
       return { ...r, time: timePart, time12, punctuality, late_by_min };
     });
 
-    return res.renderPage("manager/logs/index", { // Renamed view
+    return res.renderPage("manager/logs/index", {
       title: "Attendance Logs",
-      store,
+      workplace,
       selectedDate,
       logs
     });
@@ -106,12 +106,12 @@ exports.downloadDayCsv = async (req, res) => {
   try {
     const managerId = req.session.managerId;
     const adminId = req.session.managerAdminId;
-    const storeId = Number(req.params.storeId);
+    const workplaceId = Number(req.params.workplaceId);
 
-    const store = await getManagerStoreOrNull(managerId, adminId, storeId);
-    if (!store) return res.status(404).send("Store not found.");
+    const workplace = await getManagerWorkplaceOrNull(managerId, adminId, workplaceId);
+    if (!workplace) return res.status(404).send("Workplace not found.");
 
-    await cleanupOldLogs(storeId);
+    await cleanupOldLogs(workplaceId);
 
     const selectedDate = String(req.query.date || "");
     if (!/^\d{4}-\d{2}-\d{2}$/.test(selectedDate)) {
@@ -131,19 +131,19 @@ exports.downloadDayCsv = async (req, res) => {
         a.ip
       FROM attendance_logs a
       LEFT JOIN employees e ON e.id = a.employee_id
-      WHERE a.store_id = ?
+      WHERE a.workplace_id = ?
         AND date(datetime(a.created_at, '+5 hours', '+30 minutes')) = ?
         AND a.event_type IN (${placeholders})
       ORDER BY a.id ASC
       `,
-      [storeId, selectedDate, ...MANAGER_VISIBLE_EVENTS]
+      [workplaceId, selectedDate, ...MANAGER_VISIBLE_EVENTS]
     );
 
-    const openMin = parseSqliteTimeToMinutes(store.open_time);
-    const graceMin = store.grace_enabled ? Number(store.grace_minutes || 10) : 0;
+    const openMin = parseSqliteTimeToMinutes(workplace.open_time);
+    const graceMin = workplace.grace_enabled ? Number(workplace.grace_minutes || 10) : 0;
 
     const header = [
-      "store",
+      "workplace",
       "date",
       "time_12hr",
       "employee",
@@ -179,7 +179,7 @@ exports.downloadDayCsv = async (req, res) => {
       }
 
       const row = [
-        `"${String(store.name).replace(/"/g, '""')}"`,
+        `"${String(workplace.name).replace(/"/g, '""')}"`,
         `"${datePart}"`,
         `"${time12}"`,
         `"${String(r.employee_email || "").replace(/"/g, '""')}"`,
@@ -197,7 +197,7 @@ exports.downloadDayCsv = async (req, res) => {
     res.setHeader("Content-Type", "text/csv; charset=utf-8");
     res.setHeader(
       "Content-Disposition",
-      `attachment; filename="manager_logs_${storeId}_${selectedDate}.csv"`
+      `attachment; filename="manager_logs_${workplaceId}_${selectedDate}.csv"`
     );
     res.send(lines.join("\n"));
   } catch (err) {
@@ -211,12 +211,12 @@ exports.downloadMonthCsv = async (req, res) => {
   try {
     const managerId = req.session.managerId;
     const adminId = req.session.managerAdminId;
-    const storeId = Number(req.params.storeId);
+    const workplaceId = Number(req.params.workplaceId);
 
-    const store = await getManagerStoreOrNull(managerId, adminId, storeId);
-    if (!store) return res.status(404).send("Store not found.");
+    const workplace = await getManagerWorkplaceOrNull(managerId, adminId, workplaceId);
+    if (!workplace) return res.status(404).send("Workplace not found.");
 
-    await cleanupOldLogs(storeId);
+    await cleanupOldLogs(workplaceId);
 
     const month = String(req.query.month || "");
     if (!/^\d{4}-\d{2}$/.test(month)) {
@@ -236,19 +236,19 @@ exports.downloadMonthCsv = async (req, res) => {
         a.ip
       FROM attendance_logs a
       LEFT JOIN employees e ON e.id = a.employee_id
-      WHERE a.store_id = ?
+      WHERE a.workplace_id = ?
         AND strftime('%Y-%m', datetime(a.created_at, '+5 hours', '+30 minutes')) = ?
         AND a.event_type IN (${placeholders})
       ORDER BY a.id ASC
       `,
-      [storeId, month, ...MANAGER_VISIBLE_EVENTS]
+      [workplaceId, month, ...MANAGER_VISIBLE_EVENTS]
     );
 
-    const openMin = parseSqliteTimeToMinutes(store.open_time);
-    const graceMin = store.grace_enabled ? Number(store.grace_minutes || 10) : 0;
+    const openMin = parseSqliteTimeToMinutes(workplace.open_time);
+    const graceMin = workplace.grace_enabled ? Number(workplace.grace_minutes || 10) : 0;
 
     const header = [
-      "store",
+      "workplace",
       "date",
       "time_12hr",
       "employee",
@@ -284,7 +284,7 @@ exports.downloadMonthCsv = async (req, res) => {
       }
 
       const row = [
-        `"${String(store.name).replace(/"/g, '""')}"`,
+        `"${String(workplace.name).replace(/"/g, '""')}"`,
         `"${datePart}"`,
         `"${time12}"`,
         `"${String(r.employee_email || "").replace(/"/g, '""')}"`,
@@ -302,7 +302,7 @@ exports.downloadMonthCsv = async (req, res) => {
     res.setHeader("Content-Type", "text/csv; charset=utf-8");
     res.setHeader(
       "Content-Disposition",
-      `attachment; filename="manager_logs_${storeId}_${month}.csv"`
+      `attachment; filename="manager_logs_${workplaceId}_${month}.csv"`
     );
     res.send(lines.join("\n"));
   } catch (err) {

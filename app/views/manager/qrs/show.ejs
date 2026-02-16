@@ -1,33 +1,17 @@
-<header class="nav">
-  <div class="container nav-inner">
-    <div class="brand">
-      <span>
-        <img src="/assets/img/thlengtalogo.png" alt="Thlengta logo" width="80px"/>
-      </span>
-      <span class="small">
-        <img src="/assets/img/thlengtalogotext.png" atl="Thlengta logo type" width="195px"/>
-      </span>
-      <span class="small">
-        <img src="/assets/img/com.png" atl="Thlengta logo type" width="75px" style="margin-left: -10px"/>
-      </span>
-    </div>
-    <nav class="nav-links">
-      <a class="btn" href="/manager/dashboard">Back</a>
-    </nav>
-  </div>
-</header>
-
 <section class="section" style="padding-top:46px;">
+  <div style="max-width:980px;margin:0 auto 20px;">
+    <a class="btn" href="/manager/dashboard" style="width:auto;">← Back to Dashboard</a>
+  </div>
   <div class="card pad super" style="max-width:980px;margin:0 auto;">
     <div class="topbar" style="margin-bottom:14px;">
       <div>
         <div class="h-eyebrow">
-          <span class="chip">Store</span>
+          <span class="chip">Workplace</span>
           <span class="chip">QR</span>
         </div>
-        <h2 style="margin:10px 0 0;">Store QR</h2>
+        <h2 style="margin:10px 0 0;">Workplace QR</h2>
         <div class="small" style="margin-top:6px;">
-          Store: <b><%= store.name %></b>
+          Workplace: <b><%= workplace.name %></b>
         </div>
       </div>
     </div>
@@ -40,7 +24,7 @@
         <div style="background:#fff; padding:14px; border-radius:16px; border:2px solid rgba(0,0,0,0.1); box-shadow: 4px 4px 0 rgba(0,0,0,0.12);">
           <img
             id="rawPreview"
-            src="/manager/store/<%= store.id %>/qr.png"
+            src="/manager/workplace/<%= workplace.id %>/qr.png"
             alt="QR"
             width="260"
             height="260"
@@ -61,13 +45,13 @@
 
         <!-- Optional: raw QR -->
         <a class="btn" id="rawBtn"
-           href="/manager/store/<%= store.id %>/qr.png"
-           download="store-<%= store.id %>-qr.png"
+           href="/manager/workplace/<%= workplace.id %>/qr.png"
+           download="workplace-<%= workplace.id %>-qr.png"
            style="width:auto;">
           Download RAW
         </a>
 
-        <a class="btn" href="/manager/store/<%= store.id %>/employees">Employees</a>
+        <a class="btn" href="/manager/workplace/<%= workplace.id %>/employees">Employees</a>
       </div>
 
       <!-- Hidden canvas for framed QR generation -->
@@ -77,8 +61,8 @@
       <div
         id="qrPosterMount"
         data-frame-url="/assets/img/qr-frame.png"
-        data-raw-template="/manager/store/{ID}/qr.png"
-        data-store-id="<%= store.id %>"
+        data-raw-template="/manager/workplace/{ID}/qr.png"
+        data-workplace-id="<%= workplace.id %>"
         data-qr-scale="0.60"
         data-offset-x="0"
         data-offset-y="0"
@@ -92,7 +76,7 @@
 
     <!-- Location + scan URL -->
     <div class="card pad" style="background:#f8faf9;">
-      <h3 style="margin:0 0 10px;">Store Location</h3>
+      <h3 style="margin:0 0 10px;">Workplace Location</h3>
 
       <div class="small" style="margin:0 0 10px;">
         Coordinates (read-only)
@@ -100,17 +84,17 @@
 
       <div class="field">
         <label>Latitude</label>
-        <input value="<%= store.lat ?? '' %>" readonly onclick="this.select()" />
+        <input value="<%= workplace.lat ?? '' %>" readonly onclick="this.select()" />
       </div>
 
       <div class="field">
         <label>Longitude</label>
-        <input value="<%= store.lng ?? '' %>" readonly onclick="this.select()" />
+        <input value="<%= workplace.lng ?? '' %>" readonly onclick="this.select()" />
       </div>
 
       <div class="field">
         <label>Radius (meters)</label>
-        <input value="<%= store.radius_m ?? '' %>" readonly onclick="this.select()" />
+        <input value="<%= workplace.radius_m ?? '' %>" readonly onclick="this.select()" />
       </div>
 
       <div class="field" style="margin-top:12px;">
@@ -118,12 +102,12 @@
         <input value="<%= scanUrl %>" readonly onclick="this.select()" />
       </div>
 
-      <div class="notice" style="margin-top:12px;">
+        <div class="notice" style="margin-top:12px;">
         <div style="font-weight:900;">Employee flow</div>
         <div class="small" style="margin-top:6px;">
           1) Scan QR<br/>
           2) Enter PIN<br/>
-          3) GPS check verifies they are inside the store boundary<br/>
+          3) GPS check verifies they are inside the workplace boundary<br/>
           4) Attendance is recorded
         </div>
       </div>
@@ -131,12 +115,12 @@
       <div class="notice" style="margin-top:12px; background:#eaf6f0;">
         <div style="font-weight:900;">Tip</div>
         <div class="small" style="margin-top:6px;">
-          If GPS fails at the correct location, ask the admin to increase the store radius slightly.
+          If GPS fails at the correct location, ask the admin to increase the workplace radius slightly.
         </div>
       </div>
 
       <div class="actions" style="margin-top:12px;">
-        <a class="btn" href="/manager/store/<%= store.id %>/logs">View Logs</a>
+        <a class="btn" href="/manager/workplace/<%= workplace.id %>/logs">View Logs</a>
       </div>
     </div>
 

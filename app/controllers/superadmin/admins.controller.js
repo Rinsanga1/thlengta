@@ -147,11 +147,11 @@ exports.renew = async (req, res) => {
 exports.destroy = async (req, res) => {
   const adminId = Number(req.params.adminId);
 
-  const stores = await dbAll("SELECT id, logo_path FROM stores WHERE user_id = ?", [adminId]);
+  const workplaces = await dbAll("SELECT id, logo_path FROM workplaces WHERE user_id = ?", [adminId]);
 
-  for (const s of stores) {
-    if (s.logo_path && String(s.logo_path).startsWith("/uploads/")) {
-      const abs = path.join(process.cwd(), "public", s.logo_path);
+  for (const w of workplaces) {
+    if (w.logo_path && String(w.logo_path).startsWith("/uploads/")) {
+      const abs = path.join(process.cwd(), "public", w.logo_path);
       try {
         if (fs.existsSync(abs)) fs.unlinkSync(abs);
       } catch (e) {
@@ -161,15 +161,15 @@ exports.destroy = async (req, res) => {
 
     await dbRun(
       `DELETE FROM employee_devices
-       WHERE employee_id IN (SELECT id FROM employees WHERE store_id = ?)`,
-      [s.id]
+       WHERE employee_id IN (SELECT id FROM employees WHERE workplace_id = ?)`,
+      [w.id]
     );
 
-    await dbRun("DELETE FROM attendance_logs WHERE store_id = ?", [s.id]);
-    await dbRun("DELETE FROM employees WHERE store_id = ?", [s.id]);
+    await dbRun("DELETE FROM attendance_logs WHERE workplace_id = ?", [w.id]);
+    await dbRun("DELETE FROM employees WHERE workplace_id = ?", [w.id]);
   }
 
-  await dbRun("DELETE FROM stores WHERE user_id = ?", [adminId]);
+  await dbRun("DELETE FROM workplaces WHERE user_id = ?", [adminId]);
   await dbRun("DELETE FROM users WHERE id = ?", [adminId]);
 
   return res.redirect("/superadmin/dashboard?msg=" + encodeURIComponent("Admin deleted fully."));

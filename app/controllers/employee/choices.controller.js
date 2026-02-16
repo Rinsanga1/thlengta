@@ -1,35 +1,33 @@
 const { dbGet, dbRun } = require("../../../db/helpers");
 const { isInsideGeofence } = require("../../utils/geo");
 const { ensureFpTable } = require("../../utils/fingerprint.utils");
-const { hashToken } = require("../../utils/device.utils"); // hashToken moved to device.utils
+const { hashToken } = require("../../utils/device.utils");
 const { decideNextStepForToday } = require("../../utils/attendance.utils");
 
 
 async function handleChoiceStateless(req, res) {
-  await ensureFpTable(); // This is in fingerprint.utils
+  await ensureFpTable();
 
   try {
-    const storePublicId = String(req.params.storePublicId);
+    const workplacePublicId = String(req.params.workplacePublicId);
 
-    const store = await dbGet(
-      "SELECT id, user_id, name, public_id, lat, lng, radius_m, open_time, grace_enabled, grace_minutes FROM stores WHERE public_id = ?",
-      [storePublicId]
+    const workplace = await dbGet(
+      "SELECT id, user_id, name, public_id, lat, lng, radius_m, open_time, grace_enabled, grace_minutes FROM workplaces WHERE public_id = ?",
+      [workplacePublicId]
     );
-    if (!store) return res.status(404).send("Store not found.");
+    if (!workplace) return res.status(404).send("Workplace not found.");
 
-    // Identify employee from device cookie
     const deviceToken = req.cookies.thlengta_device || null;
     if (!deviceToken) {
-      return res.renderPage("employee/check_results/show", { // Renamed view
+      return res.renderPage("employee/check_results/show", {
         title: "Please scan again",
         ok: false,
-        store,
+        workplace,
         employeeEmail: null,
         message: "Session lost. Please scan the QR again and enter PIN."
       });
     }
 
-    // hashToken is in device.utils now
     const deviceHash = hashToken(deviceToken);
 
     const employee = await dbGet(
@@ -37,22 +35,22 @@ async function handleChoiceStateless(req, res) {
       SELECT e.id, e.email
       FROM employee_devices d
       JOIN employees e ON e.id = d.employee_id
-      WHERE d.device_token_hash = ? AND e.store_id = ? AND e.is_active = 1
+      WHERE d.device_token_hash = ? AND e.workplace_id = ? AND e.is_active = 1
       `,
-      [deviceHash, store.id]
+      [deviceHash, workplace.id]
     );
 
     if (!employee) {
-      return res.renderPage("employee/check_results/show", { // Renamed view
+      return res.renderPage("employee/check_results/show", {
         title: "Device not registered",
         ok: false,
-        store,
+        workplace,
         employeeEmail: null,
         message: "This device is not registered. Please scan again and login using email + PIN."
       });
     }
 
-    const choice = String(req.body.choice || "").trim(); // break | resume | checkout
+    const choice = String(req.body.choice || "").trim();
 
     const lat = Number(req.body.lat);
     const lng = Number(req.body.lng);
@@ -62,24 +60,24 @@ async function handleChoiceStateless(req, res) {
     let usedLng = null;
 
     if (Number.isFinite(lat) && Number.isFinite(lng)) {
-      const gf = isInsideGeofence(store.lat, store.lng, store.radius_m, lat, lng);
+      const gf = isInsideGeofence(workplace.lat, workplace.lng, workplace.radius_m, lat, lng);
       if (!gf.ok) {
         await dbRun(
           `
           INSERT INTO attendance_logs
-            (store_id, employee_id, event_type, device_ok, gps_ok, lat, lng, user_agent, ip, time_status, minutes_late)
+            (workplace_id, employee_id, event_type, device_ok, gps_ok, lat, lng, user_agent, ip, time_status, minutes_late)
           VALUES
             (?, ?, 'denied_gps', 1, 0, ?, ?, ?, ?, NULL, NULL)
           `,
-          [store.id, employee.id, lat, lng, req.get("user-agent") || "", req.ip]
+          [workplace.id, employee.id, lat, lng, req.get("user-agent") || "", req.ip]
         );
 
-        return res.renderPage("employee/check_results/show", { // Renamed view
+        return res.renderPage("employee/check_results/show", {
           title: "Check failed",
           ok: false,
-          store,
+          workplace,
           employeeEmail: employee.email || null,
-          message: `You are not at the store location.`
+          message: `You are not at the workplace location.`
         });
       }
 
@@ -88,13 +86,13 @@ async function handleChoiceStateless(req, res) {
       gps_ok = 1;
     }
 
-    const { step, mode } = await decideNextStepForToday(store.id, employee.id);
+    const { step, mode } = await decideNextStepForToday(workplace.id, employee.id);
 
     if (step === "already_checked_out") {
-      return res.renderPage("employee/check_results/show", { // Renamed view
+      return res.renderPage("employee/check_results/show", {
         title: "Already checked out",
         ok: true,
-        store,
+        workplace,
         employeeEmail: employee.email || null,
         message: "You have already checked out for today."
       });
@@ -104,10 +102,10 @@ async function handleChoiceStateless(req, res) {
     const allowed = isOnBreak ? ["resume", "checkout"] : ["break", "checkout"];
 
     if (!allowed.includes(choice)) {
-      return res.renderPage("employee/choices/new", { // Renamed view
+      return res.renderPage("employee/choices/new", {
         title: "Choose action",
-        store,
-        storePublicId: store.public_id,
+        workplace,
+        workplacePublicId: workplace.public_id,
         employeeEmail: employee.email || null,
         mode: isOnBreak ? "on_break" : "checked_in",
         lat: usedLat,
@@ -124,11 +122,11 @@ async function handleChoiceStateless(req, res) {
     await dbRun(
       `
       INSERT INTO attendance_logs
-        (store_id, employee_id, event_type, device_ok, gps_ok, lat, lng, user_agent, ip, time_status, minutes_late)
+        (workplace_id, employee_id, event_type, device_ok, gps_ok, lat, lng, user_agent, ip, time_status, minutes_late)
       VALUES
         (?, ?, ?, 1, ?, ?, ?, ?, ?, NULL, NULL)
       `,
-      [store.id, employee.id, event_type, gps_ok, usedLat, usedLng, req.get("user-agent") || "", req.ip]
+      [workplace.id, employee.id, event_type, gps_ok, usedLat, usedLng, req.get("user-agent") || "", req.ip]
     );
 
     let title = "Recorded";
@@ -145,10 +143,10 @@ async function handleChoiceStateless(req, res) {
       msg = "Checked out.";
     }
 
-    return res.renderPage("employee/check_results/show", { // Renamed view
+    return res.renderPage("employee/check_results/show", {
       title,
       ok: true,
-      store,
+      workplace,
       employeeEmail: employee.email || null,
       message: msg
     });
