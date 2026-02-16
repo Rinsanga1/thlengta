@@ -218,168 +218,220 @@
 
       <!-- SETTINGS TAB -->
       <% if (activeTab === 'settings') { %>
-        <form class="form" method="post" action="/owner/workplaces/<%= workplace.id %>/settings" enctype="multipart/form-data">
-          
+        
           <!-- Section 1: Basic Info -->
           <div class="card pad" style="background:#fff; margin-bottom:20px;">
-            <h3 style="margin:0 0 15px; color:var(--primary);">1. Workplace Details</h3>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+              <h3 style="margin:0; color:var(--primary);">1. Workplace Details</h3>
+              <button type="button" class="btn" id="editDetailsBtn" data-workplace-id="<%= workplace.id %>" style="width:auto;">Edit Details</button>
+            </div>
             
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:14px;">
-              <div class="field">
-                <label>Workplace Name *</label>
-                <input
-                  type="text"
-                  name="name"
-                  required
-                  value="<%= workplace.name || '' %>"
-                />
-              </div>
+            <div id="detailsFields" style="display:none;">
+              <form method="post" action="/owner/workplaces/<%= workplace.id %>/settings" enctype="multipart/form-data">
+                <input type="hidden" name="saveDetails" value="1" />
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:14px;">
+                  <div class="field">
+                    <label>Workplace Name *</label>
+                    <input type="text" name="name" required value="<%= workplace.name || '' %>" />
+                  </div>
 
-              <div class="field">
-                <label>Address</label>
-                <input
-                  type="text"
-                  name="address"
-                  value="<%= workplace.address || '' %>"
-                  placeholder="Street, City, State"
-                />
-              </div>
+                  <div class="field">
+                    <label>Address</label>
+                    <input type="text" name="address" value="<%= workplace.address || '' %>" placeholder="Street, City, State" />
+                  </div>
+                </div>
+
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:14px; margin-top:14px;">
+                  <div class="field">
+                    <label>Opening Time</label>
+                    <input type="text" name="open_time" data-smarttime="1" value="<%= workplace.open_time || '' %>" placeholder="e.g. 930, 1030am, 9am" />
+                  </div>
+
+                  <div class="field">
+                    <label>Closing Time</label>
+                    <input type="text" name="close_time" data-smarttime="1" value="<%= workplace.close_time || '' %>" placeholder="e.g. 6pm, 1800" />
+                  </div>
+                </div>
+
+                <div class="field" style="margin-top:14px;">
+                  <label>
+                    <input type="checkbox" name="grace_enabled" value="1" <%= workplace.grace_enabled ? 'checked' : '' %> />
+                    Enable grace period (<%= workplace.grace_minutes || 10 %> minutes)
+                  </label>
+                </div>
+
+                <!-- Logo section -->
+                <div style="margin-top:20px;">
+                  <h4 style="margin:0 0 10px;">Logo</h4>
+                  <% if (workplace.logo_path) { %>
+                    <img src="<%= workplace.logo_path %>" style="max-width:120px; margin-bottom:10px; border-radius:8px;" />
+                  <% } %>
+                  <div class="field">
+                    <label>Update Logo (optional)</label>
+                    <input type="file" name="logo" accept="image/png,image/jpeg,image/webp" />
+                    <div class="small">Leave empty to keep current logo</div>
+                  </div>
+                </div>
+
+                <div class="actions" style="margin-top:15px;">
+                  <button type="submit" class="btn primary">Save Details</button>
+                </div>
+              </form>
             </div>
 
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:14px; margin-top:14px;">
-              <div class="field">
-                <label>Opening Time</label>
-                <input
-                  type="text"
-                  name="open_time"
-                  data-smarttime="1"
-                  value="<%= workplace.open_time || '' %>"
-                  placeholder="e.g. 930, 1030am, 9am"
-                />
+            <div id="detailsDisplay">
+              <div style="display:grid; grid-template-columns: 1fr 1fr; gap:14px;">
+                <div><div class="small muted">Name</div><div><%= workplace.name || '-' %></div></div>
+                <div><div class="small muted">Address</div><div><%= workplace.address || '-' %></div></div>
               </div>
-
-              <div class="field">
-                <label>Closing Time</label>
-                <input
-                  type="text"
-                  name="close_time"
-                  data-smarttime="1"
-                  value="<%= workplace.close_time || '' %>"
-                  placeholder="e.g. 6pm, 1800"
-                />
+              <div style="display:grid; grid-template-columns: 1fr 1fr; gap:14px; margin-top:14px;">
+                <div><div class="small muted">Opening Time</div><div><%= workplace.open_time || '-' %></div></div>
+                <div><div class="small muted">Closing Time</div><div><%= workplace.close_time || '-' %></div></div>
               </div>
-            </div>
-
-            <div class="field" style="margin-top:14px;">
-              <label>
-                <input type="checkbox" name="grace_enabled" value="1" <%= workplace.grace_enabled ? 'checked' : '' %> />
-                Enable grace period (<%= workplace.grace_minutes || 10 %> minutes)
-              </label>
-            </div>
-
-            <!-- Logo section -->
-            <div style="margin-top:20px;">
-              <h4 style="margin:0 0 10px;">Logo</h4>
+              <div style="margin-top:14px;">
+                <div class="small muted">Grace Period</div>
+                <div><%= workplace.grace_enabled ? 'Enabled (' + (workplace.grace_minutes || 10) + ' minutes)' : 'Disabled' %></div>
+              </div>
               <% if (workplace.logo_path) { %>
-                <img src="<%= workplace.logo_path %>" style="max-width:120px; margin-bottom:10px; border-radius:8px;" />
-              <% } %>
-              <div class="field">
-                <label>Update Logo (optional)</label>
-                <input type="file" name="logo" accept="image/png,image/jpeg,image/webp" />
-                <div class="small">Leave empty to keep current logo</div>
+              <div style="margin-top:14px;">
+                <div class="small muted">Logo</div>
+                <img src="<%= workplace.logo_path %>" style="max-width:120px; margin-top:5px; border-radius:8px;" />
               </div>
+              <% } %>
             </div>
           </div>
 
           <!-- Section 2: Location -->
           <div class="card pad" style="background:#fff; margin-bottom:20px;">
-            <h3 style="margin:0 0 15px; color:var(--primary);">2. Location</h3>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+              <h3 style="margin:0; color:var(--primary);">2. Location</h3>
+              <button type="button" class="btn" id="editLocBtn" data-workplace-id="<%= workplace.id %>" style="width:auto;">Edit Location</button>
+            </div>
             
-            <div class="actions" style="margin-top:0; gap:10px; display:flex; flex-wrap:wrap; margin-bottom:14px;">
-              <button class="btn" type="button" id="btnUseLoc" style="width:auto;">Use my current location</button>
-              <a class="btn" href="https://www.google.com/maps" target="_blank" rel="noreferrer" style="width:auto;">Open Google Maps</a>
+            <div id="locationFields" style="display:none;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                <span></span>
+                <button type="button" class="btn" id="cancelLocBtn">Cancel</button>
+              </div>
+
+              <div class="actions" style="margin-top:0; gap:10px; display:flex; flex-wrap:wrap; margin-bottom:14px;">
+                <button class="btn" type="button" id="btnUseLoc" style="width:auto;">Use my current location</button>
+                <a class="btn" href="https://www.google.com/maps" target="_blank" rel="noreferrer" style="width:auto;">Open Google Maps</a>
+              </div>
+
+              <div id="locStatus" class="notice" style="margin-bottom:14px;"></div>
+
+              <div style="display:grid; grid-template-columns: 1fr 1fr; gap:14px;">
+                <div class="field">
+                  <label>Latitude</label>
+                  <input type="number" step="any" name="lat" id="lat" value="<%= workplace.lat || '' %>" readonly style="background:#f5f5f5;" data-radius="<%= workplace.radius_m || 70 %>" data-workplace-name="<%= workplace.name %>" />
+                </div>
+
+                <div class="field">
+                  <label>Longitude</label>
+                  <input type="number" step="any" name="lng" id="lng" value="<%= workplace.lng || '' %>" readonly style="background:#f5f5f5;" />
+                </div>
+              </div>
+
+              <div style="margin-top:14px;">
+                <div style="border:1px solid var(--border); border-radius:12px; overflow:hidden;">
+                  <iframe
+                    id="mapFrame"
+                    width="100%"
+                    height="200"
+                    style="border:0;"
+                    loading="lazy"
+                    src="https://www.google.com/maps?q=<%= workplace.lat || 0 %>,<%= workplace.lng || 0 %>&z=16&output=embed"
+                  ></iframe>
+                </div>
+              </div>
+
+              <div class="actions" style="margin-top:15px;">
+                <button type="button" class="btn primary" id="saveLocBtn" data-workplace-id="<%= workplace.id %>">Save Location</button>
+              </div>
             </div>
 
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:14px;">
-              <div class="field">
-                <label>Latitude</label>
-                <input type="number" step="any" name="lat" id="lat" value="<%= workplace.lat || '' %>" />
+            <div id="locationDisplay">
+              <% if (workplace.lat && workplace.lng) { %>
+              <div style="margin-top:14px;">
+                <div style="border:1px solid var(--border); border-radius:12px; overflow:hidden;">
+                  <iframe
+                    width="100%"
+                    height="200"
+                    style="border:0;"
+                    loading="lazy"
+                    src="https://www.google.com/maps?q=<%= workplace.lat %>,<%= workplace.lng %>&z=16&output=embed"
+                  ></iframe>
+                </div>
+                <div class="small muted" style="margin-top:8px;">Lat: <%= workplace.lat %>, Lng: <%= workplace.lng %></div>
               </div>
-
-              <div class="field">
-                <label>Longitude</label>
-                <input type="number" step="any" name="lng" id="lng" value="<%= workplace.lng || '' %>" />
-              </div>
+              <% } else { %>
+              <div class="muted small">No location set. Click "Edit Location" to set it.</div>
+              <% } %>
             </div>
-
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:14px;">
-              <div class="field">
-                <label>Latitude</label>
-                <input type="number" step="any" name="lat" id="lat_settings" value="<%= workplace.lat || '' %>" />
-              </div>
-
-              <div class="field">
-                <label>Longitude</label>
-                <input type="number" step="any" name="lng" id="lng_settings" value="<%= workplace.lng || '' %>" />
-              </div>
-            </div>
-
-            <% if (workplace.lat && workplace.lng) { %>
-            <div style="margin-top:14px;">
-              <div style="border:1px solid var(--border); border-radius:12px; overflow:hidden;">
-                <iframe
-                  width="100%"
-                  height="200"
-                  style="border:0;"
-                  loading="lazy"
-                  src="https://www.google.com/maps?q=<%= workplace.lat %>,<%= workplace.lng %>&z=16&output=embed"
-                ></iframe>
-              </div>
-            </div>
-            <% } %>
           </div>
 
           <!-- Section 3: Radius -->
           <div class="card pad" style="background:#fff; margin-bottom:20px;">
-            <h3 style="margin:0 0 15px; color:var(--primary);">3. Check-in Radius</h3>
-            
-            <div class="field">
-              <label>Radius (meters)</label>
-              <input
-                type="number"
-                name="radius_m"
-                min="10"
-                max="1000"
-                value="<%= workplace.radius_m || 70 %>"
-              />
-              <div class="small">Allowed: 10 to 1000 meters</div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+              <h3 style="margin:0; color:var(--primary);">3. Check-in Radius</h3>
+              <button type="button" class="btn" id="editRadiusBtn" data-workplace-id="<%= workplace.id %>" style="width:auto;">Edit Radius</button>
+            </div>
+
+            <div id="radiusFields" style="display:none;">
+              <form method="post" action="/owner/workplaces/<%= workplace.id %>/settings">
+                <input type="hidden" name="saveRadius" value="1" />
+                <input type="hidden" name="name" value="<%= workplace.name %>" />
+                <input type="hidden" name="lat" value="<%= workplace.lat || '' %>" />
+                <input type="hidden" name="lng" value="<%= workplace.lng || '' %>" />
+                <div class="field">
+                  <label>Radius (meters)</label>
+                  <input type="number" name="radius_m" min="10" max="1000" value="<%= workplace.radius_m || 70 %>" />
+                  <div class="small">Allowed: 10 to 1000 meters</div>
+                </div>
+                <div class="actions" style="margin-top:15px;">
+                  <button type="submit" class="btn primary">Save Radius</button>
+                </div>
+              </form>
+            </div>
+
+            <div id="radiusDisplay">
+              <div><%= workplace.radius_m || 70 %> meters</div>
+              <div class="small muted" style="margin-top:5px;">Allowed: 10 to 1000 meters</div>
             </div>
           </div>
 
-          <!-- Save Section -->
-          <div class="actions" style="margin-top:24px; margin-bottom:24px;">
-            <button class="btn primary" type="submit" style="width:auto; font-size:16px; padding:12px 24px;">Save Changes</button>
-          </div>
-
-          <!-- Danger Zone -->
+          <!-- Danger Zone (separate form) -->
           <div class="card pad" style="background:#fff3f3; margin-top:30px;">
             <h3 style="margin:0 0 15px; color:#d32f2f;">Danger Zone</h3>
             <p class="small">Deleting will remove all employees and logs. This cannot be undone.</p>
-            <form method="post" action="/owner/workplaces/<%= workplace.id %>/delete" 
-                  onsubmit="return confirm('Delete this workplace and ALL its data?');" style="margin-top:10px;">
-              <button type="submit" class="btn" style="background:#d32f2f; color:white;">Delete Workplace</button>
-            </form>
+            <button type="button" class="btn delete-workplace-btn" style="background:#d32f2f; color:white; margin-top:10px;" data-workplace-id="<%= workplace.id %>">Delete Workplace</button>
+
+            <!-- Delete Confirmation -->
+            <div id="deleteConfirm" style="display:none; margin-top:20px; padding-top:20px; border-top:1px solid #f0a0a0;">
+              <div class="card pad" style="background:#fff; margin-top:15px;">
+                <div class="topbar" style="margin-bottom:14px;">
+                  <div>
+                    <div class="h-eyebrow">
+                      <span class="chip" style="background:#fff3f3; color:#d32f2f;">Delete Workplace</span>
+                    </div>
+                    <h2 style="margin:10px 0 0;">Are you sure?</h2>
+                    <div class="small" style="margin-top:6px;">This will permanently delete all employees, attendance logs, and manager assignments.</div>
+                  </div>
+                </div>
+
+                <form method="post" action="/owner/workplaces/<%= workplace.id %>/delete" style="margin-top:1.5rem;">
+                  <button type="submit" class="btn full" style="background:#d32f2f; color:white;">Yes, Delete Workplace</button>
+                </form>
+
+                <div style="margin-top:1rem;">
+                  <button type="button" class="btn full cancel-delete-btn">Cancel</button>
+                </div>
+              </div>
+            </div>
           </div>
 
-          <!-- Mobile stacking -->
-          <style>
-            @media (max-width: 820px){
-              .card.pad[style*="grid-template-columns"] {
-                grid-template-columns: 1fr !important;
-              }
-            }
-          </style>
-        </form>
+          </div>
       <% } %>
 
     </div>
@@ -409,5 +461,6 @@
 }
 </style>
 
+<script src="/client/utils/workplace_location_edit.js" defer></script>
 <script src="/client/utils/smart_time_12h.js" defer></script>
 <script src="/client/utils/workplace_location.js" defer></script>

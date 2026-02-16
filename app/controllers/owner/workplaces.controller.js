@@ -270,7 +270,55 @@ exports.update = async (req, res) => {
     ]);
     if (!workplace) return res.status(404).send("Workplace not found.");
 
-    // Extract form data
+    const saveDetails = req.body.saveDetails;
+    const saveRadius = req.body.saveRadius;
+
+    if (saveDetails) {
+      // Save details section
+      const name = String(req.body.name || "").trim();
+      const address = String(req.body.address || "").trim();
+      const open_time = String(req.body.open_time || "").trim();
+      const close_time = String(req.body.close_time || "").trim();
+      const grace_enabled = req.body.grace_enabled ? 1 : 0;
+
+      let logo_path = workplace.logo_path;
+
+      if (req.file && req.file.filename) {
+        if (workplace.logo_path && workplace.logo_path.startsWith("/uploads/")) {
+          const oldAbs = path.join(process.cwd(), "public", workplace.logo_path);
+          try {
+            if (fs.existsSync(oldAbs)) fs.unlinkSync(oldAbs);
+          } catch (e) {
+            console.warn("Failed to delete old logo:", e.message);
+          }
+        }
+        logo_path = `/uploads/${req.file.filename}`;
+      }
+
+      await dbRun(
+        `UPDATE workplaces SET name = ?, address = ?, open_time = ?, close_time = ?, grace_enabled = ?, logo_path = ? WHERE id = ? AND user_id = ?`,
+        [name, address || null, open_time || null, close_time || null, grace_enabled, logo_path, workplaceId, userId]
+      );
+
+      return res.redirect(`/owner/workplaces/${workplaceId}?tab=settings&msg=` + encodeURIComponent("Details saved successfully."));
+    }
+
+    if (saveRadius) {
+      // Save radius section
+      const name = String(req.body.name || "").trim();
+      const lat = req.body.lat ? Number(req.body.lat) : null;
+      const lng = req.body.lng ? Number(req.body.lng) : null;
+      const radius_m = req.body.radius_m ? Number(req.body.radius_m) : 70;
+
+      await dbRun(
+        `UPDATE workplaces SET name = ?, lat = ?, lng = ?, radius_m = ? WHERE id = ? AND user_id = ?`,
+        [name, lat, lng, radius_m, workplaceId, userId]
+      );
+
+      return res.redirect(`/owner/workplaces/${workplaceId}?tab=settings&msg=` + encodeURIComponent("Radius saved successfully."));
+    }
+
+    // Original save (all fields)
     const name = String(req.body.name || "").trim();
     const address = String(req.body.address || "").trim();
     const open_time = String(req.body.open_time || "").trim();
@@ -305,7 +353,7 @@ exports.update = async (req, res) => {
        grace_enabled, lat, lng, radius_m, logo_path, workplaceId, userId]
     );
 
-    return res.redirect(`/owner/workplaces/${workplaceId}/edit?msg=` + encodeURIComponent("Workplace settings saved."));
+    return res.redirect(`/owner/workplaces/${workplaceId}?tab=settings&msg=` + encodeURIComponent("Workplace settings saved."));
   } catch (err) {
     console.error(err);
     return res.status(500).send("Server error");
