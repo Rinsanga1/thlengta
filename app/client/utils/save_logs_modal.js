@@ -1,33 +1,58 @@
-// Save Logs & Date Picker Modal Functions
+// Settings Modals Functions
 
-// Date Picker Modal Functions
-function openDatePickerModal() {
-  const modal = document.getElementById('datePickerModal');
-  if (modal) {
-    modal.style.display = 'flex';
-  }
+// Edit Details Modal
+function openEditDetailsModal() {
+  const modal = document.getElementById('editDetailsModal');
+  if (modal) modal.style.display = 'flex';
 }
 
-function closeDatePickerModal() {
-  const modal = document.getElementById('datePickerModal');
-  if (modal) {
-    modal.style.display = 'none';
-  }
+function closeEditDetailsModal() {
+  const modal = document.getElementById('editDetailsModal');
+  if (modal) modal.style.display = 'none';
 }
 
-// Save Logs Modal Functions
+// Edit Location Modal
+function openEditLocationModal() {
+  const modal = document.getElementById('editLocationModal');
+  if (modal) modal.style.display = 'flex';
+}
+
+function closeEditLocationModal() {
+  const modal = document.getElementById('editLocationModal');
+  if (modal) modal.style.display = 'none';
+}
+
+// Edit Radius Modal
+function openEditRadiusModal() {
+  const modal = document.getElementById('editRadiusModal');
+  if (modal) modal.style.display = 'flex';
+}
+
+function closeEditRadiusModal() {
+  const modal = document.getElementById('editRadiusModal');
+  if (modal) modal.style.display = 'none';
+}
+
+// Delete Workplace Modal
+function openDeleteWorkplaceModal() {
+  const modal = document.getElementById('deleteWorkplaceModal');
+  if (modal) modal.style.display = 'flex';
+}
+
+function closeDeleteWorkplaceModal() {
+  const modal = document.getElementById('deleteWorkplaceModal');
+  if (modal) modal.style.display = 'none';
+}
+
+// Save Logs Modal Functions (from previous)
 function openSaveLogsModal() {
   const modal = document.getElementById('saveLogsModal');
-  if (modal) {
-    modal.style.display = 'flex';
-  }
+  if (modal) modal.style.display = 'flex';
 }
 
 function closeSaveLogsModal() {
   const modal = document.getElementById('saveLogsModal');
-  if (modal) {
-    modal.style.display = 'none';
-  }
+  if (modal) modal.style.display = 'none';
 }
 
 function updateSaveDateInput() {
@@ -49,10 +74,7 @@ function downloadLogs() {
   if (!modal) return;
   
   const workplaceId = modal.dataset.workplaceId;
-  if (!workplaceId) {
-    console.error('Workplace ID not found');
-    return;
-  }
+  if (!workplaceId) return;
   
   const period = document.querySelector('input[name="savePeriod"]:checked');
   if (!period) return;
@@ -74,61 +96,104 @@ function downloadLogs() {
     url = `/owner/workplaces/${workplaceId}/logs_year.csv?year=${year}`;
   }
   
-  if (url) {
-    window.location.href = url;
-  }
+  if (url) window.location.href = url;
   closeSaveLogsModal();
 }
 
-// Initialize when DOM is ready
+// Initialize
 document.addEventListener('DOMContentLoaded', function() {
-  // Date Picker Modal Event Listeners
-  const datePickerModal = document.getElementById('datePickerModal');
-  if (datePickerModal) {
-    datePickerModal.addEventListener('click', function(e) {
-      if (e.target === this) {
-        closeDatePickerModal();
-      }
-    });
-  }
+  // Edit Details Modal
+  const editDetailsBtn = document.getElementById('editDetailsBtn');
+  if (editDetailsBtn) editDetailsBtn.addEventListener('click', openEditDetailsModal);
+  const cancelEditDetailsBtn = document.getElementById('cancelEditDetailsBtn');
+  if (cancelEditDetailsBtn) cancelEditDetailsBtn.addEventListener('click', closeEditDetailsModal);
   
-  const datePickerBtn = document.getElementById('datePickerBtn');
-  if (datePickerBtn) {
-    datePickerBtn.addEventListener('click', openDatePickerModal);
-  }
+  // Edit Location Modal
+  const editLocBtn = document.getElementById('editLocBtn');
+  if (editLocBtn) editLocBtn.addEventListener('click', openEditLocationModal);
+  const cancelEditLocBtn = document.getElementById('cancelEditLocBtn');
+  if (cancelEditLocBtn) cancelEditLocBtn.addEventListener('click', closeEditLocationModal);
   
-  const cancelDatePickerBtn = document.getElementById('cancelDatePickerBtn');
-  if (cancelDatePickerBtn) {
-    cancelDatePickerBtn.addEventListener('click', closeDatePickerModal);
-  }
+  // Edit Radius Modal
+  const editRadiusBtn = document.getElementById('editRadiusBtn');
+  if (editRadiusBtn) editRadiusBtn.addEventListener('click', openEditRadiusModal);
+  const cancelEditRadiusBtn = document.getElementById('cancelEditRadiusBtn');
+  if (cancelEditRadiusBtn) cancelEditRadiusBtn.addEventListener('click', closeEditRadiusModal);
   
-  // Save Logs Modal Event Listeners
-  const saveModal = document.getElementById('saveLogsModal');
-  if (saveModal) {
-    saveModal.addEventListener('click', function(e) {
-      if (e.target === this) {
-        closeSaveLogsModal();
-      }
-    });
-  }
+  // Delete Workplace Modal
+  const deleteWorkplaceBtn = document.getElementById('deleteWorkplaceBtn');
+  if (deleteWorkplaceBtn) deleteWorkplaceBtn.addEventListener('click', openDeleteWorkplaceModal);
+  const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+  if (cancelDeleteBtn) cancelDeleteBtn.addEventListener('click', closeDeleteWorkplaceModal);
   
+  // Close modals on backdrop click
+  const modals = ['editDetailsModal', 'editLocationModal', 'editRadiusModal', 'deleteWorkplaceModal', 'saveLogsModal', 'datePickerModal'];
+  modals.forEach(function(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+      modal.addEventListener('click', function(e) {
+        if (e.target === this) this.style.display = 'none';
+      });
+    }
+  });
+  
+  // Save Logs Modal
   const saveLogsBtn = document.getElementById('saveLogsBtn');
-  if (saveLogsBtn) {
-    saveLogsBtn.addEventListener('click', openSaveLogsModal);
-  }
-  
+  if (saveLogsBtn) saveLogsBtn.addEventListener('click', openSaveLogsModal);
   const cancelSaveBtn = document.getElementById('cancelSaveLogsBtn');
-  if (cancelSaveBtn) {
-    cancelSaveBtn.addEventListener('click', closeSaveLogsModal);
-  }
-  
+  if (cancelSaveBtn) cancelSaveBtn.addEventListener('click', closeSaveLogsModal);
   const downloadBtn = document.getElementById('downloadLogsBtn');
-  if (downloadBtn) {
-    downloadBtn.addEventListener('click', downloadLogs);
-  }
+  if (downloadBtn) downloadBtn.addEventListener('click', downloadLogs);
   
   const saveRadioButtons = document.querySelectorAll('input[name="savePeriod"]');
   saveRadioButtons.forEach(function(radio) {
     radio.addEventListener('change', updateSaveDateInput);
   });
+  
+  // Date Picker Modal
+  const datePickerBtn = document.getElementById('datePickerBtn');
+  if (datePickerBtn) datePickerBtn.addEventListener('click', function() {
+    const modal = document.getElementById('datePickerModal');
+    if (modal) modal.style.display = 'flex';
+  });
+  
+  const cancelDatePickerBtn = document.getElementById('cancelDatePickerBtn');
+  if (cancelDatePickerBtn) cancelDatePickerBtn.addEventListener('click', function() {
+    const modal = document.getElementById('datePickerModal');
+    if (modal) modal.style.display = 'none';
+  });
+  
+  // Modal button functionality for location modal
+  const modalBtnUseLoc = document.getElementById('modalBtnUseLoc');
+  if (modalBtnUseLoc) {
+    modalBtnUseLoc.addEventListener('click', function() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+          const modalLat = document.getElementById('modalLat');
+          const modalLng = document.getElementById('modalLng');
+          const modalMapFrame = document.getElementById('modalMapFrame');
+          const modalLocStatus = document.getElementById('modalLocStatus');
+          
+          if (modalLat) modalLat.value = position.coords.latitude.toFixed(6);
+          if (modalLng) modalLng.value = position.coords.longitude.toFixed(6);
+          if (modalMapFrame) {
+            modalMapFrame.src = `https://www.google.com/maps?q=${position.coords.latitude.toFixed(6)},${position.coords.longitude.toFixed(6)}&z=16&output=embed`;
+          }
+          if (modalLocStatus) {
+            modalLocStatus.innerHTML = '<span style="color:green;">Location updated!</span>';
+          }
+        }, function() {
+          const modalLocStatus = document.getElementById('modalLocStatus');
+          if (modalLocStatus) {
+            modalLocStatus.innerHTML = '<span style="color:red;">Unable to get location. Please enable GPS.</span>';
+          }
+        });
+      } else {
+        const modalLocStatus = document.getElementById('modalLocStatus');
+        if (modalLocStatus) {
+          modalLocStatus.innerHTML = '<span style="color:red;">Geolocation not supported.</span>';
+        }
+      }
+    });
+  }
 });
