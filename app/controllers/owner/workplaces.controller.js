@@ -67,7 +67,7 @@ exports.dashboard = async (req, res) => {
 
     employees = await dbAll(
       `SELECT e.*, 
-        CASE WHEN EXISTS (SELECT 1 FROM employee_devices d WHERE d.employee_id = e.id) THEN 1 ELSE 0 END as has_device
+        CASE WHEN EXISTS (SELECT 1 FROM employee_device_fps f WHERE f.employee_id = e.id) THEN 1 ELSE 0 END as has_device
        FROM employees e WHERE e.workplace_id = ? ORDER BY e.id DESC LIMIT ? OFFSET ?`,
       [workplaceId, ITEMS_PER_PAGE, offset]
     );

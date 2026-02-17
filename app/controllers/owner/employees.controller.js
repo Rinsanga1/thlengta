@@ -21,7 +21,7 @@ exports.index = async (req, res) => {
       e.is_active,
       e.created_at,
       CASE
-        WHEN EXISTS (SELECT 1 FROM employee_devices d WHERE d.employee_id = e.id)
+        WHEN EXISTS (SELECT 1 FROM employee_device_fps f WHERE f.employee_id = e.id)
         THEN 1 ELSE 0
       END AS device_registered
     FROM employees e
@@ -162,10 +162,11 @@ exports.resetDevice = async (req, res) => {
   if (!emp) return res.status(404).send("Employee not found.");
 
   await dbRun("DELETE FROM employee_devices WHERE employee_id = ?", [employeeId]);
+  await dbRun("DELETE FROM employee_device_fps WHERE employee_id = ?", [employeeId]);
 
   return res.redirect(
     `/owner/workplaces/${workplaceId}/employees?msg=` +
-      encodeURIComponent("Device reset. Employee can login again with email + PIN.")
+      encodeURIComponent("Device reset. Employee can check in with a new device.")
   );
 };
 

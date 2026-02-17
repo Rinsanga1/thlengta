@@ -1,6 +1,6 @@
 const { dbGet, dbRun, dbAll } = require("../../db/helpers");
 const { isInsideGeofence } = require("../utils/geo");
-const { ensureFpTable, fpHashFromBody, upsertFpHash } = require("../utils/fingerprint.utils");
+const { ensureFpTable, fpHashFromBody, getStoredFpHash, upsertFpHash } = require("../utils/fingerprint.utils");
 const { hashToken, newDeviceToken, setDeviceCookie } = require("../utils/device.utils");
 const { decideNextStepForToday, isTooSoon, computeCheckinTimeStatus } = require("../utils/attendance.utils");
 
@@ -148,12 +148,6 @@ exports.create = async (req, res) => {
       return res.status(403).json({ ok: false, error: "You are not an employee at this workplace" });
     }
 
-    await ensureFpTable();
-    const incomingFpHash = fpHashFromBody(req.body);
-    if (incomingFpHash) {
-      await upsertFpHash(employee.id, incomingFpHash);
-    }
-
     const gf = isInsideGeofence(workplace.lat, workplace.lng, workplace.radius_m, lat, lng);
     if (!gf.ok) {
       await dbRun(`
@@ -167,6 +161,31 @@ exports.create = async (req, res) => {
         ok: false, 
         error: `You are not at the workplace location. Distance ${gf.distance_m}m (allowed ${workplace.radius_m}m).` 
       });
+    }
+
+    await ensureFpTable();
+    const incomingFpHash = fpHashFromBody(req.body);
+    
+    if (incomingFpHash) {
+      const storedFpHash = await getStoredFpHash(employee.id);
+      
+      if (storedFpHash && storedFpHash !== incomingFpHash) {
+        await dbRun(`
+          INSERT INTO attendance_logs
+            (workplace_id, employee_id, event_type, device_verified, location_verified, lat, lng, user_agent, ip)
+          VALUES
+            (?, ?, 'denied_device', 0, 1, ?, ?, ?, ?)
+        `, [workplace.id, employee.id, lat, lng, req.get("user-agent") || "", req.ip]);
+
+        return res.json({ 
+          ok: false, 
+          error: "This device is not registered. Contact your manager to reset your device." 
+        });
+      }
+
+      if (!storedFpHash) {
+        await upsertFpHash(employee.id, incomingFpHash);
+      }
     }
 
     const decision = await decideNextStepForToday(workplace.id, employee.id);
