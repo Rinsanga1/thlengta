@@ -1,50 +1,17 @@
-// Save Logs & Filter Logs Modal Functions
+// Save Logs & Date Picker Modal Functions
 
-// Filter Modal Functions
-function openFilterLogsModal() {
-  const modal = document.getElementById('filterLogsModal');
+// Date Picker Modal Functions
+function openDatePickerModal() {
+  const modal = document.getElementById('datePickerModal');
   if (modal) {
     modal.style.display = 'flex';
   }
 }
 
-function closeFilterLogsModal() {
-  const modal = document.getElementById('filterLogsModal');
+function closeDatePickerModal() {
+  const modal = document.getElementById('datePickerModal');
   if (modal) {
     modal.style.display = 'none';
-  }
-}
-
-function updateFilterDateInput() {
-  const period = document.querySelector('input[name="filterPeriod"]:checked');
-  if (!period) return;
-  
-  const periodValue = period.value;
-  const dayInput = document.getElementById('filterDayInput');
-  const monthInput = document.getElementById('filterMonthInput');
-  const yearInput = document.getElementById('filterYearInput');
-  
-  if (dayInput) dayInput.style.display = periodValue === 'day' ? 'block' : 'none';
-  if (monthInput) monthInput.style.display = periodValue === 'month' ? 'block' : 'none';
-  if (yearInput) yearInput.style.display = periodValue === 'year' ? 'block' : 'none';
-  
-  // Update hidden date input value based on selected period
-  const dateInput = document.getElementById('filterDateInput');
-  const monthValueInput = document.getElementById('filterMonthValue');
-  const yearValueInput = document.getElementById('filterYearValue');
-  
-  if (periodValue === 'day' && dateInput) {
-    dateInput.name = 'date';
-    if (monthValueInput) monthValueInput.name = 'month_disabled';
-    if (yearValueInput) yearValueInput.name = 'year_disabled';
-  } else if (periodValue === 'month' && monthValueInput) {
-    monthValueInput.name = 'date';
-    if (dateInput) dateInput.name = 'date_disabled';
-    if (yearValueInput) yearValueInput.name = 'year_disabled';
-  } else if (periodValue === 'year' && yearValueInput) {
-    yearValueInput.name = 'date';
-    if (dateInput) dateInput.name = 'date_disabled';
-    if (monthValueInput) monthValueInput.name = 'month_disabled';
   }
 }
 
@@ -115,30 +82,25 @@ function downloadLogs() {
 
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', function() {
-  // Filter Modal Event Listeners
-  const filterModal = document.getElementById('filterLogsModal');
-  if (filterModal) {
-    filterModal.addEventListener('click', function(e) {
+  // Date Picker Modal Event Listeners
+  const datePickerModal = document.getElementById('datePickerModal');
+  if (datePickerModal) {
+    datePickerModal.addEventListener('click', function(e) {
       if (e.target === this) {
-        closeFilterLogsModal();
+        closeDatePickerModal();
       }
     });
   }
   
-  const filterLogsBtn = document.getElementById('filterLogsBtn');
-  if (filterLogsBtn) {
-    filterLogsBtn.addEventListener('click', openFilterLogsModal);
+  const datePickerBtn = document.getElementById('datePickerBtn');
+  if (datePickerBtn) {
+    datePickerBtn.addEventListener('click', openDatePickerModal);
   }
   
-  const cancelFilterBtn = document.getElementById('cancelFilterLogsBtn');
-  if (cancelFilterBtn) {
-    cancelFilterBtn.addEventListener('click', closeFilterLogsModal);
+  const cancelDatePickerBtn = document.getElementById('cancelDatePickerBtn');
+  if (cancelDatePickerBtn) {
+    cancelDatePickerBtn.addEventListener('click', closeDatePickerModal);
   }
-  
-  const filterRadioButtons = document.querySelectorAll('input[name="filterPeriod"]');
-  filterRadioButtons.forEach(function(radio) {
-    radio.addEventListener('change', updateFilterDateInput);
-  });
   
   // Save Logs Modal Event Listeners
   const saveModal = document.getElementById('saveLogsModal');

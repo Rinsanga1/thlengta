@@ -81,35 +81,61 @@ exports.dashboard = async (req, res) => {
     );
   }
 
+  // Track if a filter is applied for logs tab
+  let isFilterApplied = false;
+  let logPage = 1;
+  let hasPrevLogPage = false;
+  let hasNextLogPage = false;
+  
   if (activeTab === "logs") {
-    // Check for date, month, or year filter
-    const dateFilter = req.query.date;
-    const monthFilter = req.query.month;
-    const yearFilter = req.query.year;
+    // Check if date parameter is provided from date picker
+    const dateParam = req.query.date;
     
-    let whereClause = "WHERE a.workplace_id = ?";
-    let params = [workplaceId];
-    
-    if (dateFilter && /^\d{4}-\d{2}-\d{2}$/.test(dateFilter)) {
-      // Filter by specific day
-      selectedDate = dateFilter;
-      whereClause += " AND date(datetime(a.created_at, '+5 hours', '+30 minutes')) = ?";
-      params.push(dateFilter);
-    } else if (monthFilter && /^\d{4}-\d{2}$/.test(monthFilter)) {
-      // Filter by month
-      selectedDate = monthFilter + "-01"; // For display purposes
-      whereClause += " AND strftime('%Y-%m', datetime(a.created_at, '+5 hours', '+30 minutes')) = ?";
-      params.push(monthFilter);
-    } else if (yearFilter && /^\d{4}$/.test(yearFilter)) {
-      // Filter by year
-      selectedDate = yearFilter + "-01-01"; // For display purposes
-      whereClause += " AND strftime('%Y', datetime(a.created_at, '+5 hours', '+30 minutes')) = ?";
-      params.push(yearFilter);
+    let targetDate;
+    if (dateParam && /^\d{4}-\d{2}-\d{2}$/.test(dateParam)) {
+      // User selected a specific date from date picker
+      selectedDate = dateParam;
+      targetDate = new Date(selectedDate);
+      
+      // Calculate how many days ago this date is from today
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const pickedDate = new Date(selectedDate);
+      pickedDate.setHours(0, 0, 0, 0);
+      
+      const diffTime = today - pickedDate;
+      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+      logPage = diffDays + 1; // page 1 = today, page 2 = yesterday, etc.
     } else {
-      // Default to today
-      whereClause += " AND date(datetime(a.created_at, '+5 hours', '+30 minutes')) = ?";
-      params.push(selectedDate);
+      // Get page number (1 = today, 2 = yesterday, etc.)
+      logPage = Math.max(1, parseInt(req.query.logPage) || 1);
+      
+      // Calculate the date based on page (page 1 = today, page 2 = yesterday, etc.)
+      targetDate = new Date();
+      targetDate.setDate(targetDate.getDate() - (logPage - 1));
+      selectedDate = targetDate.toISOString().split('T')[0];
+      targetDate = new Date(selectedDate);
     }
+    
+    // Check if there's a previous page (more recent date)
+    hasPrevLogPage = logPage > 1;
+    
+    // Check if there's a next page (older date with logs)
+    const nextDate = new Date(targetDate);
+    nextDate.setDate(nextDate.getDate() - 1);
+    const nextDateStr = nextDate.toISOString().split('T')[0];
+    
+    const nextPageCheck = await dbGet(
+      `SELECT COUNT(*) as count FROM attendance_logs 
+       WHERE workplace_id = ? 
+       AND date(datetime(created_at, '+5 hours', '+30 minutes')) = ?`,
+      [workplaceId, nextDateStr]
+    );
+    hasNextLogPage = nextPageCheck.count > 0;
+    
+    // Check if current date is not today (for showing "Back to Present" button)
+    const today = new Date().toISOString().split('T')[0];
+    isFilterApplied = selectedDate !== today;
     
     todayLogs = await dbAll(
       `SELECT a.*, 
@@ -119,9 +145,10 @@ exports.dashboard = async (req, res) => {
               datetime(a.created_at, '+5 hours', '+30 minutes') as created_at_ist
        FROM attendance_logs a 
        LEFT JOIN employees e ON e.id = a.employee_id 
-       ${whereClause}
+       WHERE a.workplace_id = ? 
+         AND date(datetime(a.created_at, '+5 hours', '+30 minutes')) = ?
        ORDER BY a.id DESC LIMIT 100`,
-      params
+      [workplaceId, selectedDate]
     );
   }
 
@@ -139,7 +166,11 @@ exports.dashboard = async (req, res) => {
     employeePage,
     employeeTotalPages,
     employeeTotalItems,
-    selectedDate
+    selectedDate,
+    isFilterApplied,
+    logPage,
+    hasPrevLogPage,
+    hasNextLogPage
   });
 };
 

@@ -130,70 +130,51 @@
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; flex-wrap:wrap; gap:10px;">
           <h3 style="margin:0;">Recent Logs</h3>
           <div style="display:flex; gap:8px;">
-            <button class="btn" id="filterLogsBtn">Filter</button>
+            <% if (isFilterApplied) { %>
+            <a class="btn" href="/owner/workplaces/<%= workplace.id %>?tab=logs">Back to Present</a>
+            <% } %>
             <button class="btn" id="saveLogsBtn">Save Logs</button>
           </div>
         </div>
 
-        <!-- Filter Logs Modal -->
-        <div id="filterLogsModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center;">
+        <!-- Date Picker Modal -->
+        <div id="datePickerModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center;">
           <div class="card pad" style="background:#fff; max-width:400px; width:90%; margin:20px;">
-            <h3 style="margin:0 0 20px;">Filter Logs</h3>
+            <h3 style="margin:0 0 20px;">Select Date</h3>
             
             <form method="get" action="/owner/workplaces/<%= workplace.id %>">
               <input type="hidden" name="tab" value="logs" />
               
               <div style="margin-bottom:20px;">
-                <label style="display:block; margin-bottom:10px; font-weight:500;">Select Period:</label>
-                
-                <div style="display:flex; flex-direction:column; gap:10px;">
-                  <label class="period-card" data-period="day">
-                    <input type="radio" name="filterPeriod" value="day" checked>
-                    <div class="period-card-content">
-                      <div class="period-title">Specific Day</div>
-                      <div class="period-desc">View logs from a single day</div>
-                    </div>
-                  </label>
-                  
-                  <label class="period-card" data-period="month">
-                    <input type="radio" name="filterPeriod" value="month">
-                    <div class="period-card-content">
-                      <div class="period-title">Full Month</div>
-                      <div class="period-desc">View logs from an entire month</div>
-                    </div>
-                  </label>
-                  
-                  <label class="period-card" data-period="year">
-                    <input type="radio" name="filterPeriod" value="year">
-                    <div class="period-card-content">
-                      <div class="period-title">Full Year</div>
-                      <div class="period-desc">View logs from an entire year</div>
-                    </div>
-                  </label>
-                </div>
-              </div>
-              
-              <div id="filterDayInput" style="margin-bottom:20px;">
-                <label style="display:block; margin-bottom:5px; font-weight:500;">Date</label>
-                <input type="date" name="date" id="filterDateInput" value="<%= selectedDate %>" style="width:100%; padding:10px; border:1px solid var(--border); border-radius:8px;" />
-              </div>
-              
-              <div id="filterMonthInput" style="margin-bottom:20px; display:none;">
-                <label style="display:block; margin-bottom:5px; font-weight:500;">Month</label>
-                <input type="month" name="month" id="filterMonthValue" value="<%= selectedDate.slice(0,7) %>" style="width:100%; padding:10px; border:1px solid var(--border); border-radius:8px;" />
-              </div>
-              
-              <div id="filterYearInput" style="margin-bottom:20px; display:none;">
-                <label style="display:block; margin-bottom:5px; font-weight:500;">Year</label>
-                <input type="number" name="year" id="filterYearValue" value="<%= selectedDate.slice(0,4) %>" min="2020" max="2030" style="width:100%; padding:10px; border:1px solid var(--border); border-radius:8px;" />
+                <label style="display:block; margin-bottom:10px; font-weight:500;">Choose a date:</label>
+                <input type="date" name="date" id="pickerDateInput" value="<%= selectedDate %>" style="width:100%; padding:10px; border:1px solid var(--border); border-radius:8px; font-size:16px;" />
               </div>
               
               <div style="display:flex; gap:10px; justify-content:flex-end;">
-                <button type="button" class="btn" id="cancelFilterLogsBtn">Cancel</button>
-                <button type="submit" class="btn primary">Apply Filter</button>
+                <button type="button" class="btn" id="cancelDatePickerBtn">Cancel</button>
+                <button type="submit" class="btn primary">Select Date</button>
               </div>
             </form>
           </div>
+        </div>
+
+        <!-- Date Navigation -->
+        <div style="display:flex; justify-content:center; align-items:center; gap:10px; margin-bottom:15px;">
+          <% if (hasPrevLogPage) { %>
+            <a class="btn" href="/owner/workplaces/<%= workplace.id %>?tab=logs&logPage=<%= logPage - 1 %>">← Newer</a>
+          <% } else { %>
+            <button class="btn" disabled style="opacity:0.5; cursor:not-allowed;">← Newer</button>
+          <% } %>
+          
+          <button class="btn" id="datePickerBtn" style="font-weight:600; min-width:140px; text-align:center; background:#f8f9fa;">
+            <%= logPage === 1 ? 'Today' : logPage === 2 ? 'Yesterday' : new Date(selectedDate).toLocaleDateString('en-GB', { weekday: 'short', day: '2-digit', month: 'short' }) %>
+          </button>
+          
+          <% if (hasNextLogPage) { %>
+            <a class="btn" href="/owner/workplaces/<%= workplace.id %>?tab=logs&logPage=<%= logPage + 1 %>">Older →</a>
+          <% } else { %>
+            <button class="btn" disabled style="opacity:0.5; cursor:not-allowed;">Older →</button>
+          <% } %>
         </div>
 
         <!-- Save Logs Modal -->
@@ -333,6 +314,25 @@
                 </div>
               </div>
             <% }) %>
+          </div>
+          
+          <!-- Bottom Date Navigation -->
+          <div style="display:flex; justify-content:center; align-items:center; gap:10px; margin-top:20px; padding-top:20px; border-top:1px solid var(--border);">
+            <% if (hasPrevLogPage) { %>
+              <a class="btn" href="/owner/workplaces/<%= workplace.id %>?tab=logs&logPage=<%= logPage - 1 %>">← Newer</a>
+            <% } else { %>
+              <button class="btn" disabled style="opacity:0.5; cursor:not-allowed;">← Newer</button>
+            <% } %>
+            
+            <span class="small" style="font-weight:600; min-width:120px; text-align:center;">
+              <%= logPage === 1 ? 'Today' : logPage === 2 ? 'Yesterday' : new Date(selectedDate).toLocaleDateString('en-GB', { weekday: 'short', day: '2-digit', month: 'short' }) %>
+            </span>
+            
+            <% if (hasNextLogPage) { %>
+              <a class="btn" href="/owner/workplaces/<%= workplace.id %>?tab=logs&logPage=<%= logPage + 1 %>">Older →</a>
+            <% } else { %>
+              <button class="btn" disabled style="opacity:0.5; cursor:not-allowed;">Older →</button>
+            <% } %>
           </div>
         <% } %>
       <% } %>
@@ -617,6 +617,12 @@
   color:var(--primary);
   border-left-color:var(--primary);
   background:#fff;
+}
+
+/* Remove underline from buttons */
+.btn:hover,
+button:hover {
+  text-decoration: none;
 }
 
 /* Period Card Styling */
