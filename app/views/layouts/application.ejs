@@ -34,7 +34,19 @@
       <a data-nav href="/#pricing">Pricing</a>
       <a data-nav href="/#contact">Contact</a>
       <% if (isLoggedIn) { %>
-        <a data-nav href="/owner/dashboard">Workplaces</a>
+        <div class="nav-dropdown">
+          <a class="nav-dropdown-toggle" href="/checkin">
+            Check In <span style="font-size:10px;">▼</span>
+          </a>
+          <div class="nav-dropdown-menu">
+            <a data-nav href="/checkin">
+              <span style="margin-right:8px;">🏪</span> My Stores
+            </a>
+            <a data-nav href="/owner/dashboard">
+              <span style="margin-right:8px;">⚙️</span> Manage Workplaces
+            </a>
+          </div>
+        </div>
         <a class="btn" href="/users/signout">Sign Out</a>
       <% } else { %>
         <a class="btn" href="/register">Sign Up</a>

@@ -29,6 +29,7 @@ const superadminUpgradeRequests = require("../app/controllers/superadmin/upgrade
 const upload = require("../app/middleware/upload"); // Import upload middleware
 const home = require("../app/controllers/home.controller");
 const contact = require("../app/controllers/contact.controller");
+const checkin = require("../app/controllers/checkin.controller"); // Import checkin
 
 const router = express.Router();
 
@@ -115,6 +116,10 @@ router.post("/owner/upgrade", requireOwner, ownerUpgrades.create);
 
 // Employee Scans
 router.get("/e/scan/:workplacePublicId", employeeScans.index);
+
+// Check-in routes for logged-in users
+router.get("/checkin", checkin.requireCheckinUser, checkin.index);
+router.post("/checkin", checkin.requireCheckinUser, checkin.create);
 
 // Employee Device Approvals
 router.post("/e/scan/:workplacePublicId/device/approve", employeeDeviceApprovals.create);

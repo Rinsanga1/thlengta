@@ -1,0 +1,97 @@
+<div class="container" style="max-width:600px; margin:0 auto; padding:24px 16px;">
+  <div class="card">
+    <div style="text-align:center; margin-bottom:24px;">
+      <h1 style="margin:0;">Check In</h1>
+      <p class="small" style="margin-top:8px; color:#666;">Select a store to check in</p>
+    </div>
+
+    <% if (workplaces.length === 0) { %>
+      <div class="notice" style="background:#f8faf9; padding:16px; border-radius:8px; text-align:center;">
+        <p style="margin:0; color:#666;">
+          You're not employed at any store yet.
+        </p>
+        <p class="small" style="margin:8px 0 0; color:#999;">
+          Ask a store owner to add you as an employee.
+        </p>
+      </div>
+    <% } else { %>
+      <div id="workplaces-list" style="display:flex; flex-direction:column; gap:12px;">
+        <% workplaces.forEach(function(wp) { %>
+          <div class="card" style="padding:16px;">
+            <div style="display:flex; align-items:center; justify-content:space-between;">
+              <div>
+                <div style="font-weight:600; font-size:16px;"><%= wp.name %></div>
+                <% if (wp.owner_name) { %>
+                  <div class="small" style="color:#666;">Owner: <%= wp.owner_name %></div>
+                <% } %>
+                <% if (wp.address) { %>
+                  <div class="small" style="color:#666;"><%= wp.address %></div>
+                <% } %>
+                <% if (wp.radius_m) { %>
+                  <div class="small" style="color:#999;">Radius: <%= wp.radius_m %>m</div>
+                <% } %>
+              </div>
+              <button 
+                class="btn primary checkin-btn" 
+                data-workplace-id="<%= wp.public_id %>"
+                data-workplace-name="<%= wp.name %>"
+                style="padding:10px 20px;"
+              >
+                Check In
+              </button>
+            </div>
+          </div>
+        <%}); %>
+      </div>
+
+      <div id="checkin-status" class="notice" style="display:none; margin-top:16px;"></div>
+      <div id="checkin-error" class="error" style="display:none; margin-top:16px;"></div>
+    <% } %>
+
+    <div class="notice" style="margin-top:24px; background:#f0f7ff; border:1px solid #d0e0f0;">
+      <div style="font-weight:600;">How it works</div>
+      <ul style="margin:8px 0 0; padding-left:20px; font-size:14px; color:#555;">
+        <li>Click "Check In" on a store</li>
+        <li>Allow location access when prompted</li>
+        <li>Confirm your check-in</li>
+        <li>We'll verify you're at the store and record your attendance</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div id="checkin-modal" class="modal" style="display:none;">
+  <div class="modal-content" style="background:var(--card); padding:24px; border-radius:12px; max-width:400px; width:90%; text-align:center;">
+    <h2 id="modal-title" style="margin:0 0 12px;"></h2>
+    <p id="modal-message" style="color:#666; margin:0 0 20px;"></p>
+    
+    <div id="modal-loading" style="display:none;">
+      <div style="font-size:32px; margin-bottom:12px;">📍</div>
+    </div>
+    
+    <div id="modal-confirm" style="display:none; display:flex; gap:12px; justify-content:center;">
+      <button id="cancel-modal-btn" class="btn" style="flex:1;">Cancel</button>
+      <button id="confirm-checkin-btn" class="btn primary" style="flex:1;">Confirm</button>
+    </div>
+    
+    <div id="modal-result" style="display:none;">
+      <div id="result-icon" style="font-size:48px; margin-bottom:12px;"></div>
+      <div id="result-message" style="font-weight:600;"></div>
+      <button id="close-modal-btn" class="btn primary" style="margin-top:16px;">Done</button>
+    </div>
+  </div>
+</div>
+
+<form id="checkinForm" method="post" action="/checkin" style="display:none;">
+  <input type="hidden" name="workplacePublicId" id="workplacePublicId" value="">
+  <input type="hidden" name="lat" id="lat" value="">
+  <input type="hidden" name="lng" id="lng" value="">
+  <input type="hidden" name="fp_tz" id="fp_tz" value="">
+  <input type="hidden" name="fp_sw" id="fp_sw" value="">
+  <input type="hidden" name="fp_sh" id="fp_sh" value="">
+  <input type="hidden" name="fp_dpr" id="fp_dpr" value="">
+  <input type="hidden" name="fp_lang" id="fp_lang" value="">
+  <input type="hidden" name="fp_platform" id="fp_platform" value="">
+</form>
+
+<script src="/client/utils/checkin.js" defer></script>
