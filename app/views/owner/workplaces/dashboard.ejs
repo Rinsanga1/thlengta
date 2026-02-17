@@ -25,6 +25,8 @@
     <div class="dashboard-layout" style="display:flex; min-height:500px;">
       <!-- Left Sidebar Tabs -->
       <div class="tab-sidebar" style="width:180px; border-right:1px solid var(--border); background:#fafafa; flex-shrink:0;">
+        <a href="/owner/workplaces/<%= workplace.id %>?tab=checkin" 
+           class="tab<%= activeTab === 'checkin' ? ' active' : '' %>">Check-In</a>
         <a href="/owner/workplaces/<%= workplace.id %>?tab=logs" 
            class="tab<%= activeTab === 'logs' ? ' active' : '' %>">Logs</a>
         <a href="/owner/workplaces/<%= workplace.id %>?tab=employees" 
@@ -44,6 +46,57 @@
       
       <% if (msg) { %>
         <div class="notice" style="background:#eaf6f0; margin-bottom:15px;"><%= msg %></div>
+      <% } %>
+
+      <!-- CHECK-IN TAB -->
+      <% if (activeTab === 'checkin') { %>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; flex-wrap:wrap; gap:10px;">
+          <h3 style="margin:0;">Today's Check-In</h3>
+          <span class="small muted"><%= new Date().toLocaleDateString('en-GB', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' }) %></span>
+        </div>
+
+        <% if (!checkinData.length) { %>
+          <div class="muted">No active employees yet.</div>
+        <% } else { %>
+          <div style="overflow-x:auto;">
+            <table style="width:100%; border-collapse:collapse;">
+              <thead>
+                <tr style="border-bottom:2px solid var(--border);">
+                  <th style="text-align:left; padding:10px;">Employee</th>
+                  <th style="text-align:left; padding:10px;">Status</th>
+                  <th style="text-align:left; padding:10px;">Time</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% checkinData.forEach(emp => { 
+                  // Format time to 12-hour
+                  let time12 = '-';
+                  if (emp.checkin_time) {
+                    const timePart = emp.checkin_time.split(' ')[1];
+                    if (timePart) {
+                      const [hours, minutes] = timePart.split(':').map(Number);
+                      const period = hours >= 12 ? 'pm' : 'am';
+                      const hours12 = hours % 12 || 12;
+                      time12 = hours12 + ':' + String(minutes).padStart(2, '0') + ' ' + period;
+                    }
+                  }
+                %>
+                <tr style="border-bottom:1px solid var(--border);">
+                  <td style="padding:10px;"><%= emp.email %></td>
+                  <td style="padding:10px;">
+                    <% if (emp.has_checked_in) { %>
+                      <span class="chip" style="background:#e8f5e9;">Checked In</span>
+                    <% } else { %>
+                      <span class="chip" style="background:#fff3e0;">Not Checked In</span>
+                    <% } %>
+                  </td>
+                  <td style="padding:10px;"><%= time12 %></td>
+                </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        <% } %>
       <% } %>
 
       <!-- QR TAB -->

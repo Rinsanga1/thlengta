@@ -30,7 +30,7 @@ exports.editRedirect = (req, res) => {
 exports.dashboard = async (req, res) => {
   const userId = getOwnerId(req);
   const workplaceId = Number(req.params.workplaceId);
-  const activeTab = req.query.tab || "logs";
+  const activeTab = req.query.tab || "checkin";
 
   const workplace = await dbGet(
     "SELECT * FROM workplaces WHERE id = ? AND user_id = ?",
@@ -47,6 +47,7 @@ exports.dashboard = async (req, res) => {
   let employees = [];
   let managers = [];
   let todayLogs = [];
+  let checkinData = [];
   let msg = req.query.msg || null;
   let employeePage = 1;
   let employeeTotalPages = 1;
@@ -69,6 +70,39 @@ exports.dashboard = async (req, res) => {
         CASE WHEN EXISTS (SELECT 1 FROM employee_devices d WHERE d.employee_id = e.id) THEN 1 ELSE 0 END as has_device
        FROM employees e WHERE e.workplace_id = ? ORDER BY e.id DESC LIMIT ? OFFSET ?`,
       [workplaceId, ITEMS_PER_PAGE, offset]
+    );
+  }
+
+  // CHECK-IN TAB: Get all active employees with their check-in status for today
+  if (activeTab === "checkin") {
+    const today = new Date().toISOString().split('T')[0];
+    
+    checkinData = await dbAll(
+      `SELECT 
+        e.id,
+        e.email,
+        e.is_active,
+        CASE WHEN EXISTS (
+          SELECT 1 FROM attendance_logs a 
+          WHERE a.employee_id = e.id 
+            AND a.workplace_id = ? 
+            AND a.event_type = 'checkin'
+            AND date(datetime(a.created_at, '+5 hours', '+30 minutes')) = ?
+        ) THEN 1 ELSE 0 END as has_checked_in,
+        (
+          SELECT datetime(a.created_at, '+5 hours', '+30 minutes')
+          FROM attendance_logs a
+          WHERE a.employee_id = e.id
+            AND a.workplace_id = ?
+            AND a.event_type = 'checkin'
+            AND date(datetime(a.created_at, '+5 hours', '+30 minutes')) = ?
+          ORDER BY a.id ASC
+          LIMIT 1
+        ) as checkin_time
+       FROM employees e 
+       WHERE e.workplace_id = ? AND e.is_active = 1
+       ORDER BY has_checked_in DESC, e.email ASC`,
+      [workplaceId, today, workplaceId, today, workplaceId]
     );
   }
 
@@ -161,6 +195,7 @@ exports.dashboard = async (req, res) => {
     employees,
     managers,
     logs: todayLogs,
+    checkinData,
     msg,
     isEnterprise: plan === "enterprise",
     employeePage,
