@@ -41,6 +41,70 @@ exports.index = async (req, res) => {
   });
 };
 
+exports.validate = async (req, res) => {
+  try {
+    const userId = req.session.userId;
+    if (!userId) {
+      return res.status(401).json({ ok: false, error: "Not logged in" });
+    }
+
+    const workplacePublicId = String(req.body.workplacePublicId);
+    const lat = Number(req.body.lat);
+    const lng = Number(req.body.lng);
+
+    if (!workplacePublicId) {
+      return res.status(400).json({ ok: false, error: "Workplace ID required" });
+    }
+
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+      return res.status(400).json({ ok: false, error: "GPS location required" });
+    }
+
+    const workplace = dbGet(`
+      SELECT id, user_id, name, public_id, lat, lng, radius_m, open_time, grace_enabled, grace_minutes 
+      FROM workplaces WHERE public_id = ?
+    `, [workplacePublicId]);
+
+    if (!workplace) {
+      return res.status(404).json({ ok: false, error: "Workplace not found" });
+    }
+
+    const user = dbGet("SELECT email FROM users WHERE id = ?", [userId]);
+    if (!user) {
+      return res.status(401).json({ ok: false, error: "User not found" });
+    }
+
+    const employee = dbGet(`
+      SELECT id, workplace_id, pin_hash, email, name
+      FROM employees 
+      WHERE workplace_id = ? AND LOWER(email) = LOWER(?) AND is_active = 1
+    `, [workplace.id, user.email]);
+
+    if (!employee) {
+      return res.status(403).json({ ok: false, error: "You are not an employee at this workplace" });
+    }
+
+    const gf = isInsideGeofence(workplace.lat, workplace.lng, workplace.radius_m, lat, lng);
+    if (!gf.ok) {
+      return res.json({ 
+        ok: true,
+        withinGeofence: false,
+        error: `You are not at ${workplace.name}. Distance: ${gf.distance_m}m (allowed: ${workplace.radius_m}m).` 
+      });
+    }
+
+    return res.json({ 
+      ok: true,
+      withinGeofence: true,
+      workplaceName: workplace.name
+    });
+
+  } catch (err) {
+    console.error("Validate error:", err);
+    return res.status(500).json({ ok: false, error: "Server error" });
+  }
+};
+
 exports.create = async (req, res) => {
   try {
     const userId = req.session.userId;

@@ -6,21 +6,21 @@ const {
   getNowMinutesKolkata,
 } = require("./time.utils"); // Import from our time utils
 
-async function decideNextStepForToday(storeId, employeeId) {
+async function decideNextStepForToday(workplaceId, employeeId) {
   const today = todayIST_yyyy_mm_dd();
 
   const last = await dbGet(
     `
     SELECT id, event_type, created_at
     FROM attendance_logs
-    WHERE store_id = ?
+    WHERE workplace_id = ?
       AND employee_id = ?
       AND event_type IN ('checkin','checkout','break_start','break_end')
       AND date(datetime(created_at, '+5 hours', '+30 minutes')) = ?
     ORDER BY id DESC
     LIMIT 1
     `,
-    [storeId, employeeId, today]
+    [workplaceId, employeeId, today]
   );
 
   if (!last) return { step: "checkin", mode: "checked_in", lastRow: null };

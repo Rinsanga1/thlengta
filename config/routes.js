@@ -119,6 +119,7 @@ router.get("/e/scan/:workplacePublicId", employeeScans.index);
 
 // Check-in routes for logged-in users
 router.get("/checkin", checkin.requireCheckinUser, checkin.index);
+router.post("/checkin/validate", checkin.requireCheckinUser, checkin.validate);
 router.post("/checkin", checkin.requireCheckinUser, checkin.create);
 
 // Employee Device Approvals
