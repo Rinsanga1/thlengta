@@ -43,8 +43,8 @@ exports.index = async (req, res) => {
       SELECT
         a.id,
         a.event_type,
-        a.gps_ok,
-        a.device_ok,
+        a.location_verified AS gps_ok,
+        a.device_verified AS device_ok,
         a.ip,
         datetime(a.created_at, '+5 hours', '+30 minutes') AS created_at_ist,
         e.email AS employee_email
@@ -126,8 +126,8 @@ exports.downloadDayCsv = async (req, res) => {
         datetime(a.created_at, '+5 hours', '+30 minutes') AS created_at_ist,
         e.email AS employee_email,
         a.event_type,
-        a.gps_ok,
-        a.device_ok,
+        a.location_verified AS gps_ok,
+        a.device_verified AS device_ok,
         a.ip
       FROM attendance_logs a
       LEFT JOIN employees e ON e.id = a.employee_id
@@ -231,8 +231,8 @@ exports.downloadMonthCsv = async (req, res) => {
         datetime(a.created_at, '+5 hours', '+30 minutes') AS created_at_ist,
         e.email AS employee_email,
         a.event_type,
-        a.gps_ok,
-        a.device_ok,
+        a.location_verified AS gps_ok,
+        a.device_verified AS device_ok,
         a.ip
       FROM attendance_logs a
       LEFT JOIN employees e ON e.id = a.employee_id

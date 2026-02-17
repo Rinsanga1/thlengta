@@ -20,30 +20,27 @@
     </div>
   </div>
 
-  <!-- Tabs -->
+  <!-- Dashboard with Left Sidebar Tabs -->
   <div class="card" style="max-width:1200px;margin:0 auto;padding:0;">
-    <div style="display:flex; border-bottom:1px solid var(--border); flex-wrap:wrap;">
-      <a href="/owner/workplaces/<%= workplace.id %>?tab=qr" 
-         class="tab<%= activeTab === 'qr' ? ' active' : '' %>"
-         style="flex:1; min-width:120px;">QR</a>
-      <a href="/owner/workplaces/<%= workplace.id %>?tab=employees" 
-         class="tab<%= activeTab === 'employees' ? ' active' : '' %>"
-         style="flex:1; min-width:120px;">Employees</a>
-      <a href="/owner/workplaces/<%= workplace.id %>?tab=logs" 
-         class="tab<%= activeTab === 'logs' ? ' active' : '' %>"
-         style="flex:1; min-width:120px;">Logs</a>
-      <% if (isEnterprise) { %>
-      <a href="/owner/workplaces/<%= workplace.id %>?tab=managers" 
-         class="tab<%= activeTab === 'managers' ? ' active' : '' %>"
-         style="flex:1; min-width:120px;">Managers</a>
-      <% } %>
-      <a href="/owner/workplaces/<%= workplace.id %>?tab=settings" 
-         class="tab<%= activeTab === 'settings' ? ' active' : '' %>"
-         style="flex:1; min-width:120px;">Settings</a>
-    </div>
+    <div class="dashboard-layout" style="display:flex; min-height:500px;">
+      <!-- Left Sidebar Tabs -->
+      <div class="tab-sidebar" style="width:180px; border-right:1px solid var(--border); background:#fafafa; flex-shrink:0;">
+        <a href="/owner/workplaces/<%= workplace.id %>?tab=logs" 
+           class="tab<%= activeTab === 'logs' ? ' active' : '' %>">Logs</a>
+        <a href="/owner/workplaces/<%= workplace.id %>?tab=employees" 
+           class="tab<%= activeTab === 'employees' ? ' active' : '' %>">Employees</a>
+        <% if (isEnterprise) { %>
+        <a href="/owner/workplaces/<%= workplace.id %>?tab=managers" 
+           class="tab<%= activeTab === 'managers' ? ' active' : '' %>">Managers</a>
+        <% } %>
+        <a href="/owner/workplaces/<%= workplace.id %>?tab=settings" 
+           class="tab<%= activeTab === 'settings' ? ' active' : '' %>">Settings</a>
+        <a href="/owner/workplaces/<%= workplace.id %>?tab=qr" 
+           class="tab<%= activeTab === 'qr' ? ' active' : '' %>">QR</a>
+      </div>
 
-    <!-- Tab Content -->
-    <div style="padding:20px;">
+      <!-- Tab Content -->
+      <div class="tab-content" style="flex:1; padding:20px; min-width:0;">
       
       <% if (msg) { %>
         <div class="notice" style="background:#eaf6f0; margin-bottom:15px;"><%= msg %></div>
@@ -131,48 +128,211 @@
       <!-- LOGS TAB -->
       <% if (activeTab === 'logs') { %>
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; flex-wrap:wrap; gap:10px;">
-          <h3 style="margin:0;">Today's Logs</h3>
-          <a class="btn" href="/owner/workplaces/<%= workplace.id %>/logs">View Full Logs</a>
+          <h3 style="margin:0;">Recent Logs</h3>
+          <div style="display:flex; gap:8px;">
+            <button class="btn" id="filterLogsBtn">Filter</button>
+            <button class="btn" id="saveLogsBtn">Save Logs</button>
+          </div>
+        </div>
+
+        <!-- Filter Logs Modal -->
+        <div id="filterLogsModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center;">
+          <div class="card pad" style="background:#fff; max-width:400px; width:90%; margin:20px;">
+            <h3 style="margin:0 0 20px;">Filter Logs</h3>
+            
+            <form method="get" action="/owner/workplaces/<%= workplace.id %>">
+              <input type="hidden" name="tab" value="logs" />
+              
+              <div style="margin-bottom:20px;">
+                <label style="display:block; margin-bottom:10px; font-weight:500;">Select Period:</label>
+                
+                <div style="display:flex; flex-direction:column; gap:10px;">
+                  <label class="period-card" data-period="day">
+                    <input type="radio" name="filterPeriod" value="day" checked>
+                    <div class="period-card-content">
+                      <div class="period-title">Specific Day</div>
+                      <div class="period-desc">View logs from a single day</div>
+                    </div>
+                  </label>
+                  
+                  <label class="period-card" data-period="month">
+                    <input type="radio" name="filterPeriod" value="month">
+                    <div class="period-card-content">
+                      <div class="period-title">Full Month</div>
+                      <div class="period-desc">View logs from an entire month</div>
+                    </div>
+                  </label>
+                  
+                  <label class="period-card" data-period="year">
+                    <input type="radio" name="filterPeriod" value="year">
+                    <div class="period-card-content">
+                      <div class="period-title">Full Year</div>
+                      <div class="period-desc">View logs from an entire year</div>
+                    </div>
+                  </label>
+                </div>
+              </div>
+              
+              <div id="filterDayInput" style="margin-bottom:20px;">
+                <label style="display:block; margin-bottom:5px; font-weight:500;">Date</label>
+                <input type="date" name="date" id="filterDateInput" value="<%= selectedDate %>" style="width:100%; padding:10px; border:1px solid var(--border); border-radius:8px;" />
+              </div>
+              
+              <div id="filterMonthInput" style="margin-bottom:20px; display:none;">
+                <label style="display:block; margin-bottom:5px; font-weight:500;">Month</label>
+                <input type="month" name="month" id="filterMonthValue" value="<%= selectedDate.slice(0,7) %>" style="width:100%; padding:10px; border:1px solid var(--border); border-radius:8px;" />
+              </div>
+              
+              <div id="filterYearInput" style="margin-bottom:20px; display:none;">
+                <label style="display:block; margin-bottom:5px; font-weight:500;">Year</label>
+                <input type="number" name="year" id="filterYearValue" value="<%= selectedDate.slice(0,4) %>" min="2020" max="2030" style="width:100%; padding:10px; border:1px solid var(--border); border-radius:8px;" />
+              </div>
+              
+              <div style="display:flex; gap:10px; justify-content:flex-end;">
+                <button type="button" class="btn" id="cancelFilterLogsBtn">Cancel</button>
+                <button type="submit" class="btn primary">Apply Filter</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Save Logs Modal -->
+        <div id="saveLogsModal" data-workplace-id="<%= workplace.id %>" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center;">
+          <div class="card pad" style="background:#fff; max-width:400px; width:90%; margin:20px;">
+            <h3 style="margin:0 0 20px;">Save Logs</h3>
+            
+            <div style="margin-bottom:20px;">
+              <label style="display:block; margin-bottom:10px; font-weight:500;">Select Period:</label>
+              
+              <div style="display:flex; flex-direction:column; gap:10px;">
+                <label class="period-card" data-save-period="day">
+                  <input type="radio" name="savePeriod" value="day" checked>
+                  <div class="period-card-content">
+                    <div class="period-title">Specific Day</div>
+                    <div class="period-desc">Download logs from a single day</div>
+                  </div>
+                </label>
+                
+                <label class="period-card" data-save-period="month">
+                  <input type="radio" name="savePeriod" value="month">
+                  <div class="period-card-content">
+                    <div class="period-title">Full Month</div>
+                    <div class="period-desc">Download logs from an entire month</div>
+                  </div>
+                </label>
+                
+                <label class="period-card" data-save-period="year">
+                  <input type="radio" name="savePeriod" value="year">
+                  <div class="period-card-content">
+                    <div class="period-title">Full Year</div>
+                    <div class="period-desc">Download logs from an entire year</div>
+                  </div>
+                </label>
+              </div>
+            </div>
+            
+            <div id="dayInput" style="margin-bottom:20px;">
+              <label style="display:block; margin-bottom:5px; font-weight:500;">Date</label>
+              <input type="date" id="saveDateInput" value="<%= selectedDate %>" style="width:100%; padding:10px; border:1px solid var(--border); border-radius:8px;" />
+            </div>
+            
+            <div id="monthInput" style="margin-bottom:20px; display:none;">
+              <label style="display:block; margin-bottom:5px; font-weight:500;">Month</label>
+              <input type="month" id="saveMonthInput" value="<%= selectedDate.slice(0,7) %>" style="width:100%; padding:10px; border:1px solid var(--border); border-radius:8px;" />
+            </div>
+            
+            <div id="yearInput" style="margin-bottom:20px; display:none;">
+              <label style="display:block; margin-bottom:5px; font-weight:500;">Year</label>
+              <input type="number" id="saveYearInput" value="<%= selectedDate.slice(0,4) %>" min="2020" max="2030" style="width:100%; padding:10px; border:1px solid var(--border); border-radius:8px;" />
+            </div>
+            
+            <div style="display:flex; gap:10px; justify-content:flex-end;">
+              <button class="btn" id="cancelSaveLogsBtn">Cancel</button>
+              <button class="btn primary" id="downloadLogsBtn">Download</button>
+            </div>
+          </div>
         </div>
 
         <% if (!logs.length) { %>
-          <div class="muted">No check-ins recorded today.</div>
+          <div class="muted">No check-ins recorded on <%= new Date(selectedDate).toLocaleDateString('en-GB', { weekday: 'long', day: '2-digit', month: '2-digit', year: '2-digit' }) %>.</div>
         <% } else { %>
-          <div style="overflow-x:auto;">
-            <table style="width:100%; border-collapse:collapse;">
-              <thead>
-                <tr style="border-bottom:2px solid var(--border);">
-                  <th style="text-align:left; padding:10px;">Time</th>
-                  <th style="text-align:left; padding:10px;">Employee</th>
-                  <th style="text-align:left; padding:10px;">Event</th>
-                  <th style="text-align:center; padding:10px;">GPS</th>
-                </tr>
-              </thead>
-              <tbody>
-                <% logs.forEach(l => { %>
-                <tr style="border-bottom:1px solid var(--border);">
-                  <td style="padding:10px;"><%= l.created_at ? l.created_at.split(' ')[1].substring(0,8) : '-' %></td>
-                  <td style="padding:10px;"><%= l.employee_email || 'Unknown' %></td>
-                  <td style="padding:10px;">
-                    <% if (l.event_type === 'checkin') { %>
-                      <span class="chip" style="background:#e8f5e9;">Check-in</span>
-                    <% } else if (l.event_type === 'checkout') { %>
-                      <span class="chip" style="background:#e3f2fd;">Check-out</span>
-                    <% } else { %>
-                      <%= l.event_type %>
-                    <% } %>
-                  </td>
-                  <td style="padding:10px; text-align:center;">
-                    <% if (l.gps_ok) { %>
-                      <span style="color:green;">✓</span>
-                    <% } else { %>
-                      <span style="color:red;">✗</span>
-                    <% } %>
-                  </td>
-                </tr>
-                <% }) %>
-              </tbody>
-            </table>
+          <div class="logs-list">
+            <% 
+            // Group logs by date
+            const logsByDate = {};
+            logs.forEach(l => {
+              const dateKey = l.created_at_ist ? l.created_at_ist.split(' ')[0] : 'Unknown';
+              if (!logsByDate[dateKey]) logsByDate[dateKey] = [];
+              logsByDate[dateKey].push(l);
+            });
+            
+            // Sort dates in descending order
+            const sortedDates = Object.keys(logsByDate).sort().reverse();
+            
+            // Day names
+            const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            
+            sortedDates.forEach(dateKey => {
+              const dateObj = new Date(dateKey);
+              const dayName = dayNames[dateObj.getDay()] || 'Unknown';
+              const formattedDate = dateObj.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: '2-digit' }).replace(/\//g, '/');
+              
+              // Check if this date is today
+              const today = new Date();
+              const isToday = dateObj.getDate() === today.getDate() && 
+                              dateObj.getMonth() === today.getMonth() && 
+                              dateObj.getFullYear() === today.getFullYear();
+              const todayLabel = isToday ? ' ( Today )' : '';
+            %>
+              <div class="date-group" style="margin-bottom:20px;">
+                <div class="date-header" style="background:#f5f5f5; padding:10px 15px; border-radius:8px; margin-bottom:10px; font-weight:600; color:var(--text);">
+                  <%= dayName %> - <%= formattedDate %><%= todayLabel %>
+                </div>
+                <div class="logs-for-date">
+                  <% logsByDate[dateKey].forEach(l => { 
+                    // Format time to 12-hour
+                    let time12 = '-';
+                    if (l.created_at_ist) {
+                      const timePart = l.created_at_ist.split(' ')[1];
+                      if (timePart) {
+                        const [hours, minutes] = timePart.split(':').map(Number);
+                        const period = hours >= 12 ? 'pm' : 'am';
+                        const hours12 = hours % 12 || 12;
+                        time12 = hours12 + ':' + String(minutes).padStart(2, '0') + ' ' + period;
+                      }
+                    }
+                    
+                    // Get employee name from email
+                    const employeeName = l.employee_email ? l.employee_email.split('@')[0] : 'Unknown';
+                  %>
+                    <div class="log-entry" style="display:flex; align-items:center; padding:10px 15px; border-bottom:1px solid var(--border); gap:20px;">
+                      <div class="log-time" style="min-width:80px; font-weight:500;"><%= time12 %></div>
+                      <div class="log-employee" style="flex:1;"><%= employeeName %></div>
+                      <div class="log-event">
+                        <% if (l.event_type === 'checkin') { %>
+                          <span class="chip" style="background:#e8f5e9;">Check-in</span>
+                        <% } else if (l.event_type === 'checkout') { %>
+                          <span class="chip" style="background:#e3f2fd;">Check-out</span>
+                        <% } else if (l.event_type === 'break_start') { %>
+                          <span class="chip" style="background:#fff3e0;">Break</span>
+                        <% } else if (l.event_type === 'break_end') { %>
+                          <span class="chip" style="background:#f3e5f5;">Resume</span>
+                        <% } else { %>
+                          <span class="chip"><%= l.event_type %></span>
+                        <% } %>
+                      </div>
+                      <div class="log-gps" style="min-width:30px; text-align:center;">
+                        <% if (l.gps_ok) { %>
+                          <span style="color:green;">✓</span>
+                        <% } else { %>
+                          <span style="color:red;">✗</span>
+                        <% } %>
+                      </div>
+                    </div>
+                  <% }) %>
+                </div>
+              </div>
+            <% }) %>
           </div>
         <% } %>
       <% } %>
@@ -434,6 +594,7 @@
           </div>
       <% } %>
 
+      </div>
     </div>
   </div>
 </section>
@@ -441,26 +602,92 @@
 <style>
 .tab {
   display:block;
-  padding:12px 20px;
-  text-align:center;
+  padding:14px 20px;
   text-decoration:none;
   color:var(--muted);
-  border-bottom:3px solid transparent;
+  border-left:3px solid transparent;
   font-weight:500;
+  transition:all 0.15s ease;
 }
 .tab:hover {
-  background:#f5f5f5;
+  background:#f0f0f0;
+  color:var(--text);
 }
 .tab.active {
   color:var(--primary);
-  border-bottom-color:var(--primary);
-  background:#fafafa;
+  border-left-color:var(--primary);
+  background:#fff;
 }
-@media (max-width:600px) {
-  .tab { padding:10px 15px; font-size:14px; }
+
+/* Period Card Styling */
+.period-card {
+  display:flex;
+  align-items:flex-start;
+  gap:12px;
+  cursor:pointer;
+  padding:16px;
+  border:2px solid var(--border);
+  border-radius:12px;
+  background:#fff;
+  transition:all 0.2s ease;
+}
+.period-card:hover {
+  border-color:var(--primary);
+  background:#f8f9fa;
+}
+.period-card input[type="radio"] {
+  margin-top:2px;
+  width:18px;
+  height:18px;
+  accent-color:var(--primary);
+}
+.period-card:has(input:checked) {
+  border-color:var(--primary);
+  background:#f0f7ff;
+}
+.period-card-content {
+  flex:1;
+}
+.period-title {
+  font-weight:600;
+  color:var(--text);
+  margin-bottom:4px;
+}
+.period-desc {
+  font-size:13px;
+  color:var(--muted);
+}
+
+@media (max-width:768px) {
+  .dashboard-layout {
+    flex-direction:column;
+  }
+  .tab-sidebar {
+    width:100% !important;
+    border-right:none !important;
+    border-bottom:1px solid var(--border);
+    display:flex;
+    flex-wrap:wrap;
+  }
+  .tab {
+    flex:1;
+    min-width:100px;
+    padding:12px 15px;
+    text-align:center;
+    border-left:none;
+    border-bottom:3px solid transparent;
+  }
+  .tab.active {
+    border-left-color:transparent;
+    border-bottom-color:var(--primary);
+  }
+  .period-card {
+    padding:12px;
+  }
 }
 </style>
 
 <script src="/client/utils/workplace_location_edit.js" defer></script>
 <script src="/client/utils/smart_time_12h.js" defer></script>
 <script src="/client/utils/workplace_location.js" defer></script>
+<script src="/client/utils/save_logs_modal.js" defer></script>

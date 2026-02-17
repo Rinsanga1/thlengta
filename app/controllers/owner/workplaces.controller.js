@@ -30,7 +30,7 @@ exports.editRedirect = (req, res) => {
 exports.dashboard = async (req, res) => {
   const userId = getOwnerId(req);
   const workplaceId = Number(req.params.workplaceId);
-  const activeTab = req.query.tab || "qr";
+  const activeTab = req.query.tab || "logs";
 
   const workplace = await dbGet(
     "SELECT * FROM workplaces WHERE id = ? AND user_id = ?",
@@ -51,6 +51,7 @@ exports.dashboard = async (req, res) => {
   let employeePage = 1;
   let employeeTotalPages = 1;
   let employeeTotalItems = 0;
+  let selectedDate = new Date().toISOString().split('T')[0];
 
   if (activeTab === "employees") {
     employeePage = Math.max(1, Number(req.query.empPage) || 1);
@@ -81,14 +82,46 @@ exports.dashboard = async (req, res) => {
   }
 
   if (activeTab === "logs") {
-    const today = new Date().toISOString().split("T")[0];
+    // Check for date, month, or year filter
+    const dateFilter = req.query.date;
+    const monthFilter = req.query.month;
+    const yearFilter = req.query.year;
+    
+    let whereClause = "WHERE a.workplace_id = ?";
+    let params = [workplaceId];
+    
+    if (dateFilter && /^\d{4}-\d{2}-\d{2}$/.test(dateFilter)) {
+      // Filter by specific day
+      selectedDate = dateFilter;
+      whereClause += " AND date(datetime(a.created_at, '+5 hours', '+30 minutes')) = ?";
+      params.push(dateFilter);
+    } else if (monthFilter && /^\d{4}-\d{2}$/.test(monthFilter)) {
+      // Filter by month
+      selectedDate = monthFilter + "-01"; // For display purposes
+      whereClause += " AND strftime('%Y-%m', datetime(a.created_at, '+5 hours', '+30 minutes')) = ?";
+      params.push(monthFilter);
+    } else if (yearFilter && /^\d{4}$/.test(yearFilter)) {
+      // Filter by year
+      selectedDate = yearFilter + "-01-01"; // For display purposes
+      whereClause += " AND strftime('%Y', datetime(a.created_at, '+5 hours', '+30 minutes')) = ?";
+      params.push(yearFilter);
+    } else {
+      // Default to today
+      whereClause += " AND date(datetime(a.created_at, '+5 hours', '+30 minutes')) = ?";
+      params.push(selectedDate);
+    }
+    
     todayLogs = await dbAll(
-      `SELECT a.*, e.email as employee_email 
+      `SELECT a.*, 
+              a.location_verified AS gps_ok,
+              a.device_verified AS device_ok,
+              e.email as employee_email,
+              datetime(a.created_at, '+5 hours', '+30 minutes') as created_at_ist
        FROM attendance_logs a 
        LEFT JOIN employees e ON e.id = a.employee_id 
-       WHERE a.workplace_id = ? AND DATE(a.created_at) = ? 
+       ${whereClause}
        ORDER BY a.id DESC LIMIT 100`,
-      [workplaceId, today]
+      params
     );
   }
 
@@ -105,7 +138,8 @@ exports.dashboard = async (req, res) => {
     isEnterprise: plan === "enterprise",
     employeePage,
     employeeTotalPages,
-    employeeTotalItems
+    employeeTotalItems,
+    selectedDate
   });
 };
 

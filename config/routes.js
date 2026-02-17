@@ -107,6 +107,7 @@ router.post("/owner/workplaces/:workplaceId/managers/:managerId/remove", require
 router.get("/owner/workplaces/:workplaceId/logs", requireOwner, ownerLogs.index);
 router.get("/owner/workplaces/:workplaceId/logs.csv", requireOwner, ownerLogs.downloadDayCsv);
 router.get("/owner/workplaces/:workplaceId/logs_month.csv", requireOwner, ownerLogs.downloadMonthCsv);
+router.get("/owner/workplaces/:workplaceId/logs_year.csv", requireOwner, ownerLogs.downloadYearCsv);
 
 // Upgrades
 router.get("/owner/upgrade", requireOwner, ownerUpgrades.new);
