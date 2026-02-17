@@ -14,9 +14,6 @@
           <%= workplace.open_time || '--:--' %> - <%= workplace.close_time || '--:--' %>
         </div>
       </div>
-      <div style="display:flex; gap:10px;">
-        <a href="/owner/workplaces/<%= workplace.id %>?tab=qr" class="btn">View QR</a>
-      </div>
     </div>
   </div>
 
@@ -37,8 +34,6 @@
         <% } %>
         <a href="/owner/workplaces/<%= workplace.id %>?tab=settings" 
            class="tab<%= activeTab === 'settings' ? ' active' : '' %>">Settings</a>
-        <a href="/owner/workplaces/<%= workplace.id %>?tab=qr" 
-           class="tab<%= activeTab === 'qr' ? ' active' : '' %>">QR</a>
       </div>
 
       <!-- Tab Content -->
@@ -97,20 +92,6 @@
             </table>
           </div>
         <% } %>
-      <% } %>
-
-      <!-- QR TAB -->
-      <% if (activeTab === 'qr') { %>
-        <div style="text-align:center;">
-          <img src="/owner/workplaces/<%= workplace.id %>/qr.png" alt="QR Code" style="max-width:280px; margin:10px auto; display:block; border:1px solid #ddd; border-radius:8px;" />
-          <div style="margin:15px 0;">
-            <a class="btn primary" href="/owner/workplaces/<%= workplace.id %>/qr.png" download="workplace-<%= workplace.id %>-qr.png">Download QR</a>
-          </div>
-          <div class="small muted">
-            Print and place at workplace entrance<br/>
-            Employees scan with phone camera
-          </div>
-        </div>
       <% } %>
 
       <!-- EMPLOYEES TAB -->

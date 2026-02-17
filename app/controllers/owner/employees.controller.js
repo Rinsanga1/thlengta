@@ -70,21 +70,12 @@ exports.create = async (req, res) => {
     if (!workplace) return res.status(404).send("Workplace not found.");
 
     const email = String(req.body.email || "").trim().toLowerCase();
-    const pin = String(req.body.pin || "").trim();
 
     if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
       return res.renderPage("owner/employees/new", {
         title: "Add Employee",
         workplace,
         error: "Enter a valid email."
-      });
-    }
-
-    if (!/^\d{4,8}$/.test(pin)) {
-      return res.renderPage("owner/employees/new", {
-        title: "Add Employee",
-        workplace,
-        error: "PIN must be 4 to 8 digits."
       });
     }
 
@@ -100,7 +91,7 @@ exports.create = async (req, res) => {
       });
     }
 
-    const pin_hash = await bcrypt.hash(pin, 12);
+    const pin_hash = await bcrypt.hash("0000", 12);
 
     await dbRun("INSERT INTO employees (workplace_id, email, pin_hash, is_active) VALUES (?, ?, ?, 1)", [
       workplaceId,
@@ -110,7 +101,7 @@ exports.create = async (req, res) => {
 
     return res.redirect(
       `/owner/workplaces/${workplaceId}/employees?msg=` +
-        encodeURIComponent("Employee added. They can login with email + PIN.")
+        encodeURIComponent("Employee added. They can check in using their account.")
     );
   } catch (err) {
     console.error(err);
