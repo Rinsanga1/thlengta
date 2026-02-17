@@ -163,7 +163,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (modal) modal.style.display = 'none';
   });
   
-  // Modal button functionality for location modal
+  // Modal button functionality for location modal - Use my current location
   const modalBtnUseLoc = document.getElementById('modalBtnUseLoc');
   if (modalBtnUseLoc) {
     modalBtnUseLoc.addEventListener('click', function() {
@@ -195,5 +195,28 @@ document.addEventListener('DOMContentLoaded', function() {
         }
       }
     });
+  }
+  
+  // Update map when lat/lng changes manually in modal
+  const modalLat = document.getElementById('modalLat');
+  const modalLng = document.getElementById('modalLng');
+  
+  function updateModalMap() {
+    const lat = modalLat ? modalLat.value : '';
+    const lng = modalLng ? modalLng.value : '';
+    const modalMapFrame = document.getElementById('modalMapFrame');
+    
+    if (lat && lng && modalMapFrame) {
+      modalMapFrame.src = `https://www.google.com/maps?q=${lat},${lng}&z=16&output=embed`;
+    }
+  }
+  
+  if (modalLat) {
+    modalLat.addEventListener('change', updateModalMap);
+    modalLat.addEventListener('input', updateModalMap);
+  }
+  if (modalLng) {
+    modalLng.addEventListener('change', updateModalMap);
+    modalLng.addEventListener('input', updateModalMap);
   }
 });
