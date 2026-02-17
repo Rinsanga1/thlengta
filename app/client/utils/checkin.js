@@ -1,76 +1,54 @@
 (function() {
   const workplacesList = document.getElementById("workplaces-list");
-  const modal = document.getElementById("checkin-modal");
-  const modalTitle = document.getElementById("modal-title");
-  const modalLoading = document.getElementById("modal-loading");
-  const modalFail = document.getElementById("modal-fail");
-  const failMessage = document.getElementById("fail-message");
-  const modalPass = document.getElementById("modal-pass");
-  const modalSuccess = document.getElementById("modal-success");
-  const successMessage = document.getElementById("success-message");
-  const modalCloseBtn = document.getElementById("modal-close-btn");
-  const modalCancelBtn = document.getElementById("modal-cancel-btn");
-  const modalConfirmBtn = document.getElementById("modal-confirm-btn");
+  const loadingModal = document.getElementById("checkinLoadingModal");
+  const loadingMessage = document.getElementById("loadingMessage");
+  const confirmModal = document.getElementById("checkinConfirmModal");
+  const confirmMessage = document.getElementById("confirmMessage");
+  const confirmCancelBtn = document.getElementById("confirmCancelBtn");
+  const confirmYesBtn = document.getElementById("confirmYesBtn");
+  const failModal = document.getElementById("checkinFailModal");
+  const failMessage = document.getElementById("failMessage");
+  const failCloseBtn = document.getElementById("failCloseBtn");
+  const successModal = document.getElementById("checkinSuccessModal");
+  const successMessage = document.getElementById("successMessage");
+  const successCloseBtn = document.getElementById("successCloseBtn");
 
   let pendingCheckin = null;
 
-  function showModal() {
-    modal.style.display = "flex";
+  function showLoadingModal(msg) {
+    loadingMessage.textContent = msg;
+    loadingModal.style.display = "flex";
   }
 
-  function hideModal() {
-    modal.style.display = "none";
-    pendingCheckin = null;
+  function hideLoadingModal() {
+    loadingModal.style.display = "none";
   }
 
-  function showLoading(message) {
-    modalTitle.textContent = "Checking In";
-    modalLoading.style.display = "block";
-    modalFail.style.display = "none";
-    modalPass.style.display = "none";
-    modalSuccess.style.display = "none";
-    modalCloseBtn.style.display = "none";
-    modalCancelBtn.style.display = "none";
-    modalConfirmBtn.style.display = "none";
-    showModal();
+  function showConfirmModal(workplaceName, dateStr) {
+    confirmMessage.textContent = `Do you want to check in at ${workplaceName} for ${dateStr}?`;
+    confirmModal.style.display = "flex";
   }
 
-  function showFail(message) {
-    modalTitle.textContent = "Cannot Check In";
-    modalLoading.style.display = "none";
-    modalFail.style.display = "block";
-    failMessage.textContent = message;
-    modalPass.style.display = "none";
-    modalSuccess.style.display = "none";
-    modalCloseBtn.style.display = "inline-block";
-    modalCancelBtn.style.display = "none";
-    modalConfirmBtn.style.display = "none";
-    showModal();
+  function hideConfirmModal() {
+    confirmModal.style.display = "none";
   }
 
-  function showPass() {
-    modalTitle.textContent = "Check In";
-    modalLoading.style.display = "none";
-    modalFail.style.display = "none";
-    modalPass.style.display = "block";
-    modalSuccess.style.display = "none";
-    modalCloseBtn.style.display = "none";
-    modalCancelBtn.style.display = "inline-block";
-    modalConfirmBtn.style.display = "inline-block";
-    showModal();
+  function showFailModal(msg) {
+    failMessage.textContent = msg;
+    failModal.style.display = "flex";
   }
 
-  function showSuccess(message) {
-    modalTitle.textContent = "Success!";
-    modalLoading.style.display = "none";
-    modalFail.style.display = "none";
-    modalPass.style.display = "none";
-    modalSuccess.style.display = "block";
-    successMessage.textContent = message;
-    modalCloseBtn.style.display = "inline-block";
-    modalCancelBtn.style.display = "none";
-    modalConfirmBtn.style.display = "none";
-    showModal();
+  function hideFailModal() {
+    failModal.style.display = "none";
+  }
+
+  function showSuccessModal(msg) {
+    successMessage.textContent = msg;
+    successModal.style.display = "flex";
+  }
+
+  function hideSuccessModal() {
+    successModal.style.display = "none";
   }
 
   function attachFingerprint() {
@@ -119,12 +97,12 @@
     btn.disabled = true;
     btn.textContent = "Checking...";
     
-    showLoading("Getting your location...");
+    showLoadingModal("Getting your location...");
 
     try {
       const gps = await captureGps();
       
-      showLoading("Verifying location...");
+      showLoadingModal("Verifying location...");
 
       const body = {
         workplacePublicId: workplaceId,
@@ -141,8 +119,16 @@
 
       const result = await response.json();
 
+      hideLoadingModal();
+
       if (result.ok) {
         if (result.withinGeofence) {
+          const today = new Date().toLocaleDateString('en-US', { 
+            weekday: 'long', 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+          });
           pendingCheckin = {
             workplaceId,
             workplaceName,
@@ -150,26 +136,27 @@
             lng: gps.lng,
             btn
           };
-          showPass();
+          showConfirmModal(workplaceName, today);
         } else {
-          showFail(result.error || "You are not at this store location.");
+          showFailModal(result.error || "You are not at this store location.");
           btn.disabled = false;
           btn.textContent = "Check In";
         }
       } else {
-        showFail(result.error || "Unable to verify location.");
+        showFailModal(result.error || "Unable to verify location.");
         btn.disabled = false;
         btn.textContent = "Check In";
       }
 
     } catch (err) {
+      hideLoadingModal();
       let msg = "Location error. ";
       if (err.code === 1) msg += "Permission denied. Please allow location access.";
       else if (err.code === 2) msg += "Position unavailable.";
       else if (err.code === 3) msg += "Timeout. Try again.";
       else msg += err.message;
 
-      showFail(msg);
+      showFailModal(msg);
       btn.disabled = false;
       btn.textContent = "Check In";
     }
@@ -180,8 +167,8 @@
 
     const { workplaceId, workplaceName, lat, lng, btn } = pendingCheckin;
     
-    modalConfirmBtn.disabled = true;
-    modalConfirmBtn.textContent = "Checking in...";
+    hideConfirmModal();
+    showLoadingModal("Checking in...");
 
     attachFingerprint();
 
@@ -206,16 +193,25 @@
 
       const result = await response.json();
 
+      hideLoadingModal();
+
       if (result.ok) {
-        showSuccess(result.message || "Checked in successfully!");
+        const today = new Date().toLocaleDateString('en-US', { 
+          weekday: 'long', 
+          year: 'numeric', 
+          month: 'long', 
+          day: 'numeric' 
+        });
+        showSuccessModal(`Checked in at ${workplaceName} for ${today}`);
         if (workplacesList) workplacesList.style.display = "none";
       } else {
-        showFail(result.error || "Unable to check in.");
+        showFailModal(result.error || "Unable to check in.");
         btn.disabled = false;
         btn.textContent = "Check In";
       }
     } catch (err) {
-      showFail("Network error. Please try again.");
+      hideLoadingModal();
+      showFailModal("Network error. Please try again.");
       btn.disabled = false;
       btn.textContent = "Check In";
     }
@@ -231,29 +227,24 @@
     });
   });
 
-  if (modalConfirmBtn) {
-    modalConfirmBtn.addEventListener("click", submitCheckin);
-  }
-
-  if (modalCancelBtn) {
-    modalCancelBtn.addEventListener("click", () => {
-      hideModal();
-      document.querySelectorAll(".checkin-btn").forEach(btn => {
-        btn.disabled = false;
-        btn.textContent = "Check In";
-      });
+  confirmYesBtn.addEventListener("click", submitCheckin);
+  
+  confirmCancelBtn.addEventListener("click", () => {
+    hideConfirmModal();
+    document.querySelectorAll(".checkin-btn").forEach(btn => {
+      btn.disabled = false;
+      btn.textContent = "Check In";
     });
-  }
+  });
 
-  if (modalCloseBtn) {
-    modalCloseBtn.addEventListener("click", () => {
-      hideModal();
+  failCloseBtn.addEventListener("click", hideFailModal);
+  successCloseBtn.addEventListener("click", hideSuccessModal);
+
+  [loadingModal, confirmModal, failModal, successModal].forEach(modal => {
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) {
+        modal.style.display = "none";
+      }
     });
-  }
-
-  window.addEventListener("click", (e) => {
-    if (e.target === modal) {
-      hideModal();
-    }
   });
 })();

@@ -57,35 +57,45 @@
   </div>
 </div>
 
-<div id="checkin-modal" class="modal-overlay" style="display:none;">
-  <div class="modal" style="max-width:400px;">
-    <div class="modal-header">
-      <h3 class="modal-title" id="modal-title">Checking In</h3>
+<!-- Loading Modal -->
+<div id="checkinLoadingModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center;">
+  <div class="card pad" style="background:#fff; max-width:400px; width:90%; margin:20px; text-align:center;">
+    <div style="font-size:48px; margin-bottom:16px;">[ ]</div>
+    <h3 style="margin:0 0 8px;">Checking In...</h3>
+    <p id="loadingMessage" style="color:#666; margin:0;">Getting your location...</p>
+  </div>
+</div>
+
+<!-- Confirm Modal -->
+<div id="checkinConfirmModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center;">
+  <div class="card pad" style="background:#fff; max-width:400px; width:90%; margin:20px; text-align:center;">
+    <div style="font-size:48px; margin-bottom:16px;">[ ]</div>
+    <h3 style="margin:0 0 8px;">Check In</h3>
+    <p id="confirmMessage" style="color:#666; margin:0 0 20px;"></p>
+    <div style="display:flex; gap:10px; justify-content:center;">
+      <button id="confirmCancelBtn" class="btn">Cancel</button>
+      <button id="confirmYesBtn" class="btn primary">Yes, Check In</button>
     </div>
-    <div class="modal-body" style="text-align:center;">
-      <div id="modal-loading">
-        <div style="font-size:48px; margin-bottom:16px;">📍</div>
-        <p id="modal-message" style="color:#666; margin:0;">Getting your location...</p>
-      </div>
-      <div id="modal-fail" style="display:none;">
-        <div style="font-size:48px; margin-bottom:16px;">❌</div>
-        <p id="fail-message" style="color:#666; margin:0;"></p>
-      </div>
-      <div id="modal-pass" style="display:none;">
-        <div style="font-size:48px; margin-bottom:16px;">✅</div>
-        <p style="color:#666; margin:0 0 16px;">You can check in at this store.</p>
-        <p style="color:#666; margin:0; font-weight:600;">Do you want to check in?</p>
-      </div>
-      <div id="modal-success" style="display:none;">
-        <div style="font-size:48px; margin-bottom:16px;">🎉</div>
-        <p id="success-message" style="color:#22c55e; font-weight:600; margin:0;"></p>
-      </div>
-    </div>
-    <div class="modal-footer" style="justify-content:center;">
-      <button id="modal-close-btn" class="btn" style="display:none;">Close</button>
-      <button id="modal-cancel-btn" class="btn" style="display:none;">Cancel</button>
-      <button id="modal-confirm-btn" class="btn primary" style="display:none;">Yes, Check In</button>
-    </div>
+  </div>
+</div>
+
+<!-- Fail Modal -->
+<div id="checkinFailModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center;">
+  <div class="card pad" style="background:#fff; max-width:400px; width:90%; margin:20px; text-align:center;">
+    <div style="font-size:48px; margin-bottom:16px;">X</div>
+    <h3 style="margin:0 0 8px;">Failed to Check In</h3>
+    <p id="failMessage" style="color:#666; margin:0 0 20px;"></p>
+    <button id="failCloseBtn" class="btn primary">OK</button>
+  </div>
+</div>
+
+<!-- Success Modal -->
+<div id="checkinSuccessModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center;">
+  <div class="card pad" style="background:#fff; max-width:400px; width:90%; margin:20px; text-align:center;">
+    <div style="font-size:48px; margin-bottom:16px;">OK</div>
+    <h3 style="margin:0 0 8px; color:#22c55e;">Checked In</h3>
+    <p id="successMessage" style="color:#666; margin:0;"></p>
+    <button id="successCloseBtn" class="btn primary" style="margin-top:20px;">Done</button>
   </div>
 </div>
 

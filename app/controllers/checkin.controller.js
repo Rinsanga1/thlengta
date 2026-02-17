@@ -195,9 +195,9 @@ exports.create = async (req, res) => {
 
     await dbRun(`
       INSERT INTO attendance_logs
-        (workplace_id, employee_id, event_type, device_verified, location_verified, lat, lng, user_agent, ip, created_at)
+        (workplace_id, employee_id, event_type, device_verified, location_verified, lat, lng, user_agent, ip)
       VALUES
-        (?, ?, 'checkin', 1, 1, ?, ?, ?, ?, datetime('now', 'localtime'))
+        (?, ?, 'checkin', 1, 1, ?, ?, ?, ?)
     `, [
       workplace.id,
       employee.id,
