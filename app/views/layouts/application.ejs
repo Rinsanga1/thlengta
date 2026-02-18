@@ -85,14 +85,14 @@
                 </a>
               </nav>
               <div class="user-dropdown-divider"></div>
-              <a href="/users/signout" class="user-dropdown-link user-dropdown-signout">
+              <button type="button" class="user-dropdown-link user-dropdown-signout" id="signoutBtn">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
                   <polyline points="16 17 21 12 16 7"></polyline>
                   <line x1="21" y1="12" x2="9" y2="12"></line>
                 </svg>
                 <span>Sign out</span>
-              </a>
+              </button>
             </div>
           </div>
         </div>
@@ -123,6 +123,25 @@
     </div>
   </div>
 </footer>
+
+<% if (isLoggedIn) { %>
+<!-- Sign Out Confirmation Modal -->
+<div id="signoutModal" class="modal-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:2000; align-items:center; justify-content:center;">
+  <div class="modal-card" style="background:#fff; max-width:400px; width:90%; margin:20px; border:2px solid #1b1b1b; border-radius:12px; box-shadow:4px 4px 0 rgba(0,0,0,0.2); overflow:hidden;">
+    <div class="modal-header" style="padding:20px; border-bottom:1px dashed rgba(0,0,0,0.2);">
+      <div style="font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#6b7280; margin-bottom:8px;">Sign Out</div>
+      <h3 style="margin:0; color:#1b1b1b;">Are you sure?</h3>
+      <div class="small" style="margin-top:6px; color:#6b7280;">You will be signed out of your account</div>
+    </div>
+    <div class="modal-body" style="padding:20px;">
+      <form method="post" action="/users/signout" id="signoutForm">
+        <button type="submit" class="btn primary full" style="width:100%; background:#d32f2f; color:#1b1b1b; border:2px solid #1b1b1b; box-shadow:2px 2px 0 #1b1b1b; font-weight:700;">Yes, Sign Out</button>
+      </form>
+      <button type="button" class="btn full" id="cancelSignoutBtn" style="width:100%; margin-top:12px; background:#eaf6f0; border:2px solid #1b1b1b; box-shadow:2px 2px 0 #1b1b1b; font-weight:700;">Cancel</button>
+    </div>
+  </div>
+</div>
+<% } %>
 
   <script src="/client/utils/user-dropdown.js" defer></script>
 </html>

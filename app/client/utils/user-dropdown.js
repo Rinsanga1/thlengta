@@ -61,4 +61,45 @@ document.addEventListener('DOMContentLoaded', function() {
       userDropdownToggle.setAttribute('aria-expanded', 'false');
     }
   });
+
+  // Sign Out Modal Functionality
+  const signoutBtn = document.getElementById('signoutBtn');
+  const signoutModal = document.getElementById('signoutModal');
+  const cancelSignoutBtn = document.getElementById('cancelSignoutBtn');
+
+  if (signoutBtn && signoutModal) {
+    signoutBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      // Close the dropdown first
+      userDropdownMenu.classList.remove('open');
+      if (userAvatarChevron) userAvatarChevron.classList.remove('rotated');
+      userDropdownToggle.setAttribute('aria-expanded', 'false');
+      
+      // Show the modal
+      signoutModal.style.display = 'flex';
+    });
+
+    // Close modal on cancel button
+    if (cancelSignoutBtn) {
+      cancelSignoutBtn.addEventListener('click', function() {
+        signoutModal.style.display = 'none';
+      });
+    }
+
+    // Close modal on backdrop click
+    signoutModal.addEventListener('click', function(e) {
+      if (e.target === signoutModal) {
+        signoutModal.style.display = 'none';
+      }
+    });
+
+    // Close modal on escape key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && signoutModal.style.display === 'flex') {
+        signoutModal.style.display = 'none';
+      }
+    });
+  }
 });
