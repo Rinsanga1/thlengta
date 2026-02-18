@@ -98,7 +98,7 @@
       <% if (activeTab === 'employees') { %>
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; flex-wrap:wrap; gap:10px;">
           <h3 style="margin:0;">Employees (<%= employeeTotalItems %>)</h3>
-          <a class="btn primary" href="/owner/workplaces/<%= workplace.id %>/employees/new">+ Add Employee</a>
+          <button type="button" class="btn primary" id="addEmployeeBtn">+ Add Employee</button>
         </div>
 
         <% if (!employees.length) { %>
@@ -732,39 +732,6 @@ button:hover {
 }
 </style>
 
-<script>
-function showEmployeeModal(email, isActive, hasDevice) {
-  document.getElementById('empModalEmail').textContent = email;
-  document.getElementById('empModalStatus').innerHTML = isActive 
-    ? '<span style="color:#22c55e; font-weight:600;">Active</span>' 
-    : '<span style="color:#ef4444; font-weight:600;">Inactive</span>';
-  document.getElementById('empModalDevice').innerHTML = hasDevice 
-    ? '<span style="color:#22c55e; font-weight:600;">Device Registered</span>' 
-    : '<span style="color:#666;">Not Registered</span>';
-  document.getElementById('employeeModal').style.display = 'flex';
-}
-
-function closeEmployeeModal() {
-  document.getElementById('employeeModal').style.display = 'none';
-}
-
-document.getElementById('employeeModal').addEventListener('click', function(e) {
-  if (e.target === this) closeEmployeeModal();
-});
-
-// Add event listeners for edit buttons
-document.addEventListener('DOMContentLoaded', function() {
-  document.querySelectorAll('.emp-edit-btn').forEach(function(btn) {
-    btn.addEventListener('click', function() {
-      var email = this.getAttribute('data-email');
-      var isActive = this.getAttribute('data-active') === '1';
-      var hasDevice = this.getAttribute('data-device') === '1';
-      showEmployeeModal(email, isActive, hasDevice);
-    });
-  });
-});
-</script>
-
 <!-- Employee Details Modal -->
 <div id="employeeModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center;">
   <div class="card pad" style="background:#fff; max-width:400px; width:90%; margin:20px;">
@@ -788,6 +755,34 @@ document.addEventListener('DOMContentLoaded', function() {
     <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:20px;">
       <button type="button" class="btn" id="closeEmpModalBtn">Close</button>
     </div>
+  </div>
+</div>
+
+<!-- Add Employee Modal -->
+<div id="addEmployeeModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center;">
+  <div class="card pad" style="background:#fff; max-width:450px; width:90%; margin:20px; border:2px solid #1b1b1b; border-radius:12px; box-shadow:4px 4px 0 rgba(0,0,0,0.2);">
+    <div style="border-bottom:1px dashed rgba(0,0,0,0.2); padding-bottom:16px; margin-bottom:16px;">
+      <div style="font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#6b7280; margin-bottom:8px;">Employees</div>
+      <h3 style="margin:0; color:#1b1b1b;">Add Employee</h3>
+      <div class="small" style="margin-top:6px; color:#6b7280;">Workplace: <b><%= workplace.name %></b></div>
+    </div>
+
+    <form class="form" method="post" action="/owner/workplaces/<%= workplace.id %>/employees" id="addEmployeeForm">
+      <div class="field" style="margin-bottom:16px;">
+        <label style="font-weight:600; color:#1b1b1b; margin-bottom:6px; display:block;">Employee Email</label>
+        <input type="email" name="email" required placeholder="staff@example.com" style="width:100%; padding:10px; border:2px solid #1b1b1b; border-radius:8px; font-size:14px;" />
+      </div>
+
+      <div class="notice" style="background:#eaf6f0; border:2px solid #1b1b1b; border-radius:8px; padding:12px; margin-bottom:16px;">
+        <div style="font-weight:700; color:#1b1b1b; margin-bottom:4px;">Check-in method</div>
+        <div class="small" style="color:#4b5563;">Employees will check in using their logged-in account and GPS location.</div>
+      </div>
+
+      <div style="display:flex; gap:10px;">
+        <button type="button" class="btn" id="cancelAddEmployeeBtn" style="flex:1; background:#f3f4f6; color:#1b1b1b; border:2px solid #1b1b1b; box-shadow:2px 2px 0 #1b1b1b; font-weight:700;">Cancel</button>
+        <button type="submit" class="btn primary" style="flex:1; background:#d32f2f; color:#1b1b1b; border:2px solid #1b1b1b; box-shadow:2px 2px 0 #1b1b1b; font-weight:700;">Add Employee</button>
+      </div>
+    </form>
   </div>
 </div>
 

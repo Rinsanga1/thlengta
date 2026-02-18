@@ -1,5 +1,7 @@
+// Employee Modal Functions
+
 document.addEventListener('DOMContentLoaded', function() {
-  // Add event listeners for employee edit buttons
+  // Employee Details Modal Functionality
   document.querySelectorAll('.emp-edit-btn').forEach(function(btn) {
     btn.addEventListener('click', function() {
       var email = this.getAttribute('data-email');
@@ -18,15 +20,53 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 
-  // Close modal when clicking close button
-  document.getElementById('closeEmpModalBtn').addEventListener('click', function() {
-    document.getElementById('employeeModal').style.display = 'none';
-  });
+  // Close button for employee modal
+  var closeEmpBtn = document.getElementById('closeEmpModalBtn');
+  if (closeEmpBtn) {
+    closeEmpBtn.addEventListener('click', function() {
+      document.getElementById('employeeModal').style.display = 'none';
+    });
+  }
 
-  // Close modal when clicking outside
-  document.getElementById('employeeModal').addEventListener('click', function(e) {
-    if (e.target === this) {
-      this.style.display = 'none';
+  // Close employee modal when clicking outside
+  var employeeModal = document.getElementById('employeeModal');
+  if (employeeModal) {
+    employeeModal.addEventListener('click', function(e) {
+      if (e.target === this) {
+        this.style.display = 'none';
+      }
+    });
+  }
+
+  // Add Employee Modal Functionality
+  const addEmployeeBtn = document.getElementById('addEmployeeBtn');
+  const addEmployeeModal = document.getElementById('addEmployeeModal');
+  const cancelAddEmployeeBtn = document.getElementById('cancelAddEmployeeBtn');
+
+  if (addEmployeeBtn && addEmployeeModal) {
+    addEmployeeBtn.addEventListener('click', function() {
+      addEmployeeModal.style.display = 'flex';
+    });
+
+    // Close modal on cancel button
+    if (cancelAddEmployeeBtn) {
+      cancelAddEmployeeBtn.addEventListener('click', function() {
+        addEmployeeModal.style.display = 'none';
+      });
     }
-  });
+
+    // Close modal on backdrop click
+    addEmployeeModal.addEventListener('click', function(e) {
+      if (e.target === addEmployeeModal) {
+        addEmployeeModal.style.display = 'none';
+      }
+    });
+
+    // Close modal on escape key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && addEmployeeModal.style.display === 'flex') {
+        addEmployeeModal.style.display = 'none';
+      }
+    });
+  }
 });
