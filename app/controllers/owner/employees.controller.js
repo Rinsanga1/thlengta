@@ -100,7 +100,7 @@ exports.create = async (req, res) => {
     ]);
 
     return res.redirect(
-      `/owner/workplaces/${workplaceId}/employees?msg=` +
+      `/owner/workplaces/${workplaceId}?tab=employees&msg=` +
         encodeURIComponent("Employee added. They can check in using their account.")
     );
   } catch (err) {

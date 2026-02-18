@@ -1,0 +1,311 @@
+/* === User Dropdown Styles === */
+/* IMPORTANT: These styles are imported at the end of application.css */
+/* Do not modify this file unless you intend to change the user dropdown styling */
+
+.user-avatar-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px 4px 4px;
+  background: var(--surface);
+  border: 2px solid #1b1b1b;
+  border-radius: 24px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 2px 2px 0 #1b1b1b;
+}
+
+.user-avatar-btn:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 #1b1b1b;
+}
+
+.user-avatar-btn:focus {
+  outline: none;
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 #1b1b1b;
+}
+
+.user-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary-color) 0%, #7c3aed 100%);
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.user-avatar-chevron {
+  color: var(--text-secondary);
+  transition: transform 0.2s ease;
+}
+
+.user-avatar-chevron.rotated {
+  transform: rotate(180deg);
+}
+
+.user-dropdown {
+  position: relative;
+}
+
+.user-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 240px;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-8px);
+  transition: all 0.2s ease;
+  pointer-events: none;
+}
+
+.user-dropdown-menu.open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.user-dropdown-modal {
+  background: var(--surface);
+  border-radius: 12px;
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.2);
+  border: 2px solid #1b1b1b;
+  overflow: hidden;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji","Segoe UI Emoji";
+}
+
+.user-dropdown-header {
+  padding: 16px;
+  background: var(--surface);
+  color: var(--text-primary);
+  border-bottom: 1px dashed rgba(0, 0, 0, 0.2);
+}
+
+.user-dropdown-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.user-dropdown-email-text {
+  font-size: 14px;
+  font-weight: 700;
+  word-break: break-all;
+  color: #1b1b1b;
+  line-height: 1.4;
+}
+
+.plan-badge {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 9px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border: 1px solid;
+}
+
+.plan-free {
+  background: #f3f4f6;
+  color: #6b7280;
+  border-color: #d1d5db;
+}
+
+.plan-plus {
+  background: #dbeafe;
+  color: #1e40af;
+  border-color: #3b82f6;
+}
+
+.plan-pro {
+  background: #fef3c7;
+  color: #92400e;
+  border-color: #f59e0b;
+}
+
+.plan-enterprise {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-color: #5b21b6;
+}
+
+.user-dropdown-divider {
+  height: 0;
+  border-top: 1px dashed rgba(0, 0, 0, 0.2);
+  margin: 0;
+}
+
+.user-dropdown-nav {
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.user-dropdown-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  color: #1b1b1b;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 700;
+  background: #eaf6f0;
+  border: 2px solid #1b1b1b;
+  border-radius: 8px;
+  box-shadow: 2px 2px 0 #1b1b1b;
+  transition: all 0.15s ease;
+}
+
+.user-dropdown-link:hover {
+  background: #d4edda;
+  color: #1b1b1b;
+  text-decoration: none;
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 #1b1b1b;
+}
+
+.user-dropdown-link svg {
+  color: #1b1b1b;
+  flex-shrink: 0;
+}
+
+.user-dropdown-link:hover svg {
+  color: #1b1b1b;
+}
+
+.user-dropdown-signout {
+  background: #d32f2f;
+  color: #1b1b1b;
+  margin: 8px 12px;
+  border-radius: 8px;
+  font-weight: 800;
+  border: 2px solid #1b1b1b;
+  box-shadow: 2px 2px 0 #1b1b1b;
+}
+
+.user-dropdown-signout:hover {
+  background: #b71c1c;
+  color: #1b1b1b;
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 #1b1b1b;
+}
+
+.user-dropdown-signout svg {
+  color: #1b1b1b;
+}
+
+.user-dropdown-signout:hover svg {
+  color: #1b1b1b;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .user-dropdown-menu {
+    position: fixed;
+    top: 60px;
+    right: 16px;
+    left: auto;
+    min-width: 240px;
+  }
+}
+
+@media (max-width: 480px) {
+  .user-dropdown-menu {
+    right: 8px;
+    left: 8px;
+    min-width: auto;
+  }
+}
+
+/* === User Dropdown Override Styles === */
+/* Override site.css defaults for the new user dropdown */
+
+.user-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.user-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 240px;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-8px);
+  transition: all 0.2s ease;
+  pointer-events: none;
+  display: block !important;
+}
+
+.user-dropdown-menu.open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* === Sign Out Modal Styles === */
+
+.modal-overlay {
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji","Segoe UI Emoji";
+}
+
+.modal-card {
+  animation: modalSlideIn 0.2s ease;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-header h3 {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.modal-body .btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.modal-body .btn:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 #1b1b1b;
+}
+
+.modal-body .btn.primary {
+  background: #d32f2f;
+  color: #1b1b1b;
+}
+
+.modal-body .btn.primary:hover {
+  background: #b71c1c;
+}
