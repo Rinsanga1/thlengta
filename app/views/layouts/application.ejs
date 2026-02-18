@@ -44,7 +44,10 @@
           <div class="user-dropdown-menu" id="userDropdownMenu">
             <div class="user-dropdown-modal">
               <div class="user-dropdown-header">
-                <div class="user-dropdown-email"><%= currentUser?.email || '' %></div>
+                <div class="user-dropdown-info">
+                  <span class="user-dropdown-email-text"><%= currentUser?.email || '' %></span>
+                  <span class="plan-badge plan-<%= (currentUser?.plan || 'free').toLowerCase() %>"><%= (currentUser?.plan || 'FREE').toUpperCase() %></span>
+                </div>
               </div>
               <div class="user-dropdown-divider"></div>
               <nav class="user-dropdown-nav">
