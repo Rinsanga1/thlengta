@@ -9,7 +9,15 @@ const MANAGER_VISIBLE_EVENTS = [
   "break_start",
   "break_end",
   "denied_device",
-  "denied_gps"
+  "denied_gps",
+  "failed_not_logged_in",
+  "failed_workplace_not_found",
+  "failed_not_employee",
+  "failed_gps_required",
+  "failed_already_checked_out",
+  "failed_duplicate_scan",
+  "failed_invalid_pin",
+  "failed_employee_not_found"
 ];
 
 async function cleanupOldLogs(workplaceId) {

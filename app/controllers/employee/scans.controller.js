@@ -68,6 +68,16 @@ exports.create = async (req, res) => {
       if (employee) {
         const ok = await bcrypt.compare(pin, employee.pin_hash);
         if (!ok) {
+          // Log: Invalid PIN attempt
+          await dbRun(
+            `
+            INSERT INTO attendance_logs
+              (workplace_id, employee_id, event_type, device_verified, location_verified, lat, lng, user_agent, ip)
+            VALUES
+              (?, ?, 'failed_invalid_pin', 0, 0, ?, ?, ?, ?)
+            `,
+            [workplace.id, employee.id, lat, lng, req.get("user-agent") || "", req.ip]
+          );
           return res.renderPage("employee/scan/index", {
             title: "Scan",
             workplace,
@@ -102,6 +112,16 @@ exports.create = async (req, res) => {
       );
 
       if (!row) {
+        // Log: Employee not found
+        await dbRun(
+          `
+          INSERT INTO attendance_logs
+            (workplace_id, employee_id, event_type, device_verified, location_verified, lat, lng, user_agent, ip)
+          VALUES
+            (?, NULL, 'failed_employee_not_found', 0, 0, ?, ?, ?, ?)
+          `,
+          [workplace.id, lat, lng, req.get("user-agent") || "", req.ip]
+        );
         return res.renderPage("employee/scan/index", {
           title: "Scan",
           workplace,
@@ -112,6 +132,16 @@ exports.create = async (req, res) => {
 
       const ok = await bcrypt.compare(pin, row.pin_hash);
       if (!ok) {
+        // Log: Invalid PIN for employee
+        await dbRun(
+          `
+          INSERT INTO attendance_logs
+            (workplace_id, employee_id, event_type, device_verified, location_verified, lat, lng, user_agent, ip)
+          VALUES
+            (?, ?, 'failed_invalid_pin', 0, 0, ?, ?, ?, ?)
+          `,
+          [workplace.id, row.id, lat, lng, req.get("user-agent") || "", req.ip]
+        );
         return res.renderPage("employee/scan/index", {
           title: "Scan",
           workplace,
@@ -211,9 +241,9 @@ exports.create = async (req, res) => {
       await dbRun(
         `
         INSERT INTO attendance_logs
-          (workplace_id, employee_id, event_type, device_ok, gps_ok, lat, lng, user_agent, ip, time_status, minutes_late)
+          (workplace_id, employee_id, event_type, device_verified, location_verified, lat, lng, user_agent, ip)
         VALUES
-          (?, ?, 'denied_gps', 1, 0, ?, ?, ?, ?, NULL, NULL)
+          (?, ?, 'denied_gps', 1, 0, ?, ?, ?, ?)
         `,
         [workplace.id, employee.id, lat, lng, req.get("user-agent") || "", req.ip]
       );
@@ -232,6 +262,16 @@ exports.create = async (req, res) => {
     const { step, mode: workMode, lastRow } = decision;
 
     if (isTooSoon(lastRow, 6) && step !== "need_choice") {
+      // Log: Duplicate scan attempt
+      await dbRun(
+        `
+        INSERT INTO attendance_logs
+          (workplace_id, employee_id, event_type, device_verified, location_verified, lat, lng, user_agent, ip)
+        VALUES
+          (?, ?, 'failed_duplicate_scan', 1, 1, ?, ?, ?, ?)
+        `,
+        [workplace.id, employee.id, lat, lng, req.get("user-agent") || "", req.ip]
+      );
       return res.renderPage("employee/check_results/show", { // Renamed view
         title: "Already recorded",
         ok: true,
@@ -242,6 +282,16 @@ exports.create = async (req, res) => {
     }
 
     if (step === "already_checked_out") {
+      // Log: Already checked out for today
+      await dbRun(
+        `
+        INSERT INTO attendance_logs
+          (workplace_id, employee_id, event_type, device_verified, location_verified, lat, lng, user_agent, ip)
+        VALUES
+          (?, ?, 'failed_already_checked_out', 1, 1, ?, ?, ?, ?)
+        `,
+        [workplace.id, employee.id, lat, lng, req.get("user-agent") || "", req.ip]
+      );
       return res.renderPage("employee/check_results/show", { // Renamed view
         title: "Already checked out",
         ok: true,
@@ -293,9 +343,9 @@ exports.create = async (req, res) => {
     await dbRun(
       `
       INSERT INTO attendance_logs
-        (workplace_id, employee_id, event_type, device_ok, gps_ok, lat, lng, user_agent, ip, time_status, minutes_late)
+        (workplace_id, employee_id, event_type, device_verified, location_verified, lat, lng, user_agent, ip)
       VALUES
-        (?, ?, 'checkin', 1, 1, ?, ?, ?, ?, ?, ?)
+        (?, ?, 'checkin', 1, 1, ?, ?, ?, ?)
       `,
       [
         workplace.id,
@@ -303,9 +353,7 @@ exports.create = async (req, res) => {
         lat,
         lng,
         req.get("user-agent") || "",
-        req.ip,
-        ts.time_status,
-        ts.minutes_late
+        req.ip
       ]
     );
 

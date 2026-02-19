@@ -114,6 +114,13 @@ router.get("/owner/workplaces/:workplaceId/logs_year.csv", requireOwner, ownerLo
 router.get("/owner/upgrade", requireOwner, ownerUpgrades.new);
 router.post("/owner/upgrade", requireOwner, ownerUpgrades.create);
 
+// Owner Profile & Settings
+const ownerProfile = require("../app/controllers/owner/profile.controller");
+router.get("/owner/profile", requireOwner, ownerProfile.show);
+router.post("/owner/profile", requireOwner, ownerProfile.update);
+router.get("/owner/settings", requireOwner, ownerProfile.settings);
+router.post("/owner/settings/password", requireOwner, ownerProfile.changePassword);
+
 // Employee Scans
 router.get("/e/scan/:workplacePublicId", employeeScans.index);
 

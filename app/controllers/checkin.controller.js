@@ -121,6 +121,25 @@ exports.create = async (req, res) => {
     }
 
     if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+      // Log: GPS required failure (need to find employee first)
+      const workplace = dbGet(`SELECT id FROM workplaces WHERE public_id = ?`, [workplacePublicId]);
+      if (workplace) {
+        const user = dbGet("SELECT email FROM users WHERE id = ?", [userId]);
+        if (user) {
+          const employee = dbGet(`
+            SELECT id FROM employees 
+            WHERE workplace_id = ? AND LOWER(email) = LOWER(?) AND is_active = 1
+          `, [workplace.id, user.email]);
+          if (employee) {
+            await dbRun(`
+              INSERT INTO attendance_logs
+                (workplace_id, employee_id, event_type, device_verified, location_verified, lat, lng, user_agent, ip)
+              VALUES
+                (?, ?, 'failed_gps_required', 0, 0, NULL, NULL, ?, ?)
+            `, [workplace.id, employee.id, req.get("user-agent") || "", req.ip]);
+          }
+        }
+      }
       return res.status(400).json({ ok: false, error: "GPS location required" });
     }
 
@@ -130,11 +149,36 @@ exports.create = async (req, res) => {
     `, [workplacePublicId]);
 
     if (!workplace) {
+      // Log: Workplace not found (need to find employee first through user's email)
+      const user = dbGet("SELECT email FROM users WHERE id = ?", [userId]);
+      if (user) {
+        // Try to find the employee by matching email
+        const employee = dbGet(`
+          SELECT e.id, e.workplace_id 
+          FROM employees e 
+          WHERE LOWER(e.email) = LOWER(?) AND e.is_active = 1
+        `, [user.email]);
+        if (employee) {
+          await dbRun(`
+            INSERT INTO attendance_logs
+              (workplace_id, employee_id, event_type, device_verified, location_verified, lat, lng, user_agent, ip)
+            VALUES
+              (?, ?, 'failed_workplace_not_found', 0, 0, ?, ?, ?, ?)
+          `, [employee.workplace_id, employee.id, lat, lng, req.get("user-agent") || "", req.ip]);
+        }
+      }
       return res.status(404).json({ ok: false, error: "Workplace not found" });
     }
 
     const user = dbGet("SELECT email FROM users WHERE id = ?", [userId]);
     if (!user) {
+      // Log: User not found - but we have workplace
+      await dbRun(`
+        INSERT INTO attendance_logs
+          (workplace_id, employee_id, event_type, device_verified, location_verified, lat, lng, user_agent, ip)
+        VALUES
+          (?, NULL, 'failed_not_logged_in', 0, 0, ?, ?, ?, ?)
+      `, [workplace.id, lat, lng, req.get("user-agent") || "", req.ip]);
       return res.status(401).json({ ok: false, error: "User not found" });
     }
 
@@ -145,6 +189,13 @@ exports.create = async (req, res) => {
     `, [workplace.id, user.email]);
 
     if (!employee) {
+      // Log: Not an employee at this workplace
+      await dbRun(`
+        INSERT INTO attendance_logs
+          (workplace_id, employee_id, event_type, device_verified, location_verified, lat, lng, user_agent, ip)
+        VALUES
+          (?, NULL, 'failed_not_employee', 0, 0, ?, ?, ?, ?)
+      `, [workplace.id, lat, lng, req.get("user-agent") || "", req.ip]);
       return res.status(403).json({ ok: false, error: "You are not an employee at this workplace" });
     }
 
@@ -192,10 +243,24 @@ exports.create = async (req, res) => {
     const { step, mode: workMode, lastRow } = decision;
 
     if (isTooSoon(lastRow, 6) && step !== "need_choice") {
+      // Log: Duplicate scan attempt
+      await dbRun(`
+        INSERT INTO attendance_logs
+          (workplace_id, employee_id, event_type, device_verified, location_verified, lat, lng, user_agent, ip)
+        VALUES
+          (?, ?, 'failed_duplicate_scan', 1, 1, ?, ?, ?, ?)
+      `, [workplace.id, employee.id, lat, lng, req.get("user-agent") || "", req.ip]);
       return res.json({ ok: true, message: "Already recorded. Please wait a moment before scanning again." });
     }
 
     if (step === "already_checked_out") {
+      // Log: Already checked out for today
+      await dbRun(`
+        INSERT INTO attendance_logs
+          (workplace_id, employee_id, event_type, device_verified, location_verified, lat, lng, user_agent, ip)
+        VALUES
+          (?, ?, 'failed_already_checked_out', 1, 1, ?, ?, ?, ?)
+      `, [workplace.id, employee.id, lat, lng, req.get("user-agent") || "", req.ip]);
       return res.json({ ok: true, message: "You have already checked out for today." });
     }
 

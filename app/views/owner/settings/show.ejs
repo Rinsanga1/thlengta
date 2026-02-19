@@ -1,0 +1,88 @@
+<section class="section" style="padding-top:46px;">
+  <div style="max-width:720px;margin:0 auto 20px;">
+    <a class="btn" href="/owner/dashboard" style="width:auto;">← Back to Dashboard</a>
+  </div>
+  
+  <div class="card pad super" style="margin:0 auto; max-width:720px;">
+    <div class="topbar" style="margin-bottom:14px;">
+      <div>
+        <div class="h-eyebrow">
+          <span class="chip">Account</span>
+          <span class="chip">Settings</span>
+        </div>
+        <h2 style="margin:10px 0 0;">Settings</h2>
+        <div class="small" style="margin-top:6px;">
+          Manage your account settings and security
+        </div>
+      </div>
+    </div>
+
+    <% if (msg) { %>
+      <div class="notice" style="background:#eaf6f0; margin-bottom:16px;">
+        <div style="font-weight:700;">Success</div>
+        <div class="small"><%= msg %></div>
+      </div>
+    <% } %>
+
+    <% if (error) { %>
+      <div class="notice" style="background:#fff1f1; margin-bottom:16px;">
+        <div style="font-weight:700;">Error</div>
+        <div class="small"><%= error %></div>
+      </div>
+    <% } %>
+
+    <!-- Change Password -->
+    <div class="card pad" style="background:#f8faf9; margin-bottom:20px;">
+      <h3 style="margin:0 0 20px; color:var(--primary);">Change Password</h3>
+      
+      <form method="post" action="/owner/settings/password">
+        <div class="field" style="margin-bottom:16px;">
+          <label style="font-weight:600; display:block; margin-bottom:6px;">Current Password *</label>
+          <input type="password" name="current_password" required style="width:100%; padding:10px; border:2px solid var(--border); border-radius:8px;" />
+        </div>
+
+        <div class="field" style="margin-bottom:16px;">
+          <label style="font-weight:600; display:block; margin-bottom:6px;">New Password *</label>
+          <input type="password" name="new_password" required minlength="6" style="width:100%; padding:10px; border:2px solid var(--border); border-radius:8px;" />
+          <div class="small" style="margin-top:4px; color:#666;">Must be at least 6 characters</div>
+        </div>
+
+        <div class="field" style="margin-bottom:16px;">
+          <label style="font-weight:600; display:block; margin-bottom:6px;">Confirm New Password *</label>
+          <input type="password" name="confirm_password" required style="width:100%; padding:10px; border:2px solid var(--border); border-radius:8px;" />
+        </div>
+
+        <button type="submit" class="btn primary" style="width:auto;">Change Password</button>
+      </form>
+    </div>
+
+    <!-- Account Info -->
+    <div class="card pad" style="background:#f8faf9; margin-bottom:20px;">
+      <h3 style="margin:0 0 20px; color:var(--primary);">Account Information</h3>
+      
+      <div style="margin-bottom:16px;">
+        <div class="small" style="color:#666; margin-bottom:4px;">Email</div>
+        <div style="font-weight:600;"><%= user.email %></div>
+      </div>
+      
+      <div style="margin-bottom:16px;">
+        <div class="small" style="color:#666; margin-bottom:4px;">Current Plan</div>
+        <div style="font-weight:600;">
+          <%= user.plan.charAt(0).toUpperCase() + user.plan.slice(1) %>
+          <a href="/pricing" class="btn" style="margin-left:10px; padding:4px 12px; font-size:12px;">View Plans</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Links -->
+    <div class="card pad" style="background:#f8faf9;">
+      <h3 style="margin:0 0 20px; color:var(--primary);">Quick Links</h3>
+      
+      <div style="display:flex; flex-wrap:wrap; gap:10px;">
+        <a href="/owner/profile" class="btn" style="width:auto;">Edit Profile</a>
+        <a href="/owner/dashboard" class="btn" style="width:auto;">Dashboard</a>
+        <a href="/owner/upgrade" class="btn primary" style="width:auto;">Upgrade Plan</a>
+      </div>
+    </div>
+  </div>
+</section>

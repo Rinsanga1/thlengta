@@ -92,6 +92,38 @@
                   label = "Denied (Device)";
                   bg = "#fff1f1";
                   dot = "#d64545";
+                } else if (r.event_type === "failed_not_logged_in") {
+                  label = "Failed (Not Logged In)";
+                  bg = "#fff1f1";
+                  dot = "#d64545";
+                } else if (r.event_type === "failed_workplace_not_found") {
+                  label = "Failed (Invalid Workplace)";
+                  bg = "#fff1f1";
+                  dot = "#d64545";
+                } else if (r.event_type === "failed_not_employee") {
+                  label = "Failed (Not Employee)";
+                  bg = "#fff1f1";
+                  dot = "#d64545";
+                } else if (r.event_type === "failed_gps_required") {
+                  label = "Failed (GPS Required)";
+                  bg = "#fff1f1";
+                  dot = "#d64545";
+                } else if (r.event_type === "failed_already_checked_out") {
+                  label = "Failed (Already Out)";
+                  bg = "#fff8e6";
+                  dot = "#ffb000";
+                } else if (r.event_type === "failed_duplicate_scan") {
+                  label = "Failed (Duplicate)";
+                  bg = "#fff8e6";
+                  dot = "#ffb000";
+                } else if (r.event_type === "failed_invalid_pin") {
+                  label = "Failed (Invalid PIN)";
+                  bg = "#fff1f1";
+                  dot = "#d64545";
+                } else if (r.event_type === "failed_employee_not_found") {
+                  label = "Failed (Not Found)";
+                  bg = "#fff1f1";
+                  dot = "#d64545";
                 }
               %>
 

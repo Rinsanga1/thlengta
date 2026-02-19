@@ -1,0 +1,87 @@
+<section class="section" style="padding-top:46px;">
+  <div style="max-width:720px;margin:0 auto 20px;">
+    <a class="btn" href="/owner/dashboard" style="width:auto;">← Back to Dashboard</a>
+  </div>
+  
+  <div class="card pad super" style="margin:0 auto; max-width:720px;">
+    <div class="topbar" style="margin-bottom:14px;">
+      <div>
+        <div class="h-eyebrow">
+          <span class="chip">Account</span>
+          <span class="chip">Profile</span>
+        </div>
+        <h2 style="margin:10px 0 0;">Profile</h2>
+        <div class="small" style="margin-top:6px;">
+          Manage your account information
+        </div>
+      </div>
+    </div>
+
+    <% if (msg) { %>
+      <div class="notice" style="background:#eaf6f0; margin-bottom:16px;">
+        <div style="font-weight:700;">Success</div>
+        <div class="small"><%= msg %></div>
+      </div>
+    <% } %>
+
+    <% if (error) { %>
+      <div class="notice" style="background:#fff1f1; margin-bottom:16px;">
+        <div style="font-weight:700;">Error</div>
+        <div class="small"><%= error %></div>
+      </div>
+    <% } %>
+
+    <!-- Profile Info Form -->
+    <div class="card pad" style="background:#f8faf9; margin-bottom:20px;">
+      <h3 style="margin:0 0 20px; color:var(--primary);">Personal Information</h3>
+      
+      <form method="post" action="/owner/profile">
+        <div class="field" style="margin-bottom:16px;">
+          <label style="font-weight:600; display:block; margin-bottom:6px;">Email Address</label>
+          <input type="email" value="<%= user.email %>" disabled style="width:100%; padding:10px; border:2px solid #ddd; border-radius:8px; background:#f5f5f5;" />
+          <div class="small" style="margin-top:4px; color:#666;">Email cannot be changed</div>
+        </div>
+
+        <div class="field" style="margin-bottom:16px;">
+          <label style="font-weight:600; display:block; margin-bottom:6px;">Full Name *</label>
+          <input type="text" name="name" value="<%= user.name || '' %>" required style="width:100%; padding:10px; border:2px solid var(--border); border-radius:8px;" />
+        </div>
+
+        <div class="field" style="margin-bottom:16px;">
+          <label style="font-weight:600; display:block; margin-bottom:6px;">Phone Number</label>
+          <input type="tel" name="phone" value="<%= user.phone || '' %>" placeholder="+1234567890" style="width:100%; padding:10px; border:2px solid var(--border); border-radius:8px;" />
+        </div>
+
+        <button type="submit" class="btn primary" style="width:auto;">Update Profile</button>
+      </form>
+    </div>
+
+    <!-- Account Stats -->
+    <div class="card pad" style="background:#f8faf9; margin-bottom:20px;">
+      <h3 style="margin:0 0 20px; color:var(--primary);">Account Overview</h3>
+      
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap:16px;">
+        <div style="text-align:center; padding:16px; background:#fff; border-radius:8px; border:2px solid var(--border);">
+          <div style="font-size:32px; font-weight:700; color:var(--primary);"><%= stats.workplaces %></div>
+          <div class="small" style="color:#666;">Workplaces</div>
+        </div>
+        
+        <div style="text-align:center; padding:16px; background:#fff; border-radius:8px; border:2px solid var(--border);">
+          <div style="font-size:32px; font-weight:700; color:var(--primary);"><%= stats.employees %></div>
+          <div class="small" style="color:#666;">Employees</div>
+        </div>
+        
+        <div style="text-align:center; padding:16px; background:#fff; border-radius:8px; border:2px solid var(--border);">
+          <div style="font-size:32px; font-weight:700; color:var(--accent);"><%= user.plan.charAt(0).toUpperCase() + user.plan.slice(1) %></div>
+          <div class="small" style="color:#666;">Plan</div>
+        </div>
+      </div>
+      
+      <div style="margin-top:16px; padding-top:16px; border-top:1px solid var(--border);">
+        <div class="small" style="color:#666;">
+          Member since: <%= new Date(user.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) %>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

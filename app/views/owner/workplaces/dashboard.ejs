@@ -333,6 +333,26 @@
                           <span class="chip" style="background:#fff3e0;">Break</span>
                         <% } else if (l.event_type === 'break_end') { %>
                           <span class="chip" style="background:#f3e5f5;">Resume</span>
+                        <% } else if (l.event_type === 'denied_gps') { %>
+                          <span class="chip" style="background:#ffebee; color:#c62828;">Denied (GPS)</span>
+                        <% } else if (l.event_type === 'denied_device') { %>
+                          <span class="chip" style="background:#ffebee; color:#c62828;">Denied (Device)</span>
+                        <% } else if (l.event_type === 'failed_not_logged_in') { %>
+                          <span class="chip" style="background:#ffebee; color:#c62828;">Failed (Auth)</span>
+                        <% } else if (l.event_type === 'failed_workplace_not_found') { %>
+                          <span class="chip" style="background:#ffebee; color:#c62828;">Failed (Workplace)</span>
+                        <% } else if (l.event_type === 'failed_not_employee') { %>
+                          <span class="chip" style="background:#ffebee; color:#c62828;">Failed (Access)</span>
+                        <% } else if (l.event_type === 'failed_gps_required') { %>
+                          <span class="chip" style="background:#ffebee; color:#c62828;">Failed (GPS)</span>
+                        <% } else if (l.event_type === 'failed_already_checked_out') { %>
+                          <span class="chip" style="background:#fff8e1; color:#f57c00;">Failed (Checked Out)</span>
+                        <% } else if (l.event_type === 'failed_duplicate_scan') { %>
+                          <span class="chip" style="background:#fff8e1; color:#f57c00;">Failed (Duplicate)</span>
+                        <% } else if (l.event_type === 'failed_invalid_pin') { %>
+                          <span class="chip" style="background:#ffebee; color:#c62828;">Failed (Invalid PIN)</span>
+                        <% } else if (l.event_type === 'failed_employee_not_found') { %>
+                          <span class="chip" style="background:#ffebee; color:#c62828;">Failed (Not Found)</span>
                         <% } else { %>
                           <span class="chip"><%= l.event_type %></span>
                         <% } %>
