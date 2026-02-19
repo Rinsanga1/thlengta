@@ -3974,8 +3974,10 @@ textarea{ min-height: 120px; resize: vertical; }
 
 
 
+/* === user-dropdown.css === */
 /* === User Dropdown Styles === */
-/* Modern dropdown matching workplace dashboard modals */
+/* IMPORTANT: These styles are imported at the end of application.css */
+/* Do not modify this file unless you intend to change the user dropdown styling */
 
 .user-avatar-btn {
   display: flex;
@@ -4284,3 +4286,4 @@ textarea{ min-height: 120px; resize: vertical; }
 .modal-body .btn.primary:hover {
   background: #b71c1c;
 }
+

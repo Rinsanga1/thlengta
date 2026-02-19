@@ -90,9 +90,9 @@ router.get("/owner/test_qr_download/framed/:workplaceId.png", requireOwner, owne
 router.get("/owner/test_qr_download/debug_frame", requireOwner, ownerWorkplaces.debugFrame);
 
 // Admin Employees
-router.get("/owner/workplaces/:workplaceId/employees", requireOwner, ownerEmployees.index);
 router.get("/owner/workplaces/:workplaceId/employees/new", requireOwner, ownerEmployees.new);
 router.post("/owner/workplaces/:workplaceId/employees", requireOwner, ownerEmployees.create);
+router.post("/owner/workplaces/:workplaceId/employees/:employeeId/update", requireOwner, ownerEmployees.update);
 router.post("/owner/workplaces/:workplaceId/employees/:employeeId/toggle", requireOwner, ownerEmployees.updateStatus);
 router.post("/owner/workplaces/:workplaceId/employees/:employeeId/device/reset", requireOwner, ownerEmployees.resetDevice);
 router.post("/owner/workplaces/:workplaceId/employees/:employeeId/delete", requireOwner, ownerEmployees.destroy);

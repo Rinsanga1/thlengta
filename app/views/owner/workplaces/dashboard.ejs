@@ -135,7 +135,10 @@
                     <% } %>
                   </td>
                   <td style="padding:10px; text-align:right;">
-                    <button type="button" class="btn emp-edit-btn" style="padding:4px 8px; font-size:12px;" data-email="<%= e.email %>" data-active="<%= e.is_active %>" data-device="<%= e.has_device %>">Edit</button>
+                    <div style="display:flex; gap:8px; justify-content:flex-end; align-items:center;">
+                      <button type="button" class="btn emp-edit-btn" style="padding:4px 12px; font-size:12px;" data-id="<%= e.id %>" data-email="<%= e.email %>" data-active="<%= e.is_active %>" data-device="<%= e.has_device %>">Edit</button>
+                      <button type="button" class="btn emp-delete-btn" style="padding:4px 12px; font-size:12px; background:#fff1f1; color:#d32f2f;" data-id="<%= e.id %>" data-email="<%= e.email %>">Delete</button>
+                    </div>
                   </td>
                 </tr>
                 <% }) %>
@@ -732,28 +735,60 @@ button:hover {
 }
 </style>
 
-<!-- Employee Details Modal -->
+<!-- Edit Employee Modal -->
 <div id="employeeModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center;">
-  <div class="card pad" style="background:#fff; max-width:400px; width:90%; margin:20px;">
-    <h3 style="margin:0 0 20px;">Employee Details</h3>
-    
-    <div class="field">
-      <label>Email</label>
-      <div id="empModalEmail" style="padding:10px; background:#f5f5f5; border-radius:8px;"></div>
+  <div class="modal-card" style="background:#fff; max-width:450px; width:90%; margin:20px; border:2px solid #1b1b1b; border-radius:12px; box-shadow:4px 4px 0 rgba(0,0,0,0.2); overflow:hidden;">
+    <div class="modal-header" style="padding:20px; border-bottom:1px dashed rgba(0,0,0,0.2);">
+      <div style="font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#6b7280; margin-bottom:8px;">Employee</div>
+      <h3 style="margin:0; color:#1b1b1b;">Edit Employee</h3>
+      <div class="small" style="margin-top:6px; color:#6b7280;">Update employee details and settings</div>
     </div>
-    
-    <div class="field" style="margin-top:16px;">
-      <label>Status</label>
-      <div id="empModalStatus" style="padding:10px; background:#f5f5f5; border-radius:8px;"></div>
+    <div class="modal-body" style="padding:20px;">
+      <form id="editEmployeeForm" method="post" action="">
+        <div class="field" style="margin-bottom:16px;">
+          <label style="font-weight:600; color:#1b1b1b; margin-bottom:6px; display:block;">Email Address</label>
+          <input type="email" name="email" id="empEditEmail" required style="width:100%; padding:10px; border:2px solid #1b1b1b; border-radius:8px; font-size:14px;" />
+        </div>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-bottom:16px;">
+          <div class="field">
+            <label style="font-weight:600; color:#1b1b1b; margin-bottom:6px; display:block;">Status</label>
+            <div id="empEditStatusDisplay" style="padding:10px; background:#f5f5f5; border:2px solid #1b1b1b; border-radius:8px; font-size:14px;"></div>
+          </div>
+          <div class="field">
+            <label style="font-weight:600; color:#1b1b1b; margin-bottom:6px; display:block;">Device</label>
+            <div id="empEditDeviceDisplay" style="padding:10px; background:#f5f5f5; border:2px solid #1b1b1b; border-radius:8px; font-size:14px;"></div>
+          </div>
+        </div>
+
+        <div id="empEditActions" style="display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap;">
+          <!-- Action buttons will be inserted here dynamically -->
+        </div>
+
+        <div style="display:flex; gap:10px;">
+          <button type="button" class="btn" id="closeEmpModalBtn" style="flex:1; background:#f3f4f6; color:#1b1b1b; border:2px solid #1b1b1b; box-shadow:2px 2px 0 #1b1b1b; font-weight:700;">Cancel</button>
+          <button type="submit" class="btn primary" style="flex:1; background:#10b981; color:#1b1b1b; border:2px solid #1b1b1b; box-shadow:2px 2px 0 #1b1b1b; font-weight:700;">Save Changes</button>
+        </div>
+      </form>
     </div>
-    
-    <div class="field" style="margin-top:16px;">
-      <label>Device</label>
-      <div id="empModalDevice" style="padding:10px; background:#f5f5f5; border-radius:8px;"></div>
+  </div>
+</div>
+
+<!-- Delete Employee Confirmation Modal -->
+<div id="deleteEmployeeModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center;">
+  <div class="modal-card" style="background:#fff; max-width:400px; width:90%; margin:20px; border:2px solid #1b1b1b; border-radius:12px; box-shadow:4px 4px 0 rgba(0,0,0,0.2); overflow:hidden;">
+    <div class="modal-header" style="padding:20px; border-bottom:1px dashed rgba(0,0,0,0.2);">
+      <div style="font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#d32f2f; margin-bottom:8px;">Delete Employee</div>
+      <h3 style="margin:0; color:#1b1b1b;">Are you sure?</h3>
+      <div class="small" style="margin-top:6px; color:#6b7280;">This action cannot be undone</div>
     </div>
-    
-    <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:20px;">
-      <button type="button" class="btn" id="closeEmpModalBtn">Close</button>
+    <div class="modal-body" style="padding:20px;">
+      <p class="small" style="margin-bottom:16px; color:#4b5563;">You are about to delete employee: <strong id="deleteEmpEmail" style="color:#1b1b1b;"></strong></p>
+      <p class="small" style="margin-bottom:16px; color:#4b5563;">All their attendance logs will also be deleted.</p>
+      <form id="deleteEmployeeForm" method="post" action="">
+        <button type="submit" class="btn primary full" style="width:100%; background:#d32f2f; color:#1b1b1b; border:2px solid #1b1b1b; box-shadow:2px 2px 0 #1b1b1b; font-weight:700;">Yes, Delete Employee</button>
+      </form>
+      <button type="button" class="btn full" id="cancelDeleteEmpBtn" style="width:100%; margin-top:12px; background:#eaf6f0; border:2px solid #1b1b1b; box-shadow:2px 2px 0 #1b1b1b; font-weight:700;">Cancel</button>
     </div>
   </div>
 </div>
