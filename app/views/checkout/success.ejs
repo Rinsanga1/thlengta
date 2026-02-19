@@ -1,0 +1,36 @@
+<section class="section" style="padding-top:46px;">
+  <div style="max-width:720px;margin:0 auto;">
+    <div class="card pad super" style="text-align:center; padding:60px 40px;">
+      <div style="margin-bottom:24px;">
+        <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+          <polyline points="22 4 12 14.01 9 11.01"></polyline>
+        </svg>
+      </div>
+      
+      <h1 style="margin:0 0 16px; color:#10b981;">Payment Successful!</h1>
+      
+      <p style="font-size:18px; color:#666; margin-bottom:32px;">
+        Thank you for upgrading to the <strong><%= plan.charAt(0).toUpperCase() + plan.slice(1) %> Plan</strong>.
+        <br>Your account has been upgraded successfully.
+      </p>
+      
+      <div style="background:#eaf6f0; padding:24px; border-radius:12px; margin-bottom:32px;">
+        <div class="small" style="color:#666; margin-bottom:8px;">Your Plan</div>
+        <div style="font-size:28px; font-weight:700; color:var(--primary);">
+          <%= plan.charAt(0).toUpperCase() + plan.slice(1) %>
+        </div>
+        <div class="small" style="color:#666; margin-top:8px;">Yearly Subscription</div>
+      </div>
+      
+      <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+        <a href="/owner/dashboard" class="btn primary" style="width:auto; padding:12px 24px;">
+          Go to Dashboard
+        </a>
+        <a href="/owner/settings" class="btn" style="width:auto; padding:12px 24px;">
+          View Settings
+        </a>
+      </div>
+    </div>
+  </div>
+</section>

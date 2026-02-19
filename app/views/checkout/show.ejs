@@ -1,0 +1,162 @@
+<section class="section" style="padding-top:46px;">
+  <div style="max-width:720px;margin:0 auto 20px;">
+    <a class="btn" href="/owner/upgrade" style="width:auto;">← Back to Upgrade</a>
+  </div>
+  
+  <div class="card pad super" style="max-width:720px;margin:0 auto;">
+    <div class="topbar" style="margin-bottom:14px;">
+      <div>
+        <div class="h-eyebrow">
+          <span class="chip">Payment</span>
+          <span class="chip">Checkout</span>
+        </div>
+        <h2 style="margin:10px 0 0;">Complete Your Purchase</h2>
+        <div class="small" style="margin-top:6px;">
+          Upgrade to <%= plan.charAt(0).toUpperCase() + plan.slice(1) %> Plan
+        </div>
+      </div>
+    </div>
+
+    <% if (error) { %>
+      <div class="notice" style="background:#fff1f1; margin-bottom:16px;">
+        <div style="font-weight:700;">Error</div>
+        <div class="small"><%= error %></div>
+      </div>
+    <% } %>
+
+    <% if (message) { %>
+      <div class="notice" style="background:#eaf6f0; margin-bottom:16px;">
+        <div style="font-weight:700;">Success</div>
+        <div class="small"><%= message %></div>
+      </div>
+    <% } %>
+
+    <!-- Order Summary -->
+    <div class="card pad" style="background:#f8faf9; margin-bottom:20px;">
+      <h3 style="margin:0 0 20px; color:var(--primary);">Order Summary</h3>
+      
+      <div style="display:flex; justify-content:space-between; align-items:center; padding:16px 0; border-bottom:1px solid var(--border);">
+        <div>
+          <div style="font-weight:600;"><%= pricing.name %></div>
+          <div class="small" style="color:#666;">₹<%= pricing.monthlyDisplay %>/month × 12 months</div>
+        </div>
+        <div style="font-weight:700; font-size:18px;">₹<%= (pricing.amount / 100).toLocaleString('en-IN') %></div>
+      </div>
+      
+      <div style="display:flex; justify-content:space-between; align-items:center; padding:16px 0;">
+        <div style="font-weight:600;">Total (Yearly)</div>
+        <div style="font-weight:700; font-size:24px; color:var(--primary);">₹<%= (pricing.amount / 100).toLocaleString('en-IN') %></div>
+      </div>
+    </div>
+
+    <!-- User Details -->
+    <div class="card pad" style="background:#f8faf9; margin-bottom:20px;">
+      <h3 style="margin:0 0 20px; color:var(--primary);">Billing Details</h3>
+      
+      <div style="margin-bottom:12px;">
+        <div class="small" style="color:#666;">Name</div>
+        <div style="font-weight:600;"><%= user.name || 'Not provided' %></div>
+      </div>
+      
+      <div>
+        <div class="small" style="color:#666;">Email</div>
+        <div style="font-weight:600;"><%= user.email %></div>
+      </div>
+    </div>
+
+    <!-- Payment Button -->
+    <div class="card pad" style="background:#f8faf9;">
+      <button id="payButton" class="btn primary full" style="width:100%; padding:16px; font-size:16px;">
+        Pay ₹<%= (pricing.amount / 100).toLocaleString('en-IN') %> / year
+      </button>
+      
+      <div class="small" style="text-align:center; margin-top:12px; color:#666;">
+        Secured by Razorpay
+      </div>
+    </div>
+  </div>
+</section>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+document.getElementById('payButton').addEventListener('click', async function() {
+  const button = this;
+  button.disabled = true;
+  button.textContent = 'Processing...';
+  
+  try {
+    // Create order
+    const response = await fetch('/checkout/create-order', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        plan: '<%= plan %>'
+      })
+    });
+    
+    const data = await response.json();
+    
+    if (data.error) {
+      throw new Error(data.error);
+    }
+    
+    // Initialize Razorpay
+    const options = {
+      key: data.key_id,
+      amount: data.amount,
+      currency: data.currency,
+      name: 'Thlengta',
+      description: data.description,
+      order_id: data.order_id,
+      handler: async function(response) {
+        // Verify payment
+        const verifyResponse = await fetch('/checkout/verify', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_order_id: response.razorpay_order_id,
+            razorpay_signature: response.razorpay_signature
+          })
+        });
+        
+        const verifyData = await verifyResponse.json();
+        
+        if (verifyData.success) {
+          window.location.href = '/checkout/success';
+        } else {
+          alert('Payment verification failed: ' + (verifyData.error || 'Unknown error'));
+          button.disabled = false;
+          button.textContent = 'Pay ₹<%= (pricing.amount / 100).toLocaleString("en-IN") %> / year';
+        }
+      },
+      prefill: {
+        name: data.name,
+        email: data.email
+      },
+      theme: {
+        color: '#10b981'
+      },
+      modal: {
+        ondismiss: function() {
+          button.disabled = false;
+          button.textContent = 'Pay ₹<%= (pricing.amount / 100).toLocaleString("en-IN") %> / year';
+        }
+      }
+    };
+    
+    const rzp = new Razorpay(options);
+    rzp.open();
+    
+  } catch (error) {
+    console.error('Payment error:', error);
+    alert('Error: ' + error.message);
+    button.disabled = false;
+    button.textContent = 'Pay ₹<%= (pricing.amount / 100).toLocaleString(\'en-IN\') %> / year';
+  }
+});
+</script>

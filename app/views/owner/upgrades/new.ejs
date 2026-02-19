@@ -1,59 +1,168 @@
 <section class="section" style="padding-top:46px;">
-  <div style="max-width:980px;margin:0 auto 20px;">
+  <div style="max-width:1200px;margin:0 auto 20px;">
     <a class="btn" href="/owner/dashboard" style="width:auto;">← Back to Dashboard</a>
   </div>
-  <div class="card pad super" style="max-width:980px;margin:0 auto;">
+  
+  <div class="card pad super" style="max-width:1200px;margin:0 auto;">
     <div class="topbar" style="margin-bottom:14px;">
       <div>
         <div class="h-eyebrow">
           <span class="chip">Plan</span>
           <span class="chip">Upgrade</span>
         </div>
-        <h2 style="margin:10px 0 0;">Upgrade Plan</h2>
+        <h2 style="margin:10px 0 0;">Upgrade Your Plan</h2>
         <div class="small" style="margin-top:6px;">
-          Request an upgrade.
+          Choose the plan that works best for your business. All plans are billed yearly.
         </div>
       </div>
     </div>
 
-    <% if (error) { %><div class="error"><%= error %></div><% } %>
-    <% if (message) { %><div class="notice" style="background:#eaf6f0;"><%= message %></div><% } %>
+    <% if (error) { %>
+      <div class="error" style="margin-bottom:20px;"><%= error %></div>
+    <% } %>
+    
+    <% if (message) { %>
+      <div class="notice" style="background:#eaf6f0; margin-bottom:20px;"><%= message %></div>
+    <% } %>
 
-    <div class="card pad" style="background:#fff;">
-      <div class="small" style="margin-bottom:10px;">
+    <div class="card pad" style="background:#f8faf9; margin-bottom:30px;">
+      <div class="small">
         Logged in as <b><%= admin?.email %></b> | Current plan: <b><%= (admin?.plan || "free").toUpperCase() %></b>
       </div>
-
-      <% if (pendingUpgrade) { %>
-        <div class="notice" style="background:#fff7df;">
-          <b>Pending request:</b>
-          <div class="small" style="margin-top:6px;">
-            <%= String(pendingUpgrade.from_plan).toUpperCase() %> → <%= String(pendingUpgrade.to_plan).toUpperCase() %>
-          </div>
-        </div>
-      <% } %>
-
-      <% if (!options || options.length === 0) { %>
-        <div class="notice">
-          You are already on the highest plan. No upgrades available.
-        </div>
-      <% } else { %>
-        <form method="post" action="/owner/upgrade">
-          <div class="field">
-            <label>Select plan to upgrade to</label>
-            <select name="to_plan" required>
-              <% options.forEach(function(p){ %>
-                <option value="<%= p %>"><%= p.toUpperCase() %></option>
-              <% }); %>
-            </select>
-          </div>
-
-          <div class="actions" style="margin-top:14px;">
-            <button class="btn primary" type="submit">Request Upgrade</button>
-            <a class="btn" href="/owner/dashboard">Cancel</a>
-          </div>
-        </form>
-      <% } %>
     </div>
+
+    <% if (!options || options.length === 0) { %>
+      <div class="notice" style="text-align:center; padding:40px;">
+        <div style="font-size:48px; margin-bottom:16px;">🎉</div>
+        <h3>You are already on the highest plan!</h3>
+        <p class="small">You have access to all features. No upgrades available.</p>
+        <a href="/owner/dashboard" class="btn primary" style="margin-top:20px;">Go to Dashboard</a>
+      </div>
+    <% } else { %>
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:20px;">
+        
+        <% if (options.includes('plus')) { %>
+          <div class="card pad" style="border:2px solid var(--border); display:flex; flex-direction:column;">
+            <div>
+              <h2 style="margin:0 0 8px;">Plus</h2>
+              <p class="small" style="color:#666; margin:0 0 16px;">For small teams</p>
+              
+              <div style="font-size:36px;font-weight:900;margin:0 0 4px;">₹599<span class="small" style="font-size:16px; font-weight:400;">/mo</span></div>
+              <p class="small" style="color:#666; margin:0 0 20px;">₹7,188 billed yearly</p>
+              
+              <ul style="list-style:none; padding:0; margin:0 0 24px;">
+                <li style="padding:10px 0; border-bottom:1px solid rgba(0,0,0,0.08);">
+                  <span style="color:var(--accent); margin-right:8px; font-weight:700;">✓</span>
+                  1 workplace
+                </li>
+                <li style="padding:10px 0; border-bottom:1px solid rgba(0,0,0,0.08);">
+                  <span style="color:var(--accent); margin-right:8px; font-weight:700;">✓</span>
+                  10 employees
+                </li>
+                <li style="padding:10px 0; border-bottom:1px solid rgba(0,0,0,0.08);">
+                  <span style="color:var(--accent); margin-right:8px; font-weight:700;">✓</span>
+                  QR attendance
+                </li>
+                <li style="padding:10px 0;">
+                  <span style="color:var(--accent); margin-right:8px; font-weight:700;">✓</span>
+                  Download reports
+                </li>
+              </ul>
+            </div>
+            <div style="margin-top:auto;">
+              <a href="/checkout/plus" class="btn primary full" style="width:100%; text-align:center;">Get Plus</a>
+            </div>
+          </div>
+        <% } %>
+
+        <% if (options.includes('pro')) { %>
+          <div class="card pad" style="border:3px solid var(--accent); position:relative; display:flex; flex-direction:column;">
+            <div style="position:absolute; top:-14px; left:50%; transform:translateX(-50%); background:var(--accent); color:white; padding:6px 16px; border-radius:20px; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px;">
+              Popular
+            </div>
+            
+            <div>
+              <h2 style="margin:10px 0 8px;">Pro</h2>
+              <p class="small" style="color:#666; margin:0 0 16px;">For growing businesses</p>
+              
+              <div style="font-size:36px;font-weight:900;margin:0 0 4px;">₹999<span class="small" style="font-size:16px; font-weight:400;">/mo</span></div>
+              <p class="small" style="color:#666; margin:0 0 20px;">₹11,988 billed yearly</p>
+              
+              <ul style="list-style:none; padding:0; margin:0 0 24px;">
+                <li style="padding:10px 0; border-bottom:1px solid rgba(0,0,0,0.08);">
+                  <span style="color:var(--accent); margin-right:8px; font-weight:700;">✓</span>
+                  20 workplaces
+                </li>
+                <li style="padding:10px 0; border-bottom:1px solid rgba(0,0,0,0.08);">
+                  <span style="color:var(--accent); margin-right:8px; font-weight:700;">✓</span>
+                  200 employees
+                </li>
+                <li style="padding:10px 0; border-bottom:1px solid rgba(0,0,0,0.08);">
+                  <span style="color:var(--accent); margin-right:8px; font-weight:700;">✓</span>
+                  QR attendance
+                </li>
+                <li style="padding:10px 0; border-bottom:1px solid rgba(0,0,0,0.08);">
+                  <span style="color:var(--accent); margin-right:8px; font-weight:700;">✓</span>
+                  Priority support
+                </li>
+                <li style="padding:10px 0;">
+                  <span style="color:var(--accent); margin-right:8px; font-weight:700;">✓</span>
+                  Download reports
+                </li>
+              </ul>
+            </div>
+            <div style="margin-top:auto;">
+              <a href="/checkout/pro" class="btn primary full" style="width:100%; text-align:center;">Get Pro</a>
+            </div>
+          </div>
+        <% } %>
+
+        <% if (options.includes('enterprise')) { %>
+          <div class="card pad" style="border:3px solid #8547DA; position:relative; display:flex; flex-direction:column; background:linear-gradient(135deg, #faf7ff 0%, #ffffff 100%);">
+            <div style="position:absolute; top:-14px; left:50%; transform:translateX(-50%); background:#8547DA; color:white; padding:6px 16px; border-radius:20px; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px;">
+              Best Value
+            </div>
+            
+            <div>
+              <h2 style="margin:10px 0 8px;">Enterprise</h2>
+              <p class="small" style="color:#666; margin:0 0 16px;">For large organisations</p>
+              
+              <div style="font-size:36px;font-weight:900;margin:0 0 4px;">₹29,999<span class="small" style="font-size:16px; font-weight:400;">/mo</span></div>
+              <p class="small" style="color:#666; margin:0 0 20px;">₹3,59,988 billed yearly</p>
+              
+              <ul style="list-style:none; padding:0; margin:0 0 24px;">
+                <li style="padding:10px 0; border-bottom:1px solid rgba(0,0,0,0.08);">
+                  <span style="color:#8547DA; margin-right:8px; font-weight:700;">✓</span>
+                  Unlimited workplaces
+                </li>
+                <li style="padding:10px 0; border-bottom:1px solid rgba(0,0,0,0.08);">
+                  <span style="color:#8547DA; margin-right:8px; font-weight:700;">✓</span>
+                  Unlimited employees
+                </li>
+                <li style="padding:10px 0; border-bottom:1px solid rgba(0,0,0,0.08);">
+                  <span style="color:#8547DA; margin-right:8px; font-weight:700;">✓</span>
+                  Dedicated support
+                </li>
+                <li style="padding:10px 0; border-bottom:1px solid rgba(0,0,0,0.08);">
+                  <span style="color:#8547DA; margin-right:8px; font-weight:700;">✓</span>
+                  Custom onboarding
+                </li>
+                <li style="padding:10px 0;">
+                  <span style="color:#8547DA; margin-right:8px; font-weight:700;">✓</span>
+                  Manager access
+                </li>
+              </ul>
+            </div>
+            <div style="margin-top:auto;">
+              <a href="/checkout/enterprise" class="btn primary full" style="width:100%; text-align:center; background:#8547DA; border-color:#8547DA;">Get Enterprise</a>
+            </div>
+          </div>
+        <% } %>
+      </div>
+      
+      <div class="small" style="text-align:center; margin-top:30px; color:#666;">
+        All subscriptions are billed yearly. You can cancel anytime.
+      </div>
+    <% } %>
   </div>
 </section>

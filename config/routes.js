@@ -51,10 +51,6 @@ router.get("/register", auth.new);
 router.post("/register", auth.create);
 router.get("/register/submitted", auth.submitted);
 
-// Checkout route - for Plus, Pro, Enterprise plans
-router.get("/checkout/:plan", auth.checkout);
-router.post("/checkout/:plan", auth.checkoutSubmit);
-
 // User Sessions (Sign In)
 router.get("/users/signin", users.new);
 router.post("/users/signin", users.create);
@@ -120,6 +116,13 @@ router.get("/owner/profile", requireOwner, ownerProfile.show);
 router.post("/owner/profile", requireOwner, ownerProfile.update);
 router.get("/owner/settings", requireOwner, ownerProfile.settings);
 router.post("/owner/settings/password", requireOwner, ownerProfile.changePassword);
+
+// Checkout & Payments (Razorpay)
+const checkoutController = require("../app/controllers/checkout.controller");
+router.get("/checkout/:plan", requireOwner, checkoutController.show);
+router.post("/checkout/create-order", requireOwner, checkoutController.createOrder);
+router.post("/checkout/verify", requireOwner, checkoutController.verify);
+router.get("/checkout/success", requireOwner, checkoutController.success);
 
 // Employee Scans
 router.get("/e/scan/:workplacePublicId", employeeScans.index);

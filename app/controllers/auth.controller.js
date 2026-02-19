@@ -1,7 +1,6 @@
 const bcrypt = require("bcryptjs");
 const { dbGet, dbRun } = require("../../db/helpers");
 const { setRememberMeCookie, deleteSessionsByNeedle } = require("../utils/session.utils");
-const { normalizePlan } = require("../utils/auth.utils");
 
 
 exports.redirect = (req, res) => {
@@ -155,62 +154,4 @@ exports.registerFreeSubmit = async (req, res) => {
 };
 
 
-exports.checkout = (req, res) => {
-  const plan = normalizePlan(req.params.plan);
-  const allowedPlans = ["plus", "pro", "enterprise"];
-  
-  if (!allowedPlans.includes(plan)) {
-    return res.redirect("/register/" + plan);
-  }
 
-  if (!req.session?.userId) {
-    return res.redirect("/users/signin?redirect=/checkout/" + plan);
-  }
-
-  res.renderPage("registration/checkout", {
-    title: "Checkout - " + plan.toUpperCase(),
-    plan,
-    error: null,
-    success: null
-  });
-};
-
-
-exports.checkoutSubmit = async (req, res) => {
-  const plan = normalizePlan(req.params.plan);
-  const allowedPlans = ["plus", "pro", "enterprise"];
-  
-  if (!allowedPlans.includes(plan)) {
-    return res.redirect("/register/" + plan);
-  }
-
-  if (!req.session?.userId) {
-    return res.redirect("/users/signin?redirect=/checkout/" + plan);
-  }
-
-  try {
-    const userId = req.session.userId;
-    const user = await dbGet("SELECT id, email FROM users WHERE id = ?", [userId]);
-
-    if (!user) {
-      return res.redirect("/users/signin?redirect=/checkout/" + plan);
-    }
-
-    // For now, just show success message
-    // In future, this would integrate with payment gateway
-    res.renderPage("registration/checkout", {
-      title: "Checkout - " + plan.toUpperCase(),
-      plan,
-      error: null,
-      success: "Your request has been submitted! We will contact you shortly to complete the payment."
-    });
-  } catch (e) {
-    console.error(e);
-    res.renderPage("registration/checkout", {
-      title: "Checkout - " + plan.toUpperCase(),
-      plan,
-      error: "Something went wrong. Please try again.",
-      success: null
-    });
-  }
-};
